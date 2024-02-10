@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Send Notification</title>
+  </head>
+  <body>
+    <h1>Send Notification</h1>
+    <form action="/api/v1/send-notification" method="post">
+      <label for="userId">User ID:</label>
+      <input id="userId" name="userId" type="text" required />
+      <br />
+      <label for="message">Message:</label>
+      <textarea id="message" name="message" rows="4" required></textarea>
+      <br />
+      <button type="submit">Send Notification</button>
+    </form>
+  </body>
+</html>
