@@ -35,7 +35,7 @@ export const SearchContainer = styled.div`
         height: 30rem;
         background-color: #fff;
         position: absolute;
-        top: 13.5rem;
+        top: 10rem;
         z-index: 2;
         border-radius: 2rem;
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -94,6 +94,7 @@ export const SearchContainer = styled.div`
       background-color: #fff;
       border-top-right-radius: 3rem;
       border-bottom-right-radius: 3rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
 
     .default-search-dest-wrapper {
@@ -265,14 +266,60 @@ export const SearchContainer = styled.div`
 
     .add-guests-wrapper {
       width: 100%;
+      height: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
+
+      &:hover {
+        background-color: #dbdbdb;
+        border-radius: 3rem;
+        height: 100%;
+        cursor: pointer;
+      }
 
       .header-guests {
-        margin-left: .8rem;
-        font-size: .8rem;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #fff;
+        border-radius: 3rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+
+
+        p {
+          margin-left: 1.6rem;
+        }
+
+        p:first-child {
+        font-size: 0.9rem;
       }
+
+        p:last-child {
+          color: #909090;
+          font-size: 1rem;
+
+        }
+      }
+
+      .header-guests-two {
+        p {
+          margin-left: 1.6rem;
+        }
+
+        p:first-child {
+        font-size: 0.9rem;
+      }
+
+        p:last-child {
+          color: #909090;
+          font-size: 1rem;
+
+        }
+        }
 
       .search-guests-wrapper {
         width: 3.6rem;
@@ -284,6 +331,8 @@ export const SearchContainer = styled.div`
         align-items: center;
         margin-right: .8rem;
         transition: all 0.3s;
+        position: absolute;
+        right: 0;
 
         p {
           display: none;
