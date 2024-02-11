@@ -52,10 +52,17 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
       <div className="check-in-out-wrapper">
         <div className="check-in-out-divider"></div>
         {menuClick ? (
-          <div className="check-date">
-            <p className="check-date-text">Date</p>
-            <p>Add dates</p>
-          </div>
+          bgWhiteActive ? (
+            <div className="check-date">
+              <p className="check-date-text">Date</p>
+              <p>Check in</p>
+            </div>
+          ) : (
+            <div className="check-date-two">
+              <p className="check-date-text">Date</p>
+              <p>Add dates</p>
+            </div>
+          )
         ) : (
           <>
             <div
