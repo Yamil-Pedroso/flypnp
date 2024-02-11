@@ -1,11 +1,55 @@
+import { useState, useEffect } from 'react'
+import { CheckInOutContainer } from './styles'
+
 interface CheckInCheckOutProps {
   menuClick: boolean
 }
 
 const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
+  const [bgWhiteActive, setBgWhiteActive] = useState(false)
+  const [bgWhiteActiveTwo, setBgWhiteActiveTwo] = useState(false)
+
+  const handleBgWhiteActive = (type: 'check-in' | 'check-out') => {
+    if (type === 'check-in') {
+      setBgWhiteActive(true)
+      setBgWhiteActiveTwo(false)
+    } else {
+      setBgWhiteActive(false)
+      setBgWhiteActiveTwo(true)
+    }
+
+    handleGrowSearchIcon()
+  }
+
+  const clickOutside = (e: MouseEvent) => {
+    const wrapper = document.querySelector('.check-in, .check-out')
+    const searchIcon = document.querySelector('.search-wrapper')
+    if (wrapper && !wrapper.contains(e.target as Node)) {
+      setBgWhiteActive(false)
+      setBgWhiteActiveTwo(false)
+      if (searchIcon) {
+        searchIcon.classList.remove('search-wrapper-ready')
+      }
+    }
+  }
+
+  const handleGrowSearchIcon = () => {
+    const searchIcon = document.querySelector('.search-wrapper')
+    if (searchIcon) {
+      searchIcon.classList.add('search-wrapper-ready')
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('click', clickOutside)
+    return () => {
+      document.removeEventListener('click', clickOutside)
+    }
+  }, [])
+
   return (
-    <div className="check-in-out-container">
-      <div className="check-in-out">
+    <CheckInOutContainer>
+      <div className="check-in-out-wrapper">
         <div className="check-in-out-divider"></div>
         {menuClick ? (
           <div className="check-date">
@@ -14,12 +58,18 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
           </div>
         ) : (
           <>
-            <div className="check-in">
+            <div
+              className={bgWhiteActive ? 'check-in' : 'check-in-two'}
+              onClick={() => handleBgWhiteActive('check-in')}
+            >
               <p className="check-in-text">Check in</p>
               <p>Add dates</p>
             </div>
             <div className="check-in-out-divider"></div>
-            <div className="check-out">
+            <div
+              className={bgWhiteActiveTwo ? 'check-out' : 'check-out-two'}
+              onClick={() => handleBgWhiteActive('check-out')}
+            >
               <p className="check-out-text">Check out</p>
               <p>Add dates</p>
             </div>
@@ -27,7 +77,12 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
         )}
         <div className="check-in-out-divider"></div>
       </div>
-    </div>
+      {bgWhiteActive || bgWhiteActiveTwo ? (
+        <div className="test-check-menu">
+          <p>Test</p>
+        </div>
+      ) : null}
+    </CheckInOutContainer>
   )
 }
 

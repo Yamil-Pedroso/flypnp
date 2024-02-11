@@ -14,6 +14,10 @@ const Search = ({ menuClick }: SearchProps) => {
       <SearchDestination />
       <CheckInCheckOut menuClick={menuClick} />
       <AddGuests />
+      <div className={`search-wrapper`}>
+        <FaSearch className="search-icon" />
+        <p>Search</p>
+      </div>
     </SearchContainer>
   )
 }

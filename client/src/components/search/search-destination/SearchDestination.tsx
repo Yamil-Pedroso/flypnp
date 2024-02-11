@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import images from '../../../assets/images'
+import { SearchDestinationContainer } from './styles'
 
 interface SearchDestinationProps {
   img?: string
@@ -38,28 +39,23 @@ const SearchDestination = () => {
 
   const handleBgWhiteActive = () => {
     setBgWhiteActive(true)
-    handleGrowSearchIcon()
-    //const bgGray = document.querySelector('.search-dest-container')
-    //if (bgGray instanceof HTMLElement) {
-    //  bgGray.style.backgroundColor = '#4d4d4d'
-    //}
   }
 
   const clickOutside = (e: MouseEvent) => {
     const wrapper = document.querySelector('.search-dest-wrapper')
-    const searchIcon = document.querySelector('.search-guests-wrapper')
+    const searchIcon = document.querySelector('.search-wrapper')
     if (wrapper && !wrapper.contains(e.target as Node)) {
       setBgWhiteActive(false)
       if (searchIcon) {
-        searchIcon.classList.remove('search-guests-wrapper-redy')
+        searchIcon.classList.remove('search-wrapper-ready')
       }
     }
   }
 
   const handleGrowSearchIcon = () => {
-    const searchIcon = document.querySelector('.search-guests-wrapper')
+    const searchIcon = document.querySelector('.search-wrapper')
     if (searchIcon) {
-      searchIcon.classList.add('search-guests-wrapper-redy')
+      searchIcon.classList.add('search-wrapper-ready')
     }
   }
 
@@ -71,7 +67,7 @@ const SearchDestination = () => {
   }, [])
 
   return (
-    <div className="search-dest-container" onClick={handleBgWhiteActive}>
+    <SearchDestinationContainer onClick={handleBgWhiteActive}>
       {bgWhiteActive ? (
         <div className="search-dest-wrapper">
           <div className="input-wrapper">
@@ -98,7 +94,7 @@ const SearchDestination = () => {
           </div>
         </div>
       )}
-    </div>
+    </SearchDestinationContainer>
   )
 }
 
