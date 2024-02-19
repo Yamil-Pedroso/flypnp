@@ -4,6 +4,8 @@ import { GoogleLogin } from '@react-oauth/google'
 
 import { useAuth } from '../../../hooks'
 
+import { Container } from './styles'
+
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -50,76 +52,62 @@ const Register = () => {
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: '100px',
-      }}
-    >
-      <h1>Register</h1>
-      <form
-        action=""
-        onSubmit={handleSubmit}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-        }}
-      >
-        <div>
-          <label htmlFor="firstName">Name</label>
+    <Container>
+      <div className="form-wrapper">
+        <h1>Register</h1>
+        <form action="" onSubmit={handleSubmit}>
           <input
             type="text"
             name="name"
             id="name"
             value={formData.name}
+            placeholder="John Doe"
             onChange={handleFormData}
           />
-        </div>
-        <div>
-          <label htmlFor="email">Email</label>
+
           <input
             type="email"
             name="email"
             id="email"
+            placeholder="youremail@email.conm"
             value={formData.email}
             onChange={handleFormData}
           />
-        </div>
-        <div>
-          <label htmlFor="password">Password</label>
+
           <input
             type="password"
             name="password"
             id="password"
+            placeholder="********"
             value={formData.password}
             onChange={handleFormData}
           />
-        </div>
-        <button type="submit">Register</button>
-      </form>
-      <div className="mb-4 flex w-full items-center gap-4">
-        <div className="h-0 w-1/2 border-[1px]"></div>
-        <p className="small -mt-1">or</p>
-        <div className="h-0 w-1/2 border-[1px]"></div>
-      </div>
-      <GoogleLogin
-        onSuccess={(credentialResponse) => {
-          handleGoogleLogin(credentialResponse)
-        }}
-        onError={() => console.log('Google login failed')}
-      />
 
-      <div className="py-2 text-center text-gray-500">
-        Already a member?
-        <Link className="text-black underline" to={'/login'}>
-          Login
-        </Link>
+          <button type="submit">Register</button>
+        </form>
+
+        <div className="or-wrapper">
+          <p className="">or</p>
+        </div>
+
+        <div className="google-wrapper">
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              handleGoogleLogin(credentialResponse)
+            }}
+            onError={() => console.log('Google login failed')}
+            width="350"
+          />
+        </div>
+
+        <div className="question-btn-wrapper">
+          Already a member?
+          <Link className="" to={'/login'}>
+            Login
+          </Link>
+        </div>
       </div>
-    </div>
+    </Container>
   )
 }
 

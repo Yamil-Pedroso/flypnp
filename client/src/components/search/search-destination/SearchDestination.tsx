@@ -36,9 +36,12 @@ const searchDestinationData: SearchDestinationProps[] = [
 
 const SearchDestination = () => {
   const [bgWhiteActive, setBgWhiteActive] = useState(false)
+  const [defaultSearchDest, setDefaultSearchDest] = useState<boolean>(true)
 
   const handleBgWhiteActive = () => {
     setBgWhiteActive(true)
+    setDefaultSearchDest(false)
+    handleGrowSearchIcon()
   }
 
   const clickOutside = (e: MouseEvent) => {
@@ -68,19 +71,19 @@ const SearchDestination = () => {
 
   return (
     <SearchDestinationContainer onClick={handleBgWhiteActive}>
-      {bgWhiteActive ? (
-        <div className="search-dest-wrapper">
+      <div className="search-dest-wrapper">
+        {bgWhiteActive ? (
           <div className="input-wrapper">
             <label htmlFor="">Where</label>
             <input type="text" placeholder="Search destinations" />
           </div>
-        </div>
-      ) : (
-        <div className="default-search-dest-wrapper">
-          <p>Where</p>
-          <p>Search destinations</p>
-        </div>
-      )}
+        ) : (
+          <div className="default-search-dest-wrapper">
+            <p>Where</p>
+            <p>Search destinations</p>
+          </div>
+        )}
+      </div>
       {bgWhiteActive && (
         <div className="search-dest-menu-box">
           <p>Search by region</p>

@@ -1,4 +1,15 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+const fadeInFromDown = keyframes`
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
 
 export const NavbarContainer = styled.div`
  .navbar-wrapper {
@@ -49,7 +60,6 @@ export const NavbarContainer = styled.div`
     align-items: center;
     justify-content: center;
 
-
       li.active {
         margin: 0 15px;
         font-size: 1.1rem;
@@ -75,7 +85,32 @@ export const NavbarContainer = styled.div`
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      position: relative;
+      .user-login-form-wrapper {
+        display: flex;
+        position: absolute;
+        width: 100%;
+        height: 1000vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        top: 0;
+        left: 0;
+        display: none;
+        z-index: 1;
+        transition: all 0.3s ease-in-out;
+
+        &.show-login {
+          display: block;
+        }
+
+        .form-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 10%;
+          animation: ${fadeInFromDown} .6s ease-in-out;
+        }
+
+      }
 
       .user-menu-item .world-icon {
         font-size: 1.5rem;

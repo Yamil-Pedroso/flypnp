@@ -7,7 +7,6 @@ export const SearchDestinationContainer = styled.div`
     display: flex;
     align-items: center;
     border-radius: 3rem;
-    border-radius: 3rem;
     position: relative;
 
     .search-dest-menu-box {
@@ -60,37 +59,26 @@ export const SearchDestinationContainer = styled.div`
         }
       }
 
-    &:hover {
-      background-color: #dbdbdb;
-      border-top-right-radius: 3rem;
-      border-bottom-right-radius: 3rem;
-      cursor: pointer;
-
-    }
-
     .search-dest-wrapper {
       width: 100%;
       height: 100%;
-      background-color: #424242;
-      border-top-right-radius: 3rem;
-      border-bottom-right-radius: 3rem;
-      border-radius: 3rem;
-      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    }
-
-    .default-search-dest-wrapper {
-      width: 100%;
-      height: 100%;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin-left: 1.6rem;
-      color: #2a2a2a;
-      font-size: 1rem;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
 
-      p {
-        padding: 0.1rem;
+      &:hover {
+        background-color: #dbdbdb;
+        border-radius: 3rem;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
       }
+
+      .default-search-dest-wrapper {
+        p {
+        margin-left: 1.6rem;
+        }
 
       p:first-child {
         font-size: 0.9rem;
@@ -104,13 +92,17 @@ export const SearchDestinationContainer = styled.div`
     .input-wrapper {
       width: 100%;
       height: 100%;
+      background-color: #424242;
+      border-radius: 3rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
       display: flex;
       flex-direction: column;
       justify-content: center;
-      margin-left: 1.6rem;
 
        label, input {
         padding: 0.1rem;
+        margin-left: 1.6rem;
+        mouse-events: none;
       }
 
       label {
@@ -136,4 +128,7 @@ export const SearchDestinationContainer = styled.div`
         color: #e4e4e4;
       }
     }
+
+
+  }
 `;

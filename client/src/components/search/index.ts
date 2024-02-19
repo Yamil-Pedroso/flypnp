@@ -21,7 +21,6 @@ export const SearchContainer = styled.div`
   border: 0.1rem solid #e5e5e5;
   border-radius: 3rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-
   position: relative;
 
   .search-wrapper {
@@ -50,19 +49,19 @@ export const SearchContainer = styled.div`
       .bg-icon-color {
         background-color: #0a8d3d;
       }
-    }
+      .search-wrapper-ready {
+        width: 7rem;
+        background-color: #0baa4e;
+        border-radius: 3rem;
+        animation: ${growWrapperIcon} 0.5s;
 
-    .search-wrapper-ready {
-      animation: ${growWrapperIcon} 0.5s;
-      width: 7rem;
-      background-color: #0baa4e;
-      border-radius: 3rem;
-
-      p {
-        display: block;
-        margin-left: .5rem;
-        font-size: 1rem;
-        color: #fff;
+        p {
+          display: block;
+          margin-left: .5rem;
+          font-size: 1rem;
+          color: #fff;
+        }
       }
     }
+
 `;

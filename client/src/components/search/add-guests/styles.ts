@@ -35,7 +35,6 @@ export const AddGuestsContainer = styled.div`
         border-radius: 3rem;
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 
-
         p {
           margin-left: 1.6rem;
         }
@@ -52,6 +51,7 @@ export const AddGuestsContainer = styled.div`
       }
 
       .header-guests-two {
+
         p {
           margin-left: 1.6rem;
         }

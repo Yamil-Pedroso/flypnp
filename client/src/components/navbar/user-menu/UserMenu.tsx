@@ -5,10 +5,13 @@ import { TbWorld } from 'react-icons/tb'
 import { IoMdCloseCircle } from 'react-icons/io'
 import { useAuth } from '../../../../hooks'
 import { useNotifications } from '../../../../hooks'
+import Login from '../../user-auth/Login'
 
 const UserMenu = () => {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [userLoginOpen, setUserLoginOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [closeForm, setCloseForm] = useState(false)
   const auth = useAuth() as any
   const { user, logout } = auth
   const notis = useNotifications() as any
@@ -17,6 +20,15 @@ const UserMenu = () => {
 
   const handleMenuIconClick = () => {
     setMenuOpen(!menuOpen)
+  }
+
+  const handleCloseForm = () => {
+    setCloseForm(!closeForm)
+    setUserLoginOpen(false)
+  }
+
+  const handleMenuLoginIconClick = () => {
+    setUserLoginOpen(!userLoginOpen)
   }
 
   const handleUserMenuIconClick = () => {
@@ -127,8 +139,8 @@ const UserMenu = () => {
               </ul>
             ) : (
               <ul>
-                <li>
-                  <a href="/login">Login</a>
+                <li onClick={handleMenuLoginIconClick}>
+                  <a href="#">Login</a>
                 </li>
                 <li>
                   <a href="/register">Sign up</a>
@@ -151,6 +163,27 @@ const UserMenu = () => {
               </ul>
             )}
           </div>
+        </div>
+      </div>
+      <div
+        className={`user-login-form-wrapper ${userLoginOpen && 'show-login'}`}
+      >
+        <div className="form-content">
+          <span
+            style={{
+              cursor: 'pointer',
+              position: 'absolute',
+              top: '20rem',
+              right: '41.5rem',
+              fontSize: '2rem',
+              zIndex: 1,
+            }}
+            onClick={handleCloseForm}
+            className="close-icon"
+          >
+            X
+          </span>
+          <Login />
         </div>
       </div>
     </div>
