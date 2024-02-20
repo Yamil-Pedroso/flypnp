@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
@@ -5,39 +6,62 @@ import { GoogleLogin } from '@react-oauth/google'
 import Profile from '../user-profile/Profile'
 import { useAuth } from '../../../hooks'
 
+import { IoCloseSharp } from 'react-icons/io5'
 import { Container } from './styles'
 
 interface LoginProps {
-  className?: string
+  closeUserForm: () => void
+  changeToRegister: () => void
 }
 
-const Login = ({ className }: LoginProps) => {
+const Login = ({ closeUserForm, changeToRegister }: LoginProps) => {
   const [formData, setFormData] = useState({ email: '', password: '' })
+  const [formErrors, setFormErrors] = useState({
+    email: false,
+    password: false,
+  })
   const [redirect, setRedirect] = useState(false)
   const auth = useAuth() as any
 
   const handleFormData = (e: any) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
+
+    if (setFormErrors) {
+      setFormErrors({ ...formErrors, [name]: false })
+    }
   }
 
   const handleFormSubmit = async (e: any) => {
     e.preventDefault()
 
+    if (!formData.email || !formData.password) {
+      setFormErrors({ email: !formData.email, password: !formData.password })
+      console.log('Login failed: Missing fields')
+      return
+    }
+
     const response = await auth.login(formData)
     if (response.success) {
       console.log('User logged in')
       setRedirect(true)
+      closeUserForm()
     } else {
-      console.log('Login failed')
+      console.log('Login failed: Invalid credentials')
+
+      setFormErrors({ email: true, password: true })
     }
+  }
+
+  const handleCloseForm = () => {
+    closeUserForm()
   }
 
   const handleGoogleLogin = async (credential: any) => {
     const response = await auth.googleLogin(credential)
     if (response.success) {
       console.log('User logged in with Google')
-      setRedirect(true)
+      //setRedirect(true)
     } else {
       console.log(response.message)
     }
@@ -55,6 +79,9 @@ const Login = ({ className }: LoginProps) => {
     <Container>
       <div className="form-wrapper">
         <h1 className="">Login</h1>
+
+        <IoCloseSharp onClick={handleCloseForm} className="close-icon" />
+
         <form className="" onSubmit={handleFormSubmit}>
           <input
             name="email"
@@ -62,6 +89,7 @@ const Login = ({ className }: LoginProps) => {
             placeholder="your@email.com"
             value={formData.email}
             onChange={handleFormData}
+            className={formErrors.email ? 'error-border' : ''}
           />
           <input
             name="password"
@@ -69,7 +97,9 @@ const Login = ({ className }: LoginProps) => {
             placeholder="password"
             value={formData.password}
             onChange={handleFormData}
+            className={formErrors.password ? 'error-border' : ''}
           />
+
           <button className="primary my-4">Login</button>
         </form>
 
@@ -93,9 +123,9 @@ const Login = ({ className }: LoginProps) => {
 
         <div className="question-btn-wrapper">
           Don't have an account yet?{' '}
-          <a className="" href={'/register'}>
+          <p className="link" onClick={changeToRegister}>
             Register now
-          </a>
+          </p>
         </div>
       </div>
     </Container>

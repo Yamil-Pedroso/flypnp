@@ -111,6 +111,32 @@ export const NavbarContainer = styled.div`
         }
 
       }
+      .user-register-form-wrapper {
+        display: flex;
+        position: absolute;
+        width: 100%;
+        height: 1000vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        top: 0;
+        left: 0;
+        display: none;
+        z-index: 1;
+        transition: all 0.3s ease-in-out;
+
+        &.show-register {
+          display: block;
+        }
+
+        .form-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 10%;
+          animation: ${fadeInFromDown} .6s ease-in-out;
+        }
+
+      }
 
       .user-menu-item .world-icon {
         font-size: 1.5rem;
@@ -121,35 +147,42 @@ export const NavbarContainer = styled.div`
 
 
         .menu-translation-region-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-           width: 60rem;
-           height: 45rem;
-           background-color: #fff;
-           color: #686868;
-           box-shadow: 0px 3px 50rem 30rem rgba(0, 0, 0, 0.3);
-           border-radius: 1rem;
-           position: absolute;
-           top: 10rem;
-           right: 23rem;
-           opacity: 0;
-           transform: translateY(100%);
-           transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+          display: flex;
+          position: absolute;
+          width: 100%;
+          height: 1000vh;
+          background-color: rgba(0, 0, 0, 0.5);
+          top: 0;
+          left: 0;
+          display: none;
+          z-index: 1;
+          transition: all 0.3s ease-in-out;
 
            &.show {
-                opacity: 1;
-                transform: translateY(0);
-                z-index: 1;
+              display: block;
            }
 
-           .close-icon-wrapper .close-icon {
-                position: absolute;
-                top: 1rem;
-                right: 1rem;
-                font-size: 1.5rem;
-                cursor: pointer;
-            }
+           .menu-translation-region-content {
+              display: flex;
+              position: absolute;
+              top: 12rem;
+              left: 22.5%;
+              margin: 0 auto;
+              width: 60rem;
+              height: 40rem;
+              background-color: #fff;
+              border-radius: 1rem;
+
+              animation: ${fadeInFromDown} .6s ease-in-out;
+              .close-icon-wrapper .close-icon-translate {
+                   position: absolute;
+                   top: 1rem;
+                   right: 1rem;
+                   font-size: 1.5rem;
+                   cursor: pointer;
+               }
+           }
+
 
         }
 

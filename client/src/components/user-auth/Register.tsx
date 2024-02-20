@@ -1,17 +1,29 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 
 import { useAuth } from '../../../hooks'
-
+import { IoCloseSharp } from 'react-icons/io5'
 import { Container } from './styles'
 
-const Register = () => {
+interface RegisterProps {
+  closeUserForm: () => void
+  changeToLogin: () => void
+}
+
+const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
   })
+  const [formErrors, setFormErrors] = useState({
+    name: false,
+    email: false,
+    password: false,
+  })
+
   const [redirect, setRedirect] = useState(false)
   const auth = useAuth() as any
 
@@ -22,20 +34,39 @@ const Register = () => {
       ...formData,
       [name]: value,
     })
+
+    if (setFormErrors) {
+      setFormErrors({ ...formErrors, [name]: false })
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
+    if (!formData.name || !formData.email || !formData.password) {
+      setFormErrors({
+        name: !formData.name,
+        email: !formData.email,
+        password: !formData.password,
+      })
+      console.log('Register failed: Missing fields')
+      return
+    }
+
     const response = await auth.register(formData)
     if (response.success) {
       console.log('User registered')
-      setRedirect(true)
+      //setRedirect(true)
+      closeUserForm()
     } else {
       console.log(
         "Couldn't register user, this user may already exist or there was an error",
       )
     }
+  }
+
+  const handleCloseForm = () => {
+    closeUserForm()
   }
 
   const handleGoogleLogin = async (credential: any) => {
@@ -47,14 +78,15 @@ const Register = () => {
     }
   }
 
-  if (redirect) {
-    return <Navigate to="/" />
-  }
+  //if (redirect) {
+  //  return <Navigate to="/" />
+  //}
 
   return (
     <Container>
       <div className="form-wrapper">
         <h1>Register</h1>
+        <IoCloseSharp className="close-icon" onClick={handleCloseForm} />
         <form action="" onSubmit={handleSubmit}>
           <input
             type="text"
@@ -63,6 +95,7 @@ const Register = () => {
             value={formData.name}
             placeholder="John Doe"
             onChange={handleFormData}
+            className={formErrors.name ? 'error-border' : ''}
           />
 
           <input
@@ -72,6 +105,7 @@ const Register = () => {
             placeholder="youremail@email.conm"
             value={formData.email}
             onChange={handleFormData}
+            className={formErrors.email ? 'error-border' : ''}
           />
 
           <input
@@ -81,6 +115,7 @@ const Register = () => {
             placeholder="********"
             value={formData.password}
             onChange={handleFormData}
+            className={formErrors.password ? 'error-border' : ''}
           />
 
           <button type="submit">Register</button>
@@ -102,9 +137,14 @@ const Register = () => {
 
         <div className="question-btn-wrapper">
           Already a member?
-          <Link className="" to={'/login'}>
+          <p
+            className="link"
+            onClick={() => {
+              changeToLogin()
+            }}
+          >
             Login
-          </Link>
+          </p>
         </div>
       </div>
     </Container>

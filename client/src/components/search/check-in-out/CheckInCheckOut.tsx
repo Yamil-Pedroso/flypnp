@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { CheckInOutContainer } from './styles'
+import CalendarComp from '../../common/calendar/CalendarComp'
 
 interface CheckInCheckOutProps {
   menuClick: boolean
@@ -25,8 +26,6 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
     const wrapper = document.querySelector('.check-in, .check-out')
     const searchIcon = document.querySelector('.search-wrapper')
     if (wrapper && !wrapper.contains(e.target as Node)) {
-      setBgWhiteActive(false)
-      setBgWhiteActiveTwo(false)
       if (searchIcon) {
         searchIcon.classList.remove('search-wrapper-ready')
       }
@@ -86,7 +85,7 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
       </div>
       {bgWhiteActive || bgWhiteActiveTwo ? (
         <div className="test-check-menu">
-          <p>Test</p>
+          <CalendarComp />
         </div>
       ) : null}
     </CheckInOutContainer>

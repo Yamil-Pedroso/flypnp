@@ -8,16 +8,26 @@ export const Container = styled.div`
     padding: 1.25rem;
     width: 100%;
     max-width: 31.25rem;
-
     border: 1px solid #e5e5e5;
     border-radius: 0.625rem;
     background-color: #fff;
     position: absolute;
 
-
     h1 {
         margin-bottom: 1.25rem;
     }
+
+    .close-icon {
+        position: absolute;
+        font-size: 2rem;
+        top: 0.625rem;
+        right: 0.625rem;
+        cursor: pointer;
+    }
+
+    .error-border {
+        border: 1px solid red;
+     }
 
     .form-wrapper {
         display: flex;
@@ -71,11 +81,9 @@ export const Container = styled.div`
         gap: 5px;
         margin-top: 1.25rem;
 
-        a {
-            color: #000;
+        p {
+            color: #f94a51;
             text-decoration: underline;
         }
     }
 `;
-
-{/* Register Form */}

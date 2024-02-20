@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react'
 import { FaHouseUser } from 'react-icons/fa6'
 import { RiMenuUnfoldLine } from 'react-icons/ri'
@@ -6,12 +7,13 @@ import { IoMdCloseCircle } from 'react-icons/io'
 import { useAuth } from '../../../../hooks'
 import { useNotifications } from '../../../../hooks'
 import Login from '../../user-auth/Login'
+import Register from '../../user-auth/Register'
 
 const UserMenu = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [userLoginOpen, setUserLoginOpen] = useState(false)
+  const [userRegisterOpen, setUserRegisterOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [closeForm, setCloseForm] = useState(false)
   const auth = useAuth() as any
   const { user, logout } = auth
   const notis = useNotifications() as any
@@ -22,13 +24,14 @@ const UserMenu = () => {
     setMenuOpen(!menuOpen)
   }
 
-  const handleCloseForm = () => {
-    setCloseForm(!closeForm)
-    setUserLoginOpen(false)
-  }
-
   const handleMenuLoginIconClick = () => {
     setUserLoginOpen(!userLoginOpen)
+    setUserRegisterOpen(false)
+  }
+
+  const handleMenuRegisterIconClick = () => {
+    setUserRegisterOpen(!userRegisterOpen)
+    setUserLoginOpen(false)
   }
 
   const handleUserMenuIconClick = () => {
@@ -65,13 +68,15 @@ const UserMenu = () => {
         <TbWorld onClick={handleMenuIconClick} className="world-icon" />
       </div>
       <div className={`menu-translation-region-wrapper ${menuOpen && 'show'}`}>
-        <div className="close-icon-wrapper">
-          <IoMdCloseCircle
-            onClick={handleMenuIconClick}
-            className="close-icon"
-          />
+        <div className="menu-translation-region-content">
+          <div className="close-icon-wrapper">
+            <IoMdCloseCircle
+              onClick={handleMenuIconClick}
+              className="close-icon-translate"
+            />
+          </div>
+          Translation & Region & Currency
         </div>
-        <h2>Translation & Region & Currency</h2>
       </div>
       <div className="user-menu-content">
         <div onClick={handleUserMenuIconClick} className="user-menu-wrapper">
@@ -142,8 +147,8 @@ const UserMenu = () => {
                 <li onClick={handleMenuLoginIconClick}>
                   <a href="#">Login</a>
                 </li>
-                <li>
-                  <a href="/register">Sign up</a>
+                <li onClick={handleMenuRegisterIconClick}>
+                  <a href="#">Sign up</a>
                 </li>
                 <hr
                   style={{
@@ -169,21 +174,22 @@ const UserMenu = () => {
         className={`user-login-form-wrapper ${userLoginOpen && 'show-login'}`}
       >
         <div className="form-content">
-          <span
-            style={{
-              cursor: 'pointer',
-              position: 'absolute',
-              top: '20rem',
-              right: '41.5rem',
-              fontSize: '2rem',
-              zIndex: 1,
-            }}
-            onClick={handleCloseForm}
-            className="close-icon"
-          >
-            X
-          </span>
-          <Login />
+          <Login
+            closeUserForm={handleMenuLoginIconClick}
+            changeToRegister={handleMenuRegisterIconClick}
+          />
+        </div>
+      </div>
+      <div
+        className={`user-register-form-wrapper ${
+          userRegisterOpen && 'show-register'
+        }`}
+      >
+        <div className="form-content">
+          <Register
+            closeUserForm={handleMenuRegisterIconClick}
+            changeToLogin={handleMenuLoginIconClick}
+          />
         </div>
       </div>
     </div>
