@@ -53,9 +53,6 @@ const Profile = () => {
               <div className="active-green-dot">
                 <TiCamera size={22} />
               </div>
-              {/*<div className="add-photo-wrapper">
-                <p>Add</p>
-      </div>*/}
               {user.avatar ? (
                 <div className="user-avatar-img">
                   <AvatarImage src={user.avatar} />
