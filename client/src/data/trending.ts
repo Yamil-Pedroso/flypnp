@@ -16,6 +16,7 @@ export const trending = [
       'Wifi, Air conditioning, Kitchen, Pool, Free parking, Washing machine',
     maxGuests: 6,
     rating: 3.5,
+    review: 248,
     price: 350,
   },
   {
@@ -35,6 +36,7 @@ export const trending = [
       'Wifi, Air conditioning, Kitchen, Pool, Free parking, Washing machine',
     maxGuests: 6,
     rating: 4,
+    review: 248,
     price: 350,
   },
   {
@@ -53,6 +55,7 @@ export const trending = [
     extraInfo: 'Wifi, Kitchen',
     maxGuests: 2,
     rating: 5,
+    review: 248,
     price: 145,
   },
   {
@@ -72,6 +75,7 @@ export const trending = [
       'Wifi, Air conditioning, Kitchen, Free parking, Indoor fireplace',
     maxGuests: 4,
     rating: 3.5,
+    review: 248,
     price: 308,
   },
   {
@@ -90,6 +94,7 @@ export const trending = [
     extraInfo: 'Wifi, Kitchen, Free parking',
     maxGuests: 3,
     rating: 4,
+    review: 248,
     price: 208,
   },
   {
@@ -109,6 +114,7 @@ export const trending = [
       'Wifi, Air conditioning, Kitchen, Free parking, Indoor fireplace',
     maxGuests: 4,
     rating: 3.5,
+    review: 248,
     price: 308,
   },
   {
@@ -127,6 +133,7 @@ export const trending = [
     extraInfo: 'Wifi, Kitchen, Free parking',
     maxGuests: 3,
     rating: 4,
+    review: 248,
     price: 208,
   },
   {
@@ -146,6 +153,7 @@ export const trending = [
       'Wifi, Air conditioning, Kitchen, Free parking, Indoor fireplace',
     maxGuests: 4,
     rating: 3.5,
+    review: 248,
     price: 308,
   },
   {
@@ -164,6 +172,7 @@ export const trending = [
     extraInfo: 'Wifi, Kitchen, Free parking',
     maxGuests: 3,
     rating: 4,
+    review: 248,
     price: 208,
   },
   {
@@ -182,6 +191,7 @@ export const trending = [
     extraInfo: 'Wifi, Kitchen, Free parking',
     maxGuests: 3,
     rating: 4,
+    review: 248,
     price: 208,
   },
 ]

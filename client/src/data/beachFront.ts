@@ -19,6 +19,7 @@ export const beachFront = [
         'Wifi, Air conditioning, Kitchen, Pool, Free parking, Washing machine',
       maxGuests: 6,
       rating: 3.5,
+      review: 246,
       price: 350,
     },
     {
@@ -38,6 +39,7 @@ export const beachFront = [
         'Wifi, Air conditioning, Kitchen, Pool, Free parking, Washing machine',
       maxGuests: 6,
       rating: 4.5,
+      review: 110,
       price: 350,
     },
     {
@@ -56,6 +58,7 @@ export const beachFront = [
       extraInfo: 'Wifi, Kitchen',
       maxGuests: 2,
       rating: 5,
+      review: 80,
       price: 145,
     },
     {
@@ -75,6 +78,7 @@ export const beachFront = [
         'Wifi, Air conditioning, Kitchen, Free parking, Indoor fireplace',
       maxGuests: 4,
       rating: 3.5,
+      review: 200,
       price: 308,
     },
     {
@@ -93,6 +97,7 @@ export const beachFront = [
       extraInfo: 'Wifi, Kitchen, Free parking',
       maxGuests: 3,
       rating: 4,
+      review: 257,
       price: 208,
     },
     {
@@ -112,6 +117,7 @@ export const beachFront = [
         'Wifi, Air conditioning, Kitchen, Free parking, Indoor fireplace',
       maxGuests: 4,
       rating: 3.5,
+      review: 160,
       price: 308,
     },
     {
@@ -130,6 +136,7 @@ export const beachFront = [
       extraInfo: 'Wifi, Kitchen, Free parking',
       maxGuests: 3,
       rating: 4,
+      review: 384,
       price: 208,
     },
     {
@@ -149,6 +156,7 @@ export const beachFront = [
         'Wifi, Air conditioning, Kitchen, Free parking, Indoor fireplace',
       maxGuests: 4,
       rating: 3.5,
+      review: 300,
       price: 308,
     },
     {
@@ -167,6 +175,7 @@ export const beachFront = [
       extraInfo: 'Wifi, Kitchen, Free parking',
       maxGuests: 3,
       rating: 4,
+      review: 150,
       price: 208,
     },
     {
@@ -185,6 +194,7 @@ export const beachFront = [
       extraInfo: 'Wifi, Kitchen, Free parking',
       maxGuests: 3,
       rating: 4,
+      review: 208,
       price: 208,
     },
   ]
