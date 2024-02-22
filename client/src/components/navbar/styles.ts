@@ -164,6 +164,8 @@ export const NavbarContainer = styled.div`
 
            .menu-translation-region-content {
               display: flex;
+              justify-content: center;
+              align-items: center;
               position: absolute;
               top: 12rem;
               left: 22.5%;
@@ -172,6 +174,13 @@ export const NavbarContainer = styled.div`
               height: 40rem;
               background-color: #fff;
               border-radius: 1rem;
+
+              h2 {
+                font-size:1%.8rem;
+                font-weight: 600;
+                color: #000;
+                margin: 1.5rem 0 0 2rem;
+              }
 
               animation: ${fadeInFromDown} .6s ease-in-out;
               .close-icon-wrapper .close-icon-translate {

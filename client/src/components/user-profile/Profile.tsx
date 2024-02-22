@@ -1,43 +1,78 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react'
-import { Navigate, useParams, useNavigate, Link } from 'react-router-dom'
-import { trending } from '../../data/trending'
-import { UserProfileContainer } from './styles'
+import { useState, useEffect } from "react";
+import { Navigate, useParams, useNavigate, Link } from "react-router-dom";
+import { trending } from "../../data/trending";
+import { UserProfileContainer } from "./styles";
+import { usePlaces } from "../../../hooks";
 
-import { Avatar, AvatarFallback, AvatarImage } from './user-avatar/Avatar'
-import { FaCheck } from 'react-icons/fa6'
-import { TiCamera } from 'react-icons/ti'
+import { Avatar, AvatarFallback, AvatarImage } from "./user-avatar/Avatar";
+import { FaCheck } from "react-icons/fa6";
+import { TiCamera } from "react-icons/ti";
+import { GrAchievement } from "react-icons/gr";
+import { GiAchievement } from "react-icons/gi";
+import { FaAward } from "react-icons/fa6";
+import { RiAwardFill } from "react-icons/ri";
+import { FaGithub, FaSquareGitlab, FaLinkedin } from "react-icons/fa6";
+import { CgWebsite } from "react-icons/cg";
 //import { Button } from './button/Button'
 
-import { useAuth } from '../../../hooks'
-import { LogOut } from 'lucide-react'
-import EditeProfileDialog from './edit-profile-dialog/EditeProfileDialog'
+import { useAuth } from "../../../hooks";
+import { LogOut } from "lucide-react";
+interface PlacesProps {
+  id: string;
+  owner: string;
+  address: string;
+  description: string;
+  extraInfo: string;
+  maxGuests: number;
+  price: number;
+  perks: string[];
+  photos: string[];
+  title: string;
+}
 
 const Profile = () => {
-  const auth = useAuth() as any
-  const { user, logout } = auth
-  const [redirect, setRedirect] = useState(null)
-  const navigate = useNavigate()
+  //const { places } = usePlaces() as any
+  //const [myPlaces, setMyPlaces] = useState<PlacesProps[]>([])
+  const auth = useAuth() as any;
+  const { user, logout } = auth;
+  const [redirect, setRedirect] = useState(null);
+  const [time, setTime] = useState(new Date());
+  const navigate = useNavigate();
 
-  console.log('user', user)
+  useEffect(() => {
+    const update = () => {
+      setTime(new Date());
+    };
+    const intervalId = setInterval(update, 1000);
 
-  let { subpage } = useParams()
+    return () => clearInterval(intervalId);
+  }, []);
+
+  //useEffect(() => {
+  //  if (places) {
+  //    setMyPlaces(places);
+  //    console.log('places', places)
+  //  }
+  //}, [places]);
+
+  let { subpage } = useParams();
   if (!subpage) {
-    subpage = 'profile'
+    subpage = "profile";
   }
 
   const handleLogout = async () => {
-    const response = await logout()
+    const response = await logout();
     if (response.success) {
-      console.log('logout success')
-      navigate('/')
+      console.log("logout success");
+      navigate("/");
     } else {
-      console.log('logout failed')
+      console.log("logout failed");
     }
-  }
+  };
 
   if (!user && !redirect) {
-    return <Navigate to="/profile" />
+    return <Navigate to="/profile" />;
   }
 
   //if (redirect) {
@@ -46,7 +81,7 @@ const Profile = () => {
 
   return (
     <UserProfileContainer>
-      {subpage === 'profile' && (
+      {subpage === "profile" && (
         <div className="user-profile-wrapper">
           <div className="user-content">
             <Avatar>
@@ -68,7 +103,7 @@ const Profile = () => {
             </Avatar>
             <div className="user-desc">
               <p className="text-gray-600">{user.name} Pedroso</p>
-              <span className="text-gray-600">{'Guest'}</span>
+              <span className="text-gray-600">{"Guest"}</span>
             </div>
 
             <div className="activities-wrapper">
@@ -124,7 +159,24 @@ const Profile = () => {
                   </div>
                 </div>
                 <div className="favorites-places">
-                  <p>Favorites places</p>
+                  <p>Favorite place</p>
+                  {trending.slice(7, 8).map((place) => (
+                    <div className="favorite-places-wrapper">
+                      <div key={place.id} className="favorites-places-cont">
+                        <Link to={`/place/${place.category}/${place.id}`}>
+                          <img src={`${place.photos?.[0]}`} alt="place" />
+                        </Link>
+                      </div>
+
+                      <div className="desc">
+                        <Link to={`/place/${place.category}/${place.id}`}>
+                          {place.title}
+                        </Link>
+
+                        <button>Explore</button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -138,6 +190,51 @@ const Profile = () => {
 
                 <h2 className="website">WEBSITE</h2>
                 <p>www.journey.com</p>
+
+                <div className="achievement-wrapper">
+                  <h2 className="achievement">ACHIEVEMENT</h2>
+                  <div className="achievement-cont">
+                    <div className="achievement-wrapper">
+                      <GrAchievement size={24} className="achievement-icon" />
+                      {/*<span>Superhost</span>*/}
+                    </div>
+                    <div className="achievement-wrapper">
+                      <GiAchievement size={24} className="achievement-icon" />
+                      {/*<span>Explorer</span> */}
+                    </div>
+                    <div className="achievement-wrapper">
+                      <FaAward size={24} className="achievement-icon" />
+                      {/*<span>Great Guest</span> */}
+                    </div>
+                    <div className="achievement-wrapper">
+                      <RiAwardFill size={24} className="achievement-icon" />
+                      {/*<span>Great Host</span> */}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="local-time">
+                  <p>
+                    ZURICH, SWITZERLAND
+                  </p>
+                  {time.toLocaleTimeString()}</div>
+
+                <div className="user-social">
+                  <div className="social-wrapper">
+                    <div className="social-cont">
+                      <FaGithub size={24} />
+                    </div>
+                    <div className="social-cont">
+                      <FaSquareGitlab size={24} />
+                    </div>
+                    <div className="social-cont">
+                      <FaLinkedin size={24} />
+                    </div>
+                    <div className="social-cont">
+                      <CgWebsite size={24} />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -145,7 +242,7 @@ const Profile = () => {
       )}
       {/*{subpage === 'places' && <Places />}*/}
     </UserProfileContainer>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

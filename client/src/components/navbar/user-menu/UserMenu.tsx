@@ -4,6 +4,7 @@ import { FaHouseUser } from 'react-icons/fa6'
 import { RiMenuUnfoldLine } from 'react-icons/ri'
 import { TbWorld } from 'react-icons/tb'
 import { IoMdCloseCircle } from 'react-icons/io'
+import { IoCloseSharp } from 'react-icons/io5'
 import { useAuth } from '../../../../hooks'
 import { useNotifications } from '../../../../hooks'
 import Login from '../../user-auth/Login'
@@ -70,12 +71,12 @@ const UserMenu = () => {
       <div className={`menu-translation-region-wrapper ${menuOpen && 'show'}`}>
         <div className="menu-translation-region-content">
           <div className="close-icon-wrapper">
-            <IoMdCloseCircle
+            <IoCloseSharp
               onClick={handleMenuIconClick}
               className="close-icon-translate"
             />
           </div>
-          Translation & Region & Currency
+          <h2>Translation & Region & Currency</h2>
         </div>
       </div>
       <div className="user-menu-content">
@@ -107,7 +108,7 @@ const UserMenu = () => {
             {user ? (
               <ul>
                 <li>
-                  <a href="/notifications">Messages</a>
+                  <a href="/notifications">Notis</a>
                 </li>
                 <li>
                   <a href="/profile">Profile</a>
@@ -125,7 +126,7 @@ const UserMenu = () => {
                   <a href="#">Flypnp our home</a>
                 </li>
                 <li>
-                  <a href="#">Account</a>
+                  <a href="#">Messages</a>
                 </li>
                 <hr
                   style={{ margin: '0.5rem 0', border: '.02px solid #dedede' }}

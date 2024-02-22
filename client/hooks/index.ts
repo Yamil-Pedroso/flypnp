@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useContext } from 'react';
 import { jwtDecode } from "jwt-decode";
 
@@ -177,9 +178,16 @@ export const useProvidePlaces = () => {
     const [loading, setLoading] = useState<boolean>(true)
 
     const getPlaces = async () => {
-        const { data } = await axiosInstance.get('/')
+        try {
+        const { data } = await axiosInstance.get('/all-places')
+        console.log(data)
         setPlaces(data)
         setLoading(false)
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }   
     }
 
     useEffect(() => {

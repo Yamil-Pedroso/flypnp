@@ -1,14 +1,4 @@
-import styled, { keyframes } from "styled-components";
-
-const btnBackgroundColorExpand = keyframes`
-    from {
-        background-color: #2a2a2a;
-    }
-
-    to {
-        background-color: #ffffff;
-    }
-    `;
+import styled from "styled-components";
 
 export const UserProfileContainer = styled.div`
   display: flex;
@@ -93,18 +83,18 @@ export const UserProfileContainer = styled.div`
             gap: .9rem;
             margin-top: 5rem;
             background-color: #fff;
-            color: #2a2a2a;
+            color: #4c4c4c;
             padding: .8rem 2rem;
             font-size: 1rem;
-            border: 3px solid #2a2a2a;
+            border: 3px solid #4c4c4c;
             transition: all .3s ease;
             border-radius: .6rem;
             cursor: pointer;
 
             &:hover {
-               background-color: #2a2a2a;
+               background-color: #4c4c4c;
                 color: #fff;
-                border: 3px solid #2a2a2a;
+                border: 3px solid #4c4c4c;
             }
 
         }
@@ -233,10 +223,70 @@ export const UserProfileContainer = styled.div`
 
                 .favorites-places {
                   width: 38rem;
-                 height: 14rem;
-                 margin-top: 2rem;
-                 box-shadow: 0 .5rem 5rem 5px rgba(0, 0, 0, .1);
-                 border-radius: 1rem;
+                  height: 14rem;
+                  margin-top: 2rem;
+                  box-shadow: 0 .5rem 5rem 5px rgba(0, 0, 0, .1);
+                  border-radius: 1rem;
+                  padding: 1rem;
+
+                  .favorite-places-wrapper 
+                  {
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+
+                    .desc {
+                        display: flex;
+                        flex-direction: column;
+                        width: 18rem;
+
+                        button {
+                            margin-top: 1rem;
+                            width:7rem;
+                            background-color: #4c4c4c;
+                            color: #fff;
+                            font-size: .8rem;
+                            font-weight: 700;
+                            border: 2px solid #4c4c4c;
+                            border-radius: .5rem;
+                            cursor: pointer;
+                            transition: all .3s ease;
+
+                            &:hover {
+                                background-color: #fff;
+                                color: #4c4c4c;
+                                border: 2px solid #4c4c4c;
+                            }
+                        
+                        }
+                    }
+                     .desc a {
+                        text-decoration: none;
+                        color: #2a2a2a;
+                        font-size: 1.2rem;
+                        font-weight: 700;
+                     }
+                  }
+
+                   p {
+                    font-size: 1rem;
+                    margin-bottom: 1rem;
+                    color: #7d7d7d;
+                   }
+
+                   .favorites-places-cont {
+                    width: 9rem;
+                    height: 9rem;
+                    overflow: hidden;
+                    border-radius: 50%;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    
+                 }
+                }
             }
 
         }
@@ -263,7 +313,71 @@ export const UserProfileContainer = styled.div`
             .website {
                 margin-top: 1rem;
             }
+
+            .achievement-wrapper {
+                display: flex;
+                margin-top: 1rem;
+                flex-direction: column;
+
+                .achievement-cont {
+                    display: flex;
+                    gap: .5rem;
+
+                    .achievement-wrapper {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: .3rem;
+
+                        .achievement-icon {
+                            color: #4c4c4c;
+                            cursor: pointer;
+                        }
+
+                    span {
+                        font-size: .7rem;
+                        color: #7d7d7d;
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+
+        .local-time {
+            margin-top: 2rem;
+            font-size: 2rem;
+            color: #7d7d7d;
+        }
+
+        .user-social {
+            margin-top: .2rem;
+
+            .social-wrapper {
+                display: flex;
+                gap: 1rem;
+
+                .social-cont {
+                    width: 3rem;
+                    height: 3rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: #4c4c4c;
+                    color: #fff;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    transition: all .3s ease;
+                    box-shadow: 0 .5rem 1rem 10px rgba(0, 0, 0, 0.1);
+
+                    &:hover {
+                        background-color: #ff8c91;
+                        color: #fff;
+                    }
+                }
+            }
         }
      }
   }
+}
+}
 `;
