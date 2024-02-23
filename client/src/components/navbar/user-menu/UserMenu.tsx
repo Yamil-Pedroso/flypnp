@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import { FaHouseUser } from 'react-icons/fa6'
 import { RiMenuUnfoldLine } from 'react-icons/ri'
 import { TbWorld } from 'react-icons/tb'
-import { IoMdCloseCircle } from 'react-icons/io'
 import { IoCloseSharp } from 'react-icons/io5'
 import { useAuth } from '../../../../hooks'
 import { useNotifications } from '../../../../hooks'
@@ -18,8 +17,9 @@ const UserMenu = () => {
   const auth = useAuth() as any
   const { user, logout } = auth
   const notis = useNotifications() as any
+  const { notifications } = notis
 
-  console.log('notifications', notis.notifications.length)
+  console.log('notifications', notis)
 
   const handleMenuIconClick = () => {
     setMenuOpen(!menuOpen)
@@ -86,9 +86,9 @@ const UserMenu = () => {
           </div>
           {user ? (
             <div className="user-menu-item">
-              {notis.notifications.length > 0 && (
+              {notifications.length > 0 && (
                 <span className="notification-count">
-                  <p>{notis.notifications.length}</p>
+                  <p>{notifications.length}</p>
                 </span>
               )}
               <img

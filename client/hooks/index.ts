@@ -187,7 +187,7 @@ export const useProvidePlaces = () => {
             console.log(error)
         } finally {
             setLoading(false)
-        }   
+        }
     }
 
     useEffect(() => {
@@ -211,19 +211,42 @@ export const useProvideNotifications = () => {
     const [notifications, setNotifications] = useState([])
     const [loading, setLoading] = useState(true)
 
-    const getNotifications = async () => {
-        const { data } = await axiosInstance.get('/notifications')
+    const getNotifications = async (userId: any) => {
+
+        try  {
+        const { data } = await axiosInstance.get(`/notification/${userId}`)
         console.log(data)
         setNotifications(data)
         setLoading(false)
+    }   catch (error) {
+        console.log(error)
+    }
+    }
+
+    const deleteNotification = async (notisId: any) => {
+        try {
+        const { data } = await axiosInstance.delete(`/delete-notification/${notisId}`)
+
+        if (data.success) {
+            const newNotis = notifications.filter((notis: any) => notis._id !== notisId)
+            setNotifications(newNotis)
+        }
+
+    }  catch (error) {
+        console.log(error)
+    }
     }
 
     useEffect(() => {
-        getNotifications()
+        const user = JSON.parse(getItemsFromLocalStorage('user') as any)
+        if (user) {
+            getNotifications(user._id)
+        }
     } , [])
 
     return {
         notifications,
+        deleteNotification,
         setNotifications,
         loading,
         setLoading,

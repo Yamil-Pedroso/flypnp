@@ -1,30 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
-import { NotificationsContainer } from "./styles";
-import { useNotifications } from "../../hooks";
+import { useState, useEffect } from 'react'
+import { NotificationsContainer } from './styles'
+import { useNotifications } from '../../hooks'
+import { AiFillDelete } from 'react-icons/ai'
 
 const NotificationsPage = () => {
-  const [notifications, setNotifications] = useState([]);
-  const notis = useNotifications();
-
-  console.log(notis.notifications.length);
+  const [myNotifications, setMyNotifications] = useState([])
+  const { notifications, deleteNotification } = useNotifications()
 
   useEffect(() => {
-    setNotifications(notis.notifications);
-  }, [notis.notifications]);
+    setMyNotifications(notifications as any)
+  }, [notifications])
+
+  const handleDeleteNotification = async (id: any) => {
+    await deleteNotification(id)
+  }
 
   return (
     <NotificationsContainer>
-      <h1>Notifications</h1>
       <div className="notis-wrapper">
-        {notifications.slice(0, 12).map((notification: any) => (
+        {myNotifications.length === 0 && <p>No notifications</p>}
+        {myNotifications.map((notification: any) => (
           <div className="notis-cont" key={notification.id}>
-            <p>{notification.text}</p>
+            <p>{notification.message}</p>
+            <AiFillDelete
+              className="close-icon"
+              size={18}
+              onClick={() => handleDeleteNotification(notification._id)}
+            />
           </div>
         ))}
       </div>
     </NotificationsContainer>
-  );
-};
+  )
+}
 
-export default NotificationsPage;
+export default NotificationsPage

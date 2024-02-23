@@ -31,6 +31,7 @@ colors.enable();
 const app = express();
 app.use(morgan('dev'));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors({
     origin: process.env.CLIENT_URL,
@@ -58,6 +59,11 @@ import routes from '../routes/index';
 app.use('/api/v1', routes);
 
 app.use(express.static(path.join(__dirname, '../../', 'public')));
+
+app.get('*', (req: Request, res: Response ) => {
+    res.sendFile(path.join(__dirname, '../../', 'public', 'index.html'));
+}
+);
 
 app.get('/', (req: Request, res: Response) => {
 	res.send('Hello World we have been just init with Node and Typescript!');
