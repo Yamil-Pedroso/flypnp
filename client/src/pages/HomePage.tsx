@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import PlaceGallery from '../components/place-gallery/PlaceGallery'
 
 const HomePage = () => {

@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { PlaceCardWrapper, PlaceCardImageWrapper } from './styles'
+import { Link } from 'react-router-dom'
+import { Container, PlaceCardWrapper, PlaceCardImageWrapper } from './styles'
 import { MdStar } from 'react-icons/md'
 import { MdStarBorder } from 'react-icons/md'
 import { MdStarHalf } from 'react-icons/md'
 import { FaHeart } from 'react-icons/fa'
+import { IoCloseSharp } from 'react-icons/io5'
 import { FaRegHeart } from 'react-icons/fa'
+import CreateWishListBox from '../wishlist/create/CreateWishListBox'
 
 interface PlaceCardProps {
   place: {
@@ -25,12 +27,23 @@ interface PlaceCardProps {
 }
 
 const PlaceCard = (props: PlaceCardProps) => {
+  const [showCreateWishList, setShowCreateWishList] = useState(false)
   const [isFavorited, setIsFavorited] = useState(false)
   const { place } = props
   const { title, address, photos, rating, price } = place
 
+  const handleClickCreateWishList = () => {
+    setShowCreateWishList(!showCreateWishList)
+  }
+
   return (
-    <>
+    <Container>
+      <div className={`overlay ${showCreateWishList && 'show'}`}>
+        <CreateWishListBox
+          closeCreateWishList={handleClickCreateWishList}
+          className="wishlist-box"
+        />
+      </div>
       <PlaceCardWrapper>
         {photos?.[0] && (
           <PlaceCardImageWrapper>
@@ -42,15 +55,12 @@ const PlaceCard = (props: PlaceCardProps) => {
                 width="300"
               />
             </Link>
+
             <div
               className="favorite-heart"
-              onClick={() => setIsFavorited(!isFavorited)}
+              onClick={() => handleClickCreateWishList()}
             >
-              {isFavorited ? (
-                <FaHeart style={{ color: 'red' }} />
-              ) : (
-                <FaRegHeart />
-              )}
+              <FaRegHeart />
             </div>
           </PlaceCardImageWrapper>
         )}
@@ -148,7 +158,7 @@ const PlaceCard = (props: PlaceCardProps) => {
           </div>
         </div>
       </PlaceCardWrapper>
-    </>
+    </Container>
   )
 }
 

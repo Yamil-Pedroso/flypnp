@@ -10,7 +10,14 @@ const Trending = () => {
     setTrendingPlaces(trending as any)
   }, [])
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        marginTop: '1.5rem',
+      }}
+    >
       {trendingPlaces.map((place, idx) => (
         <PlaceCard key={idx} place={place} />
       ))}

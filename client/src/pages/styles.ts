@@ -3,12 +3,18 @@ import styled from "styled-components";
 export const NotificationsContainer = styled.div`
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 60rem;
+
+    width: 100%;
     height: 50rem;
     margin: 0 auto;
-    //border: 1px solid #e0e0e0;
-    border-radius: 1rem;
+    border-top: 1px solid #e0e0e0;
+
+    h1 {
+        font-weight: 500;
+        color: #434343;
+        margin-top: 1.6rem;
+        margin-left: 3.5rem;
+    }
 
     .notis-wrapper {
         display: flex;
@@ -24,9 +30,9 @@ export const NotificationsContainer = styled.div`
             height: 6rem;
             padding: 1rem 1rem 1rem 1.5rem;
             background-color: #fff;
-            border: 3px solid rgba(21, 59, 37, 0.6);
+            border: 3px solid #8b2e3f;
             border-radius: 1rem;
-            box-shadow: 3px 3px 0rem 1px rgba(21, 59, 37, 0.6);
+            box-shadow: 3px 3px 0rem 1px #8b2e3f;
             cursor: pointer;
             position: relative;
 

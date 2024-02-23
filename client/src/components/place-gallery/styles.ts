@@ -4,7 +4,12 @@ export const PlaceGalleryContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-2323
+
+  .place-gallery-wrapper {
+    margin-top: -2rem;
+    border-top: 1px solid #dddddd;
+  }
+
   ul {
     display: flex;
     list-style: none;
@@ -21,32 +26,53 @@ export const PlaceGalleryContainer = styled.div`
 
 export const MenuWrapper = styled.div`
   display: flex;
-  margin-top: 3.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+  position: relative;
+
+  .underlineIndicator {
+    position: absolute;
+    bottom: -10px;
+    height: 2px;
+    width: 0;
+    background-color: #2a2a2a;
+    transition: all .3s ease;
+}
+
+  .icon-places-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 1.5rem;
+
+    p {
+      margin-top: .4rem;
+      font-size: 1rem;
+      font-weight: 400;
+      color: #939393;
+    }
+  }
 
   button.active {
-    margin: 0 1rem;
     cursor: pointer;
+    color: #2a2a2a;
     border: none;
-    background-color: #ff8c91;
-    color: #1c1413;
-    padding: .3rem 1rem;
-    border-radius: 15rem;
     transition: all .3s ease;
+    background-color: transparent;
   }
 
   button.inactive {
-    margin: 0 1rem;
     cursor: pointer;
-    border: 2px solid #c3adae;
-    color: #c3adae;
-    background-color: transparent;
-    padding: .3rem 1rem;
-    border-radius: 15rem;
+    color: #2a2a2a;
+    border: none;
     transition: all .3s ease;
-  }
-
-  .card-wrapper {
-    position: absolute;
-    margin-top: 4rem;
+    background-color: transparent;
   }
 `;

@@ -12,6 +12,42 @@ const boomBoomHeart = keyframes`
   }
 `;
 
+const fadeInFromDown = keyframes`
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
+
+
+export const Container = styled.div`
+ .overlay {
+      display: flex;
+      position: absolute;
+      width: 100%;
+      height: 1000vh;
+      top: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 999;
+      transition: all 0.3s ease-in-out;
+
+      &.show {
+        display: block;
+      }
+
+      .wishlist-box {
+
+        animation: ${fadeInFromDown} 0.6s ease-in-out;
+      }
+    }
+`;
+
 export const PlaceCardWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -19,9 +55,10 @@ export const PlaceCardWrapper = styled.div`
   min-width: 300px;
   margin: 0 10px 20px;
   border-radius: .8rem;
-  overflow: hidden;
+
   cursor: pointer;
   transition: transform 0.3s ease;
+  position: relative;
 
   .content-wrapper {
     padding: 20px;
@@ -33,7 +70,6 @@ export const PlaceCardWrapper = styled.div`
 `;
 
 export const PlaceCardImageWrapper = styled.div`
-    position: relative;
     width: 100%;
     height: 290px;
     overflow: hidden;
@@ -59,4 +95,6 @@ export const PlaceCardImageWrapper = styled.div`
       }
 
     }
-`;
+
+
+    `;

@@ -19,8 +19,6 @@ const UserMenu = () => {
   const notis = useNotifications() as any
   const { notifications } = notis
 
-  console.log('notifications', notis)
-
   const handleMenuIconClick = () => {
     setMenuOpen(!menuOpen)
   }
@@ -114,10 +112,10 @@ const UserMenu = () => {
                   <a href="/profile">Profile</a>
                 </li>
                 <li>
-                  <a href="/register">Trips</a>
+                  <a href="/trips">Trips</a>
                 </li>
                 <li>
-                  <a href="#">Wishlists</a>
+                  <a href="/wishlist">Wishlists</a>
                 </li>
                 <hr
                   style={{ margin: '0.5rem 0', border: '.02px solid #dedede' }}

@@ -18,8 +18,12 @@ const NotificationsPage = () => {
 
   return (
     <NotificationsContainer>
+      {myNotifications.length === 0 ? (
+        <h1>No notis</h1>
+      ) : (
+        <h1>You have notis...</h1>
+      )}
       <div className="notis-wrapper">
-        {myNotifications.length === 0 && <p>No notifications</p>}
         {myNotifications.map((notification: any) => (
           <div className="notis-cont" key={notification.id}>
             <p>{notification.message}</p>

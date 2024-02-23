@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react'
-import { PlaceGalleryContainer, MenuWrapper, CardWrapper } from './styles'
+import { PlaceGalleryContainer, MenuWrapper } from './styles'
 import Trending from './trending/Trending'
 import Beachfront from './beachfront/BeachFront'
 import IconicCities from './iconic-cities/IconicCities'
+//import Spinner from '../common/progress/Progress'
 
 import { FaFireAlt } from 'react-icons/fa'
 import { LiaUmbrellaBeachSolid } from 'react-icons/lia'
@@ -14,51 +16,112 @@ type ComponentType = {
 }
 
 const PlaceGallery = () => {
+  const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 })
   const [activeComponent, setActiveComponent] = useState<
     keyof typeof components
   >('trending')
 
   const components: Record<string, ComponentType> = {
-    trending: { icon: <FaFireAlt />, component: <Trending /> },
-    beachfront: { icon: <LiaUmbrellaBeachSolid />, component: <Beachfront /> },
-    iconicCities: { icon: <FaTreeCity />, component: <IconicCities /> },
-    uno: { icon: <FaTreeCity />, component: <IconicCities /> },
-    dos: { icon: <FaTreeCity />, component: <IconicCities /> },
-    tres: { icon: <FaTreeCity />, component: <IconicCities /> },
-    cuatro: { icon: <FaTreeCity />, component: <IconicCities /> },
-    cinco: { icon: <FaTreeCity />, component: <IconicCities /> },
-    seis: { icon: <FaTreeCity />, component: <IconicCities /> },
-    siete: { icon: <FaTreeCity />, component: <IconicCities /> },
-    ocho: { icon: <FaTreeCity />, component: <IconicCities /> },
-    nueve: { icon: <FaTreeCity />, component: <IconicCities /> },
-    diez: { icon: <FaTreeCity />, component: <IconicCities /> },
-    once: { icon: <FaTreeCity />, component: <IconicCities /> },
-    doce: { icon: <FaTreeCity />, component: <IconicCities /> },
+    trending: {
+      icon: <FaFireAlt size={32} style={{ color: '#515151' }} />,
+      component: <Trending />,
+    },
+    beachfront: {
+      icon: <LiaUmbrellaBeachSolid size={32} style={{ color: '#515151' }} />,
+      component: <Beachfront />,
+    },
+    iconicCities: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    uno: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    dos: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    tres: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    cuatro: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    cinco: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    seis: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    siete: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    ocho: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    nueve: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    diez: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    once: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
+    doce: {
+      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      component: <IconicCities />,
+    },
   }
 
-  const handleClick = (component: keyof typeof components) => {
+  const handleClick = (component: keyof typeof components, e: any) => {
     setActiveComponent(component)
+
+    const buttonRect = e.currentTarget.getBoundingClientRect()
+    setUnderlineStyle({
+      left: buttonRect.left + window.scrollX,
+      width: buttonRect.width,
+    })
   }
 
   return (
     <PlaceGalleryContainer>
-      <div>
+      <div className="place-gallery-wrapper">
         <MenuWrapper>
           {Object.keys(components).map((key) => (
-            <div key={key} style={{}}>
+            <div key={key} className="btn-wrapper">
               <button
                 className={activeComponent === key ? 'active' : 'inactive'}
-                onClick={() => handleClick(key as keyof typeof components)}
+                onClick={(e) => handleClick(key as keyof typeof components, e)}
               >
-                {components[key as keyof typeof components].icon}
-                {key.charAt(0).toUpperCase() + key.slice(1)}
+                <div className="icon-places-wrapper">
+                  {components[key as keyof typeof components].icon}
+                </div>
+                <p>{key.charAt(0).toUpperCase() + key.slice(1)}</p>
               </button>
             </div>
           ))}
-          <div className="card-wrapper">
-            {activeComponent && components[activeComponent].component}
-          </div>
+          <div
+            className="underlineIndicator"
+            style={{
+              left: underlineStyle.left,
+              width: underlineStyle.width,
+            }}
+          ></div>
         </MenuWrapper>
+        <div className="card-wrapper">
+          {activeComponent && components[activeComponent].component}
+        </div>
       </div>
     </PlaceGalleryContainer>
   )

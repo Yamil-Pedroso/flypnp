@@ -11,11 +11,11 @@ import './index.css'
 import Navbar from './components/navbar/Navbar'
 import HomePage from './pages/HomePage'
 import NotFoundPage from './pages/NotFoundPage'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
 import PlaceDetailsPage from './pages/PlaceDetailsPage'
 import NotificationsPage from './pages/NotificationsPage'
+import TripsPage from './pages/TripsPage'
+import WishListPage from './pages/WishListPage'
 
 //interface AppProps {
 //  children: React.ReactNode
@@ -48,14 +48,14 @@ function App({ menuClick }: AppProps) {
             <Router>
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                {/*<Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />*/}
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route
                   path="/place/:category/:id"
                   element={<PlaceDetailsPage />}
                 />
+                <Route path="/trips" element={<TripsPage />} />
+                <Route path="/wishlist" element={<WishListPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Router>
