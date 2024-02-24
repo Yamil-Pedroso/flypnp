@@ -4,11 +4,25 @@ import { PlaceGalleryContainer, MenuWrapper } from './styles'
 import Trending from './trending/Trending'
 import Beachfront from './beachfront/BeachFront'
 import IconicCities from './iconic-cities/IconicCities'
+import { usePlaces } from '../../../hooks'
 //import Spinner from '../common/progress/Progress'
 
-import { FaFireAlt } from 'react-icons/fa'
-import { LiaUmbrellaBeachSolid } from 'react-icons/lia'
-import { FaTreeCity } from 'react-icons/fa6'
+import { FaTreeCity, FaUmbrellaBeach } from 'react-icons/fa6'
+import {
+  GiFamilyHouse,
+  GiTropicalFish,
+  GiCaveEntrance,
+  GiCampingTent,
+} from 'react-icons/gi'
+import {
+  FaShuttleVan,
+  FaSkiing,
+  FaLaptopHouse,
+  FaFireAlt,
+} from 'react-icons/fa'
+import { AiFillPicture } from 'react-icons/ai'
+import { MdFoodBank, MdCastle, MdOutlineSurfing } from 'react-icons/md'
+import { PiWarehouseFill } from 'react-icons/pi'
 
 type ComponentType = {
   icon: JSX.Element
@@ -20,6 +34,8 @@ const PlaceGallery = () => {
   const [activeComponent, setActiveComponent] = useState<
     keyof typeof components
   >('trending')
+  const { places } = usePlaces()
+  console.log('Geting place from backend', places)
 
   const components: Record<string, ComponentType> = {
     trending: {
@@ -27,59 +43,59 @@ const PlaceGallery = () => {
       component: <Trending />,
     },
     beachfront: {
-      icon: <LiaUmbrellaBeachSolid size={32} style={{ color: '#515151' }} />,
+      icon: <FaUmbrellaBeach size={32} style={{ color: '#515151' }} />,
       component: <Beachfront />,
     },
     iconicCities: {
       icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    uno: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    tinyHomes: {
+      icon: <FaLaptopHouse size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    dos: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    mansions: {
+      icon: <GiFamilyHouse size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    tres: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    huts: {
+      icon: <FaShuttleVan size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    cuatro: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    ski: {
+      icon: <FaSkiing size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    cinco: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    amazingViews: {
+      icon: <AiFillPicture size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    seis: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    luxe: {
+      icon: <MdFoodBank size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    siete: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    design: {
+      icon: <PiWarehouseFill size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    ocho: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    tropical: {
+      icon: <GiTropicalFish size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    nueve: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    historicalHomes: {
+      icon: <MdCastle size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    diez: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    surfing: {
+      icon: <MdOutlineSurfing size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    once: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    caves: {
+      icon: <GiCaveEntrance size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
-    doce: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+    camping: {
+      icon: <GiCampingTent size={32} style={{ color: '#515151' }} />,
       component: <IconicCities />,
     },
   }

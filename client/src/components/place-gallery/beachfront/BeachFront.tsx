@@ -1,18 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react'
-import { beachFront } from '../../../data/beachFront'
+import { usePlaces } from '../../../../hooks'
 import PlaceCard from '../../place-card/PlaceCard'
+import { Place } from '../../../providers/PlacesProvider'
 
 const BeachFront = () => {
-  const [beachFrontPlaces, setBeachFrontPlaces] = useState([])
+  const [beachFrontPlaces, setBeachFrontPlaces] = useState<Place[]>([])
+  const { places, loading } = usePlaces()
 
   useEffect(() => {
-    setBeachFrontPlaces(beachFront as any)
-  }, [])
+    if (!loading && Array.isArray(places)) {
+      const beachFrontPlaces = places.filter(
+        (place) => place.category === 'beachFront',
+      )
+      setBeachFrontPlaces(beachFrontPlaces)
+    }
+  }, [places, loading])
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: '1.5rem' }}>
-      {beachFrontPlaces.map((place, idx) => (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        marginTop: '1.5rem',
+      }}
+    >
+      {beachFrontPlaces.map((place: any, idx: number) => (
         <PlaceCard key={idx} place={place} />
       ))}
     </div>

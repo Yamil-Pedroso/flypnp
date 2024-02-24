@@ -156,15 +156,24 @@ export const useProvideAuth = () => {
     }
 }
 
+interface Photo {
+    main: string;
+    thumbnails: string[];
+
+}
+
 interface Place {
-    owner: number;
+    _id: string;
     title: string;
     address: string;
-    photos: string[];
+    photos: Photo[];
+    category: string;
     description: string;
     perks: string[];
     extraInfo: string;
     maxGuests: number;
+    rating: number;
+    reviews: number;
     price: number;
 }
 
@@ -180,8 +189,8 @@ export const useProvidePlaces = () => {
     const getPlaces = async () => {
         try {
         const { data } = await axiosInstance.get('/all-places')
-        console.log(data)
-        setPlaces(data)
+        console.log(data.data)
+        setPlaces(data.data)
         setLoading(false)
         } catch (error) {
             console.log(error)

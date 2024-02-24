@@ -1,35 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { trending } from '../../../data/trending'
-import { iconicCities } from '../../../data/iconicCities'
-import { beachFront } from '../../../data/beachFront'
+import { usePlaces } from '../../../../hooks'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 
 const ReserveBox = () => {
   const [clickArrow, setClickArrow] = useState(false)
+  const { places, loading } = usePlaces()
   const { id, category } = useParams()
 
   const handleArrowClick = () => {
     setClickArrow(!clickArrow)
   }
 
-  let dataSource = [] as any
-  switch (category) {
-    case 'trending':
-      dataSource = trending
-      break
-    case 'iconicCities':
-      dataSource = iconicCities
-      break
-    case 'beachFront':
-      dataSource = beachFront
-      break
-    default:
-      dataSource = []
+  if (loading) {
+    return <div>Loading...</div>
   }
 
-  const place = dataSource.find((place: any) => place.id === Number(id))
+  const place = places.find(
+    (place) => place._id === id && place.category === category,
+  )
 
   if (!place) {
     return <div>Image not found</div>
