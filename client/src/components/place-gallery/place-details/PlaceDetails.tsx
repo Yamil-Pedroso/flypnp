@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useParams } from 'react-router-dom'
-import { trending } from '../../../data/trending'
-import { iconicCities } from '../../../data/iconicCities'
-import { beachFront } from '../../../data/beachFront'
+import { usePlaces } from '../../../../hooks'
 import { Container } from './styles'
 import { IoShareSocial } from 'react-icons/io5'
 import { FaRegHeart } from 'react-icons/fa6'
@@ -18,28 +16,23 @@ import {
 } from 'react-icons/md'
 
 const PlaceDetails = () => {
-  const { id, category } = useParams()
+  const { id, category } = useParams<{ id: string; category: string }>()
+  const { places, loading } = usePlaces()
 
-  let dataSource = [] as any
-  switch (category) {
-    case 'trending':
-      dataSource = trending
-      break
-    case 'iconicCities':
-      dataSource = iconicCities
-      break
-    case 'beachFront':
-      dataSource = beachFront
-      break
-    default:
-      dataSource = []
+  if (loading) {
+    return <div>Loading...</div>
   }
 
-  const place = dataSource.find((place: any) => place.id === Number(id))
+  const place = places.find(
+    (place) => place._id === id && place.category === category,
+  )
 
   if (!place) {
-    return <div>Image not found</div>
+    return <div>Place not found</div>
   }
+
+  const mainPhoto = place.photos[0]?.main || ''
+  const thumbnails = place.photos[0]?.thumbnails || []
 
   return (
     <Container>
@@ -60,11 +53,11 @@ const PlaceDetails = () => {
       </div>
       <div className="img-details-wrapper">
         <div className="img-wrapper">
-          <img src={place.photos[0]} alt={place.title} width={400} />
+          <img src={mainPhoto} alt={place.title} width={400} />
         </div>
         <div className="img-thumbnail-wrapper">
           <ShowAllPhotos />
-          {place.photos[1].thumbnails.map((photo: string, index: number) => (
+          {thumbnails.map((photo, index) => (
             <img
               key={index}
               src={photo}
@@ -103,7 +96,7 @@ const PlaceDetails = () => {
               </div>
 
               <p>
-                {place.review} <span>reviews</span>
+                {place.reviews} <span>reviews</span>
               </p>
             </div>
           </div>

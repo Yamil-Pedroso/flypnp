@@ -5,8 +5,10 @@ export const iconicCities = [
       title: 'Luxury Villa Indu Siam',
       address: 'Koh Samui, Thailand',
       photos: [
-        'https://images.unsplash.com/photo-1612698093158-e07ac200d44e?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         {
+          main:
+        'https://images.unsplash.com/photo-1612698093158-e07ac200d44e?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
           thumbnails: ['https://images.unsplash.com/photo-1612698093158-e07ac200d44e?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://images.unsplash.com/photo-1612698093158-e07ac200d44e?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://images.unsplash.com/photo-1612698093158-e07ac200d44e?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -20,7 +22,7 @@ export const iconicCities = [
         'Wifi, Air conditioning, Kitchen, Pool, Free parking, Washing machine',
       maxGuests: 6,
       rating: 3.5,
-      review: 350,
+      reviews: 350,
       price: 350,
     },
     {
@@ -29,8 +31,10 @@ export const iconicCities = [
       title: 'The Joshua Tree House',
       address: 'Joshua Tree, United States',
       photos: [
-        'https://plus.unsplash.com/premium_photo-1682056762907-23d08f913805?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         {
+          main:
+        'https://plus.unsplash.com/premium_photo-1682056762907-23d08f913805?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
           thumbnails: ['https://plus.unsplash.com/premium_photo-1682056762907-23d08f913805?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1682056762907-23d08f913805?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1682056762907-23d08f913805?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -44,7 +48,7 @@ export const iconicCities = [
         'Wifi, Air conditioning, Kitchen, Pool, Free parking, Washing machine',
       maxGuests: 6,
       rating: 4,
-      review: 350,
+      reviews: 350,
       price: 350,
     },
     {
@@ -53,8 +57,10 @@ export const iconicCities = [
       title: 'Unique Cob Cottage',
       address: 'Mayne Island, Canada',
       photos: [
-        'https://plus.unsplash.com/premium_photo-1670176447319-c5622f2fb996?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         {
+          main:
+        'https://plus.unsplash.com/premium_photo-1670176447319-c5622f2fb996?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
           thumbnails: ['https://plus.unsplash.com/premium_photo-1670176447319-c5622f2fb996?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1670176447319-c5622f2fb996?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1670176447319-c5622f2fb996?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -67,7 +73,7 @@ export const iconicCities = [
       extraInfo: 'Wifi, Kitchen',
       maxGuests: 2,
       rating: 5,
-      review: 350,
+      reviews: 350,
       price: 145,
     },
     {
@@ -76,8 +82,10 @@ export const iconicCities = [
       title: 'The World Famous Seashell House ~ Casa Caracol',
       address: 'Isla Mujeres, Mexico',
       photos: [
-        'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         {
+          main:
+        'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
           thumbnails: ['https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -91,7 +99,7 @@ export const iconicCities = [
         'Wifi, Air conditioning, Kitchen, Free parking, Indoor fireplace',
       maxGuests: 4,
       rating: 3.5,
-      review: 350,
+      reviews: 350,
       price: 308,
     },
     {
@@ -100,8 +108,10 @@ export const iconicCities = [
       title: 'A Pirate’s Life For Me - Houseboat!',
       address: 'Charleston, United States',
       photos: [
-        'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         {
+          main:
+        'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
           thumbnails: ['https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -114,7 +124,7 @@ export const iconicCities = [
       extraInfo: 'Wifi, Kitchen, Free parking',
       maxGuests: 3,
       rating: 4,
-      review: 350,
+      reviews: 350,
       price: 208,
     },
     {
@@ -123,8 +133,10 @@ export const iconicCities = [
       title: 'The World Famous Seashell House ~ Casa Caracol',
       address: 'Isla Mujeres, Mexico',
       photos: [
-        'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         {
+          main:
+        'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
           thumbnails: ['https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -138,7 +150,7 @@ export const iconicCities = [
         'Wifi, Air conditioning, Kitchen, Free parking, Indoor fireplace',
       maxGuests: 4,
       rating: 3.5,
-      review: 350,
+      reviews: 350,
       price: 308,
     },
     {
@@ -147,8 +159,10 @@ export const iconicCities = [
       title: 'A Pirate’s Life For Me - Houseboat!',
       address: 'Charleston, United States',
       photos: [
-        'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         {
+          main:
+        'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
           thumbnails: ['https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -161,7 +175,7 @@ export const iconicCities = [
       extraInfo: 'Wifi, Kitchen, Free parking',
       maxGuests: 3,
       rating: 4,
-      review: 350,
+      reviews: 350,
       price: 208,
     },
     {
@@ -170,8 +184,10 @@ export const iconicCities = [
       title: 'The World Famous Seashell House ~ Casa Caracol',
       address: 'Isla Mujeres, Mexico',
       photos: [
-        'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         {
+          main:
+        'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
           thumbnails: ['https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1682056762928-10e7aa38fe49?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -185,7 +201,7 @@ export const iconicCities = [
         'Wifi, Air conditioning, Kitchen, Free parking, Indoor fireplace',
       maxGuests: 4,
       rating: 3.5,
-      review: 350,
+      reviews: 350,
       price: 308,
     },
     {
@@ -194,8 +210,10 @@ export const iconicCities = [
       title: 'A Pirate’s Life For Me - Houseboat!',
       address: 'Charleston, United States',
       photos: [
-        'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         {
+          main:
+        'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
           thumbnails: ['https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -208,7 +226,7 @@ export const iconicCities = [
       extraInfo: 'Wifi, Kitchen, Free parking',
       maxGuests: 3,
       rating: 4,
-      review: 350,
+      reviews: 350,
       price: 208,
     },
     {
@@ -217,8 +235,10 @@ export const iconicCities = [
       title: 'A Pirate’s Life For Me - Houseboat!',
       address: 'Charleston, United States',
       photos: [
-        'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         {
+          main:
+        'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
           thumbnails: ['https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1680328655580-6429f1107deb?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -231,7 +251,7 @@ export const iconicCities = [
       extraInfo: 'Wifi, Kitchen, Free parking',
       maxGuests: 3,
       rating: 4,
-      review: 350,
+      reviews: 350,
       price: 208,
     },
   ]

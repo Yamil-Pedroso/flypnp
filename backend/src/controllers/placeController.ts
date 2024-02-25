@@ -12,18 +12,20 @@ interface AuthenticatedRequest extends Request {
 // Add a new place to the database
 export const addPlace = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-        const userData = req.user;
-        const { title, address, addedPhotos, description, perks, extraInfo, maxGuests, price } = req.body;
+
+        const { title, address, addedPhotos, category, description, perks, extraInfo, maxGuests, rating, reviews, price } = req.body;
 
         const place = new Place({
-            owner: userData.id,
             title,
             address,
             photos: addedPhotos,
+            category,
             description,
             perks,
             extraInfo,
             maxGuests,
+            rating,
+            reviews,
             price,
         });
 
@@ -68,6 +70,8 @@ export const updatePlace = async (req: AuthenticatedRequest, res: Response, next
             perks,
             extraInfo,
             maxGuests,
+            rating,
+            reviews,
             price,
         } = req.body;
 
@@ -81,6 +85,8 @@ export const updatePlace = async (req: AuthenticatedRequest, res: Response, next
                 perks,
                 extraInfo,
                 maxGuests,
+                rating,
+                reviews,
                 price,
             });
             await place.save();
@@ -152,17 +158,14 @@ export const searchPlaces = async (req: Request, res: Response, next: NextFuncti
 export const deletePlace = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const userData = req.user;
-        const userId = userData.id;
         const { id } = req.params;
 
         const place = await Place.findById(id);
 
-        if (userId === place?.owner.toString()) {
-            await place?.deleteOne();
-            res.status(200).json({ success: true, message: 'Place deleted successfully' });
-        } else {
-            res.status(401).json({ success: false, message: 'Unauthorized' });
+        if (!place) {
+            res.status(404).json({ success: false, message: 'Place not found' });
         }
+
     } catch (error: any) {
         res.status(500).json({
             message: 'Internal server error',

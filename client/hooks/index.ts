@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useContext } from 'react';
 import { jwtDecode } from "jwt-decode";
 
@@ -155,15 +156,24 @@ export const useProvideAuth = () => {
     }
 }
 
+interface Photo {
+    main: string;
+    thumbnails: string[];
+
+}
+
 interface Place {
-    owner: number;
+    _id: string;
     title: string;
     address: string;
-    photos: string[];
+    photos: Photo[];
+    category: string;
     description: string;
     perks: string[];
     extraInfo: string;
     maxGuests: number;
+    rating: number;
+    reviews: number;
     price: number;
 }
 
@@ -177,9 +187,16 @@ export const useProvidePlaces = () => {
     const [loading, setLoading] = useState<boolean>(true)
 
     const getPlaces = async () => {
-        const { data } = await axiosInstance.get('/')
-        setPlaces(data)
+        try {
+        const { data } = await axiosInstance.get('/all-places')
+        console.log(data.data)
+        setPlaces(data.data)
         setLoading(false)
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
@@ -203,19 +220,42 @@ export const useProvideNotifications = () => {
     const [notifications, setNotifications] = useState([])
     const [loading, setLoading] = useState(true)
 
-    const getNotifications = async () => {
-        const { data } = await axiosInstance.get('/notifications')
+    const getNotifications = async (userId: any) => {
+
+        try  {
+        const { data } = await axiosInstance.get(`/notification/${userId}`)
         console.log(data)
         setNotifications(data)
         setLoading(false)
+    }   catch (error) {
+        console.log(error)
+    }
+    }
+
+    const deleteNotification = async (notisId: any) => {
+        try {
+        const { data } = await axiosInstance.delete(`/delete-notification/${notisId}`)
+
+        if (data.success) {
+            const newNotis = notifications.filter((notis: any) => notis._id !== notisId)
+            setNotifications(newNotis)
+        }
+
+    }  catch (error) {
+        console.log(error)
+    }
     }
 
     useEffect(() => {
-        getNotifications()
+        const user = JSON.parse(getItemsFromLocalStorage('user') as any)
+        if (user) {
+            getNotifications(user._id)
+        }
     } , [])
 
     return {
         notifications,
+        deleteNotification,
         setNotifications,
         loading,
         setLoading,

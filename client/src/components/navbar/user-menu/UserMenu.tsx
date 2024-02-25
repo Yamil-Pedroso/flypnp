@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { FaHouseUser } from 'react-icons/fa6'
 import { RiMenuUnfoldLine } from 'react-icons/ri'
 import { TbWorld } from 'react-icons/tb'
-import { IoMdCloseCircle } from 'react-icons/io'
+import { IoCloseSharp } from 'react-icons/io5'
 import { useAuth } from '../../../../hooks'
 import { useNotifications } from '../../../../hooks'
 import Login from '../../user-auth/Login'
@@ -17,8 +17,7 @@ const UserMenu = () => {
   const auth = useAuth() as any
   const { user, logout } = auth
   const notis = useNotifications() as any
-
-  console.log('notifications', notis.notifications.length)
+  const { notifications } = notis
 
   const handleMenuIconClick = () => {
     setMenuOpen(!menuOpen)
@@ -70,12 +69,12 @@ const UserMenu = () => {
       <div className={`menu-translation-region-wrapper ${menuOpen && 'show'}`}>
         <div className="menu-translation-region-content">
           <div className="close-icon-wrapper">
-            <IoMdCloseCircle
+            <IoCloseSharp
               onClick={handleMenuIconClick}
               className="close-icon-translate"
             />
           </div>
-          Translation & Region & Currency
+          <h2>Translation & Region & Currency</h2>
         </div>
       </div>
       <div className="user-menu-content">
@@ -85,9 +84,9 @@ const UserMenu = () => {
           </div>
           {user ? (
             <div className="user-menu-item">
-              {notis.notifications.length > 0 && (
+              {notifications.length > 0 && (
                 <span className="notification-count">
-                  <p>{notis.notifications.length}</p>
+                  <p>{notifications.length}</p>
                 </span>
               )}
               <img
@@ -107,16 +106,16 @@ const UserMenu = () => {
             {user ? (
               <ul>
                 <li>
-                  <a href="/notifications">Messages</a>
+                  <a href="/notifications">Notis</a>
                 </li>
                 <li>
                   <a href="/profile">Profile</a>
                 </li>
                 <li>
-                  <a href="/register">Trips</a>
+                  <a href="/trips">Trips</a>
                 </li>
                 <li>
-                  <a href="#">Wishlists</a>
+                  <a href="/wishlist">Wishlists</a>
                 </li>
                 <hr
                   style={{ margin: '0.5rem 0', border: '.02px solid #dedede' }}
@@ -125,7 +124,7 @@ const UserMenu = () => {
                   <a href="#">Flypnp our home</a>
                 </li>
                 <li>
-                  <a href="#">Account</a>
+                  <a href="#">Messages</a>
                 </li>
                 <hr
                   style={{ margin: '0.5rem 0', border: '.02px solid #dedede' }}

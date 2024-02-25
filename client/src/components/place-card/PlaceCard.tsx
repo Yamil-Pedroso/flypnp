@@ -1,20 +1,24 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { PlaceCardWrapper, PlaceCardImageWrapper } from './styles'
+import { Link } from 'react-router-dom'
+import { Container, PlaceCardWrapper, PlaceCardImageWrapper } from './styles'
 import { MdStar } from 'react-icons/md'
 import { MdStarBorder } from 'react-icons/md'
 import { MdStarHalf } from 'react-icons/md'
-import { FaHeart } from 'react-icons/fa'
 import { FaRegHeart } from 'react-icons/fa'
+import CreateWishListBox from '../wishlist/create/CreateWishListBox'
 
+interface Photo {
+  main: string
+  thumbnails: string[]
+}
 interface PlaceCardProps {
   place: {
-    id: number
+    _id: string
     category: string
     placeId?: number
     title: string
     address: string
-    photos: string[]
+    photos: Photo[]
     description?: string
     perks?: string[]
     extraInfo?: string
@@ -25,32 +29,38 @@ interface PlaceCardProps {
 }
 
 const PlaceCard = (props: PlaceCardProps) => {
-  const [isFavorited, setIsFavorited] = useState(false)
+  const [showCreateWishList, setShowCreateWishList] = useState(false)
+  //const [isFavorited, setIsFavorited] = useState(false)
   const { place } = props
   const { title, address, photos, rating, price } = place
 
+  const mainPhotoUrl = photos?.[0]?.main
+  console.log('mainPhotoUrl', mainPhotoUrl)
+
+  const handleClickCreateWishList = () => {
+    setShowCreateWishList(!showCreateWishList)
+  }
+
   return (
-    <>
+    <Container>
+      <div className={`overlay ${showCreateWishList && 'show'}`}>
+        <CreateWishListBox
+          closeCreateWishList={handleClickCreateWishList}
+          className="wishlist-box"
+        />
+      </div>
       <PlaceCardWrapper>
-        {photos?.[0] && (
+        {mainPhotoUrl && (
           <PlaceCardImageWrapper>
-            <Link to={`/place/${place.category}/${place.id}`}>
-              <img
-                src={`${photos?.[0]}`}
-                className=""
-                alt="place"
-                width="300"
-              />
+            <Link to={`/place/${place.category}/${place._id}`}>
+              <img src={mainPhotoUrl} className="" alt="place" width="300" />
             </Link>
+
             <div
               className="favorite-heart"
-              onClick={() => setIsFavorited(!isFavorited)}
+              onClick={() => handleClickCreateWishList()}
             >
-              {isFavorited ? (
-                <FaHeart style={{ color: 'red' }} />
-              ) : (
-                <FaRegHeart />
-              )}
+              <FaRegHeart />
             </div>
           </PlaceCardImageWrapper>
         )}
@@ -148,7 +158,7 @@ const PlaceCard = (props: PlaceCardProps) => {
           </div>
         </div>
       </PlaceCardWrapper>
-    </>
+    </Container>
   )
 }
 

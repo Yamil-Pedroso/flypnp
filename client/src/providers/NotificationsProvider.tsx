@@ -1,17 +1,40 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createContext } from 'react'
 
 import { useProvideNotifications } from '../../hooks'
 
-const initialState = {
+interface Notifications {
+  id: string
+  message: string
+}
+
+interface NotificationsContextType {
+  notifications: Notifications[]
+  deleteNotification: (id: string) => Promise<void>
+  setNotifications: (notifications: Notifications[]) => void
+  loading: boolean
+  setLoading: (loading: boolean) => void
+}
+
+const initialState: NotificationsContextType = {
   notifications: [],
+  deleteNotification: async () => {},
   setNotifications: () => {},
   loading: true,
   setLoading: () => {},
 }
 
-export const NotificationsContext = createContext(initialState)
+export const NotificationsContext = createContext<NotificationsContextType>(
+  initialState,
+)
 
-export const NotificationsProvider = ({ children }: any) => {
+interface NotificationsProviderProps {
+  children: React.ReactNode
+}
+
+export const NotificationsProvider = ({
+  children,
+}: NotificationsProviderProps) => {
   const allNotifications = useProvideNotifications()
 
   return (

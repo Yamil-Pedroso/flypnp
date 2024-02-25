@@ -1,5 +1,5 @@
 const EditeProfileDialog = () => {
-  return <div>EditeProfileDialog</div>
+  return <div>Edite Profile</div>
 }
 
 export default EditeProfileDialog
