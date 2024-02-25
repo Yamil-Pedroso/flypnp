@@ -5,6 +5,7 @@ interface Photo {
     thumbnails: string[];
 }
 interface IPlace {
+    owner?: Types.ObjectId;
     title: string;
     address: string;
     photos: Photo[];
@@ -24,6 +25,7 @@ const photoSchema = new Schema<Photo>({
   });
 
 const placeSchema = new Schema<IPlace>({
+    owner: { type: Schema.Types.ObjectId, ref: "User", required: false },
     title: { type: String, required: true },
     address: { type: String, required: true },
     photos: { type: [photoSchema], required: true },

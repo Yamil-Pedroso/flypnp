@@ -5,6 +5,7 @@ import user from './userRoutes';
 import place from './placeRoutes';
 import booking from './bookingRoutes';
 import notification  from './notificationRoutes';
+import wishlist from './wishlistRoutes';
 
 const router = Router();
 
@@ -56,5 +57,6 @@ router.use('/', user);
 router.use('/', place);
 router.use('/', booking);
 router.use('/', notification);
+router.use('/', wishlist);
 
 export default router;
