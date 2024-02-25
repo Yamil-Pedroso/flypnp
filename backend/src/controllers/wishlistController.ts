@@ -9,7 +9,7 @@ interface AuthenticatedRequest extends Request {
 export const addPlaceToWishlist = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const userData = req.user;
-        const { placeId, title } = req.body;
+        const { placeId, title, picture } = req.body;
 
         if (!req.user) {
             return res.status(401).json({ message: "User not authenticated" });
@@ -18,6 +18,7 @@ export const addPlaceToWishlist = async (req: AuthenticatedRequest, res: Respons
         const wishlist = await WishList.create({
             owner: userData.id,
             place: placeId,
+            picture,
             title,
         });
 

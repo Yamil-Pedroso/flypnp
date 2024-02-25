@@ -1,46 +1,50 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react'
 import { WishListContainer } from './styles'
 import { useWishlist } from '../../../hooks'
+import { AiFillDelete } from 'react-icons/ai'
 
 const WishList = () => {
-  const [items, setItems] = useState<string[]>([])
-  const [inputValues, setInputValues] = useState<string[]>([])
-  const { wishlist } = useWishlist()
+  //const [items, setItems] = useState<string[]>([])
+  //const [inputValues, setInputValues] = useState<string[]>([])
+  const { wishlist, deleteWishlist } = useWishlist()
   console.log('wishlist', wishlist)
 
-  const addItemToWishList = () => {
-    const newItem = `Item ${
-      items.length + 1
-    } - ${new Date().toLocaleTimeString()}`
-    setItems((prevItems) => [...prevItems, newItem])
-    setInputValues((prevInputValues) => [...prevInputValues, ''])
+  const handleDeleteWishlist = async (placeId: any) => {
+    await deleteWishlist(placeId)
   }
 
-  const updateItemInWishList = (index: number) => {
-    const updatedItems = [...items]
-    updatedItems[index] = inputValues[index]
-    setItems(updatedItems)
-    const updatedInputValues = [...inputValues]
-    updatedInputValues[index] = ''
-    setInputValues(updatedInputValues)
-  }
-
-  const deleteItemFromWishList = (index: number) => {
-    setItems((prevItems) => prevItems.filter((_item, i) => i !== index))
-    setInputValues((prevInputValues) =>
-      prevInputValues.filter((_item, i) => i !== index),
-    )
-  }
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index: number,
-  ) => {
-    const newInputValues = [...inputValues]
-    newInputValues[index] = e.target.value
-    setInputValues(newInputValues)
-  }
+  //const addItemToWishList = () => {
+  //  const newItem = `Item ${
+  //    items.length + 1
+  //  } - ${new Date().toLocaleTimeString()}`
+  //  setItems((prevItems) => [...prevItems, newItem])
+  //  setInputValues((prevInputValues) => [...prevInputValues, ''])
+  //}
+  //
+  //const updateItemInWishList = (index: number) => {
+  //  const updatedItems = [...items]
+  //  updatedItems[index] = inputValues[index]
+  //  setItems(updatedItems)
+  //  const updatedInputValues = [...inputValues]
+  //  updatedInputValues[index] = ''
+  //  setInputValues(updatedInputValues)
+  //}
+  //
+  //const deleteItemFromWishList = (index: number) => {
+  //  setItems((prevItems) => prevItems.filter((_item, i) => i !== index))
+  //  setInputValues((prevInputValues) =>
+  //    prevInputValues.filter((_item, i) => i !== index),
+  //  )
+  //}
+  //
+  //const handleInputChange = (
+  //  e: React.ChangeEvent<HTMLInputElement>,
+  //  index: number,
+  //) => {
+  //  const newInputValues = [...inputValues]
+  //  newInputValues[index] = e.target.value
+  //  setInputValues(newInputValues)
+  //}
 
   return (
     <WishListContainer>
@@ -51,7 +55,7 @@ const WishList = () => {
           item you want to save.
         </p>
 
-        <button onClick={addItemToWishList}>Add item</button>
+        {/*<button onClick={addItemToWishList}>Add item</button>
 
         <div className="wishlist-items">
           {items.map((item, index) => (
@@ -72,13 +76,24 @@ const WishList = () => {
               </button>
             </div>
           ))}
+        </div> */}
+        <div className="wishlist-content-wrapper">
+          {wishlist.map((wish: any) => (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div key={wish._id} className="content">
+                <img src={wish.picture} alt={wish.title} />
+              </div>
+              <p>{wish.title}</p>
+              <AiFillDelete
+                className="close-icon"
+                style={{ cursor: 'pointer' }}
+                size={18}
+                onClick={() => handleDeleteWishlist(wish.placeId)}
+              />
+            </div>
+          ))}
         </div>
       </div>
-      {wishlist.map((wish: any) => (
-        <div key={wish._id}>
-          <p>{wish.title}</p>
-        </div>
-      ))}
     </WishListContainer>
   )
 }

@@ -3,18 +3,34 @@ import { useState } from 'react'
 import { CreateWishListContainer } from './styles'
 import { IoCloseSharp } from 'react-icons/io5'
 import { FaCircleExclamation } from 'react-icons/fa6'
+import { useWishlist } from '../../../../hooks'
 
-interface CloseCreateWishListProps {
+interface CreateWishListProps {
   closeCreateWishList: () => void
   className?: string
+  placeId: string
+  title: string
+  picture: string
 }
 
 const CreateWishListBox = ({
   closeCreateWishList,
   className,
-}: CloseCreateWishListProps) => {
+  placeId,
+  title,
+  picture,
+}: CreateWishListProps) => {
   const [wishListName, setWishListName] = useState('')
   const [errorCharLimit, setErrorCharLimit] = useState(false)
+  const { addWishlist } = useWishlist()
+
+  const handleCreateWishList = () => {
+    if (wishListName.trim() && !errorCharLimit) {
+      addWishlist(placeId, title, picture)
+      closeCreateWishList()
+      setWishListName('')
+    }
+  }
 
   const handleWishListNameChange = (e: any) => {
     const name = e.target.value
@@ -73,11 +89,17 @@ const CreateWishListBox = ({
           Clear
         </button>
         <button
+          onClick={
+            wishListName.length > 0 && !errorCharLimit
+              ? handleCreateWishList
+              : undefined
+          }
           className={
             wishListName.length > 0 && !errorCharLimit
               ? 'create-btn'
               : 'disabled'
           }
+          disabled={!(wishListName.length > 0 && !errorCharLimit)}
         >
           Create
         </button>

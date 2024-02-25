@@ -27,4 +27,34 @@ export const WishListContainer = syled.div`
         }
 
     }
+
+    .wishlist-content-wrapper {
+        display: flex;
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 12rem;
+            height: 12rem;
+            box-shadow: 0px 0px 10px 0px #e0e0e0;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+            margin: 0.5rem;
+        }
+
+        img {
+            object-fit: cover;
+            border-radius: 10px;
+            height: 100%;
+            width: 100%;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #393939;
+            font-weight: 500;
+        }
+    }
 `;

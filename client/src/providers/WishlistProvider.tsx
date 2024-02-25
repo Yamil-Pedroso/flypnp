@@ -11,6 +11,11 @@ interface Wishlist {
 interface WishlistContextType {
   wishlist: Wishlist[]
   deleteWishlist: (id: string) => Promise<void>
+  addWishlist: (
+    placeId: string,
+    title: string,
+    picture: string,
+  ) => Promise<void>
   setWishlist: (wishlist: Wishlist[]) => void
   loading: boolean
   setLoading: (loading: boolean) => void
@@ -20,6 +25,7 @@ const initialState: WishlistContextType = {
   wishlist: [],
   deleteWishlist: async () => {},
   setWishlist: () => {},
+  addWishlist: async () => {},
   loading: true,
   setLoading: () => {},
 }

@@ -9,6 +9,7 @@ import { WishlistContext } from '../src/providers/WishlistProvider';
 import axiosInstance from '../src/utils/axios';
 
 import { setItemsInLocalStorage, getItemsFromLocalStorage, removeItemFromLocalStorage} from '../src/utils';
+import { cn } from '../src/lib/utils';
 
 // User context
 export const useAuth = () => {
@@ -278,13 +279,24 @@ export const useProvideWishlist = () => {
     const [wishlist, setWishlist] = useState<Wishlist[]>([])
     const [loading, setLoading] = useState(true)
 
-    const addWishlist = async (placeId: any, title: any) => {
+    const addWishlist = async (placeId: any, title: any, picture: any) => {
         try {
-        const user = JSON.parse(getItemsFromLocalStorage('user') as any)
+        //const user = JSON.parse(getItemsFromLocalStorage('user') as any)
+        const token = getItemsFromLocalStorage('token')
+
+        if (!token) {
+            console.log('User not authenticated or token expired')
+        }
         const { data } = await axiosInstance.post('/add-place', {
             placeId,
             title,
-            userId: user._id
+            picture,
+
+        },{
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+
         })
         console.log(data.data)
         setWishlist(data.data)
@@ -305,7 +317,8 @@ export const useProvideWishlist = () => {
 
     const deleteWishlist = async (placeId: any) => {
         try {
-        const { data } = await axiosInstance.delete(`/remove-wishlist/${placeId}`)
+        const { data } = await axiosInstance.delete(`/remove-place/${placeId}`)
+        console.log(data.data)
 
         if (data.success) {
             const newWishlist = wishlist.filter((wish: any) => wish.placeId !== placeId)
