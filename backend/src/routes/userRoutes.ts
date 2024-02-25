@@ -13,6 +13,7 @@ import {
     loginUser,
     logoutUser,
     getUsers,
+    deleteUser,
     googleLogin,
     uploadAvatar,
     updateUser,
@@ -25,5 +26,6 @@ router.get('/logout', logoutUser);
 router.post('/google-login', googleLogin);
 router.post('/upload-avatar', upload.single('file'), uploadAvatar);
 router.put('/update', updateUser);
+router.delete('/delete/:id', deleteUser);
 
 export default router;

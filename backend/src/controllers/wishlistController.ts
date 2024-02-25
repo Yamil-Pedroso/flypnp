@@ -11,6 +11,10 @@ export const addPlaceToWishlist = async (req: AuthenticatedRequest, res: Respons
         const userData = req.user;
         const { placeId, title } = req.body;
 
+        if (!req.user) {
+            return res.status(401).json({ message: "User not authenticated" });
+        }
+
         const wishlist = await WishList.create({
             owner: userData.id,
             place: placeId,

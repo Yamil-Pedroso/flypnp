@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
 import { WishListContainer } from './styles'
+import { useWishlist } from '../../../hooks'
 
 const WishList = () => {
   const [items, setItems] = useState<string[]>([])
   const [inputValues, setInputValues] = useState<string[]>([])
+  const { wishlist } = useWishlist()
+  console.log('wishlist', wishlist)
 
   const addItemToWishList = () => {
     const newItem = `Item ${
@@ -71,6 +74,11 @@ const WishList = () => {
           ))}
         </div>
       </div>
+      {wishlist.map((wish: any) => (
+        <div key={wish._id}>
+          <p>{wish.title}</p>
+        </div>
+      ))}
     </WishListContainer>
   )
 }

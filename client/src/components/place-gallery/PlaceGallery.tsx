@@ -4,7 +4,7 @@ import { PlaceGalleryContainer, MenuWrapper } from './styles'
 import Trending from './trending/Trending'
 import Beachfront from './beachfront/BeachFront'
 import IconicCities from './iconic-cities/IconicCities'
-import { usePlaces } from '../../../hooks'
+//import { usePlaces } from '../../../hooks'
 //import Spinner from '../common/progress/Progress'
 
 import { FaTreeCity, FaUmbrellaBeach } from 'react-icons/fa6'
@@ -34,8 +34,6 @@ const PlaceGallery = () => {
   const [activeComponent, setActiveComponent] = useState<
     keyof typeof components
   >('trending')
-  const { places } = usePlaces()
-  console.log('Geting place from backend', places)
 
   const components: Record<string, ComponentType> = {
     trending: {

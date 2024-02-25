@@ -4,6 +4,7 @@ import axiosInstance from './utils/axios'
 import { UserProvider } from './providers/UserProvider'
 import { PlacesProvider } from './providers/PlacesProvider'
 import { NotificationsProvider } from './providers/NotificationsProvider'
+import { WishlistProvider } from './providers/WishlistProvider'
 import { getItemsFromLocalStorage } from './utils'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import './index.css'
@@ -44,21 +45,26 @@ function App({ menuClick }: AppProps) {
       <UserProvider>
         <PlacesProvider>
           <NotificationsProvider>
-            <Navbar menuClick={menuClick} />
-            <Router>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/notifications" element={<NotificationsPage />} />
-                <Route
-                  path="/place/:category/:id"
-                  element={<PlaceDetailsPage />}
-                />
-                <Route path="/trips" element={<TripsPage />} />
-                <Route path="/wishlist" element={<WishListPage />} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </Router>
+            <WishlistProvider>
+              <Navbar menuClick={menuClick} />
+              <Router>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route
+                    path="/notifications"
+                    element={<NotificationsPage />}
+                  />
+                  <Route
+                    path="/place/:category/:id"
+                    element={<PlaceDetailsPage />}
+                  />
+                  <Route path="/trips" element={<TripsPage />} />
+                  <Route path="/wishlist" element={<WishListPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Router>
+            </WishlistProvider>
           </NotificationsProvider>
         </PlacesProvider>
       </UserProvider>

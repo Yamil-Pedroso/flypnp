@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import { UserContext } from '../src/providers/UserProvider';
 import { PlacesContext } from '../src/providers/PlacesProvider';
 import { NotificationsContext } from '../src/providers/NotificationsProvider';
+import { WishlistContext } from '../src/providers/WishlistProvider';
 import axiosInstance from '../src/utils/axios';
 
 import { setItemsInLocalStorage, getItemsFromLocalStorage, removeItemFromLocalStorage} from '../src/utils';
@@ -257,6 +258,77 @@ export const useProvideNotifications = () => {
         notifications,
         deleteNotification,
         setNotifications,
+        loading,
+        setLoading,
+    }
+}
+
+// The Wishlist Provider
+interface Wishlist {
+    id: string;
+    placeId: string;
+    title: string;
+}
+
+export const useWishlist = () => {
+    return useContext(WishlistContext)
+}
+
+export const useProvideWishlist = () => {
+    const [wishlist, setWishlist] = useState<Wishlist[]>([])
+    const [loading, setLoading] = useState(true)
+
+    const addWishlist = async (placeId: any, title: any) => {
+        try {
+        const user = JSON.parse(getItemsFromLocalStorage('user') as any)
+        const { data } = await axiosInstance.post('/add-place', {
+            placeId,
+            title,
+            userId: user._id
+        })
+        console.log(data.data)
+        setWishlist(data.data)
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const getWishlist = async (  ) => {
+        try {
+          const { data } = await axiosInstance.get('/user-wishlist')
+            console.log(data.data)
+            setWishlist(data.data)
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const deleteWishlist = async (placeId: any) => {
+        try {
+        const { data } = await axiosInstance.delete(`/remove-wishlist/${placeId}`)
+
+        if (data.success) {
+            const newWishlist = wishlist.filter((wish: any) => wish.placeId !== placeId)
+            setWishlist(newWishlist)
+        }
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    useEffect(() => {
+        const user = JSON.parse(getItemsFromLocalStorage('user') as any)
+        if (user) {
+            getWishlist()
+        }
+    } , [])
+
+    return {
+        wishlist,
+        getWishlist,
+        addWishlist,
+        deleteWishlist,
+        setWishlist,
         loading,
         setLoading,
     }
