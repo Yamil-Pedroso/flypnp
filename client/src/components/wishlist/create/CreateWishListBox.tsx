@@ -27,6 +27,7 @@ const CreateWishListBox = ({
   const handleCreateWishList = () => {
     if (wishListName.trim() && !errorCharLimit) {
       addWishlist(placeId, title, picture)
+      console.log(wishListName)
       closeCreateWishList()
       setWishListName('')
     }

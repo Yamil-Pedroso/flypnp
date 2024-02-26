@@ -191,7 +191,6 @@ export const useProvidePlaces = () => {
     const getPlaces = async () => {
         try {
         const { data } = await axiosInstance.get('/all-places')
-        console.log(data.data)
         setPlaces(data.data)
         setLoading(false)
         } catch (error) {
@@ -226,7 +225,6 @@ export const useProvideNotifications = () => {
 
         try  {
         const { data } = await axiosInstance.get(`/notification/${userId}`)
-        console.log(data)
         setNotifications(data)
         setLoading(false)
     }   catch (error) {

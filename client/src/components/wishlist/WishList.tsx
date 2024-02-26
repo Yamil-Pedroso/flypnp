@@ -3,6 +3,7 @@ import { WishListContainer } from './styles'
 import { useWishlist } from '../../../hooks'
 import { AiFillDelete } from 'react-icons/ai'
 import DeleteBox from './DeleteBox'
+import images from '../../assets/images/index'
 
 interface ShowDeleteIconState {
   [key: string]: boolean
@@ -42,6 +43,10 @@ const WishList = () => {
               Start adding items to your wishlist by clicking the heart icon on
               the item you want to save.
             </p>
+
+            <div className="empty-box-wrapper">
+              <img src={images.emptyBox} alt="wishlist" />
+            </div>
           </div>
         ) : (
           <>

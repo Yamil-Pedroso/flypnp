@@ -15,6 +15,20 @@ export const WishListContainer = syled.div`
         padding: 1rem 20rem;
         gap: .6rem;
 
+        .empty-box-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 0.625rem;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
         h1 {
             font-weight: 500;
             color: #666666;
