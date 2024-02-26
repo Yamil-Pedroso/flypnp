@@ -56,7 +56,7 @@ export const removePlaceFromWishlist = async (req: AuthenticatedRequest, res: Re
 
         const deletedWishList = await WishList.findOneAndDelete({
             owner: userId,
-            place: placeId
+            place: placeId,
         });
 
         if (deletedWishList) {

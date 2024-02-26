@@ -3,20 +3,21 @@ import { createContext } from 'react'
 import { useProvideWishlist } from '../../hooks'
 
 interface Wishlist {
+  picture: string | undefined
   id: string
   placeId: string
+  place: string
   title: string
 }
 
 interface WishlistContextType {
   wishlist: Wishlist[]
-  deleteWishlist: (id: string) => Promise<void>
+  deleteWishlist: (placeId: string) => Promise<void>
   addWishlist: (
     placeId: string,
     title: string,
     picture: string,
   ) => Promise<void>
-  setWishlist: (wishlist: Wishlist[]) => void
   loading: boolean
   setLoading: (loading: boolean) => void
 }
@@ -24,7 +25,6 @@ interface WishlistContextType {
 const initialState: WishlistContextType = {
   wishlist: [],
   deleteWishlist: async () => {},
-  setWishlist: () => {},
   addWishlist: async () => {},
   loading: true,
   setLoading: () => {},

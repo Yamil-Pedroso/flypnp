@@ -9,7 +9,7 @@ import { WishlistContext } from '../src/providers/WishlistProvider';
 import axiosInstance from '../src/utils/axios';
 
 import { setItemsInLocalStorage, getItemsFromLocalStorage, removeItemFromLocalStorage} from '../src/utils';
-import { cn } from '../src/lib/utils';
+
 
 // User context
 export const useAuth = () => {
@@ -268,7 +268,9 @@ export const useProvideNotifications = () => {
 interface Wishlist {
     id: string;
     placeId: string;
+    place: string;
     title: string;
+    picture: string;
 }
 
 export const useWishlist = () => {
@@ -308,7 +310,6 @@ export const useProvideWishlist = () => {
     const getWishlist = async (  ) => {
         try {
           const { data } = await axiosInstance.get('/user-wishlist')
-            console.log(data.data)
             setWishlist(data.data)
     }  catch (error) {
         console.log(error)
@@ -318,12 +319,12 @@ export const useProvideWishlist = () => {
     const deleteWishlist = async (placeId: any) => {
         try {
         const { data } = await axiosInstance.delete(`/remove-place/${placeId}`)
-        console.log(data.data)
 
         if (data.success) {
-            const newWishlist = wishlist.filter((wish: any) => wish.placeId !== placeId)
+            const newWishlist = wishlist.filter((wish: any) => wish.place !== placeId)
             setWishlist(newWishlist)
         }
+
     }  catch (error) {
         console.log(error)
     }
@@ -341,7 +342,6 @@ export const useProvideWishlist = () => {
         getWishlist,
         addWishlist,
         deleteWishlist,
-        setWishlist,
         loading,
         setLoading,
     }
