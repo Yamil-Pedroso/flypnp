@@ -16,6 +16,7 @@ const WishList = () => {
     itemId: null as string | null,
   })
   const { wishlist, deleteWishlist } = useWishlist()
+  console.log(wishlist)
 
   const handleShowDeleteBox = (itemId: string) => {
     setDeleteBoxInfo({ show: true, itemId })
@@ -75,6 +76,12 @@ const WishList = () => {
                       size={18}
                       onClick={() => handleShowDeleteBox(wish.place)}
                     />
+                  </div>
+                  <div
+                    style={{ width: '15rem', textAlign: 'center' }}
+                    className="name-wrapper"
+                  >
+                    <strong>{wish.title}</strong>
                   </div>
                 </div>
               ))}

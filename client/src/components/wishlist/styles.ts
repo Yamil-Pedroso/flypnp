@@ -47,6 +47,7 @@ export const WishListContainer = syled.div`
 
     .wishlist-content-wrapper {
         width: 80rem;
+        height: 100%;
         display: flex;
         flex-wrap: wrap;
         gap: 1rem;

@@ -17,7 +17,6 @@ const CreateWishListBox = ({
   closeCreateWishList,
   className,
   placeId,
-  title,
   picture,
 }: CreateWishListProps) => {
   const [wishListName, setWishListName] = useState('')
@@ -26,7 +25,7 @@ const CreateWishListBox = ({
 
   const handleCreateWishList = () => {
     if (wishListName.trim() && !errorCharLimit) {
-      addWishlist(placeId, title, picture)
+      addWishlist(placeId, wishListName, picture)
       console.log(wishListName)
       closeCreateWishList()
       setWishListName('')
@@ -36,6 +35,7 @@ const CreateWishListBox = ({
   const handleWishListNameChange = (e: any) => {
     const name = e.target.value
     setWishListName(name)
+
     setErrorCharLimit(name.length > 50)
 
     if (e.target.value.length > 0) {
