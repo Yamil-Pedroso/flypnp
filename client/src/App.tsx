@@ -5,6 +5,7 @@ import { UserProvider } from './providers/UserProvider'
 import { PlacesProvider } from './providers/PlacesProvider'
 import { NotificationsProvider } from './providers/NotificationsProvider'
 import { WishlistProvider } from './providers/WishlistProvider'
+import { BookingProvider } from './providers/BookingProvider'
 import { getItemsFromLocalStorage } from './utils'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import './index.css'
@@ -14,6 +15,7 @@ import HomePage from './pages/HomePage'
 import NotFoundPage from './pages/NotFoundPage'
 import ProfilePage from './pages/ProfilePage'
 import PlaceDetailsPage from './pages/PlaceDetailsPage'
+import BookingPage from './pages/BookingPage'
 import NotificationsPage from './pages/NotificationsPage'
 import TripsPage from './pages/TripsPage'
 import WishListPage from './pages/WishListPage'
@@ -46,24 +48,27 @@ function App({ menuClick }: AppProps) {
         <PlacesProvider>
           <NotificationsProvider>
             <WishlistProvider>
-              <Navbar menuClick={menuClick} />
-              <Router>
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route
-                    path="/notifications"
-                    element={<NotificationsPage />}
-                  />
-                  <Route
-                    path="/place/:category/:id"
-                    element={<PlaceDetailsPage />}
-                  />
-                  <Route path="/trips" element={<TripsPage />} />
-                  <Route path="/wishlist" element={<WishListPage />} />
-                  <Route path="*" element={<NotFoundPage />} />
-                </Routes>
-              </Router>
+              <BookingProvider>
+                <Navbar menuClick={menuClick} />
+                <Router>
+                  <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route
+                      path="/notifications"
+                      element={<NotificationsPage />}
+                    />
+                    <Route
+                      path="/place/:category/:id"
+                      element={<PlaceDetailsPage />}
+                    />
+                    <Route path="/bookings" element={<BookingPage />} />
+                    <Route path="/trips" element={<TripsPage />} />
+                    <Route path="/wishlist" element={<WishListPage />} />
+                    <Route path="*" element={<NotFoundPage />} />
+                  </Routes>
+                </Router>
+              </BookingProvider>
             </WishlistProvider>
           </NotificationsProvider>
         </PlacesProvider>

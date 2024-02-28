@@ -1,22 +1,34 @@
 import { Schema, model, Types } from "mongoose";
 
 interface IBooking {
-    user: Types.ObjectId;
+    owner: Types.ObjectId;
     place: Types.ObjectId;
     checkIn: Date;
     checkOut: Date;
     numOfGuests: number;
+    status: string;
+    extraInfo: string;
     name: string;
     phone: string;
     price: number;
 }
 
 const bookingSchema = new Schema<IBooking>({
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
     place: { type: Schema.Types.ObjectId, ref: "Place", required: true },
     checkIn: { type: Date, required: true },
     checkOut: { type: Date, required: true },
-    numOfGuests: { type: Number, required: true },
+    numOfGuests: {
+        adults: { type: Number, required: true },
+        children: { type: Number, default: 0 },
+        infants: { type: Number, default: 0 },
+    },
+    status: {
+        type: String,
+        enum: ["pending", "confirmed", "cancelled"],
+        default: "pending",
+    },
+    extraInfo: { type: String },
     name: { type: String, required: true },
     phone: { type: String, required: true },
     price: { type: Number, required: true },

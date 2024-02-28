@@ -6,6 +6,7 @@ import { UserContext } from '../src/providers/UserProvider';
 import { PlacesContext } from '../src/providers/PlacesProvider';
 import { NotificationsContext } from '../src/providers/NotificationsProvider';
 import { WishlistContext } from '../src/providers/WishlistProvider';
+import { BookingContext } from '../src/providers/BookingProvider';
 import axiosInstance from '../src/utils/axios';
 
 import { setItemsInLocalStorage, getItemsFromLocalStorage, removeItemFromLocalStorage} from '../src/utils';
@@ -340,6 +341,102 @@ export const useProvideWishlist = () => {
         getWishlist,
         addWishlist,
         deleteWishlist,
+        loading,
+        setLoading,
+    }
+}
+
+// The Booking Provider
+
+interface Booking {
+    owner: string
+    place: string
+    checkIn: Date
+    checkOut: Date
+    numOfGuests: {
+        adults: number
+        children: number
+        infants: number
+    }
+    extraInfo: string
+    status: string
+    name: string
+    phone: string
+    price: number
+}
+export const useBooking = () => {
+    return useContext(BookingContext)
+}
+
+export const useProvideBooking = () => {
+    const [bookings, setBookings] = useState<Booking[]>([])
+    const [loading, setLoading] = useState(true)
+
+    const addBooking = async (booking: Booking) => {
+        try {
+        const { data } = await axiosInstance.post('/create-booking', booking)
+        setBookings(prevBookings => [...prevBookings, data.data])
+        console.log(data.data)
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const getBookings = async () => {
+        try {
+          const { data } = await axiosInstance.get('/user-bookings')
+            setBookings(data.data)
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const getBookingDetails = async (id: any) => {
+        try {
+        const { data } = await axiosInstance.get(`/booking-details/${id}`)
+        return data.data
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const updateBooking = async (id: string, booking: Partial<Booking>) => {
+        try {
+            const { data } = await axiosInstance.put(`/update-booking/${id}`, booking);
+            return data.data;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const deleteBooking = async (id: any) => {
+        try {
+        const { data } = await axiosInstance.delete(`/delete-booking/${id}`)
+
+        if (data.success) {
+            const newBookings = bookings.filter((booking: any) => booking._id !== id)
+            setBookings(newBookings)
+        }
+
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    useEffect(() => {
+        const user = JSON.parse(getItemsFromLocalStorage('user') as any)
+        if (user) {
+            getBookings()
+        }
+    } , [])
+
+    return {
+        bookings,
+        getBookings,
+        addBooking,
+        deleteBooking,
+        getBookingDetails,
+        updateBooking,
         loading,
         setLoading,
     }
