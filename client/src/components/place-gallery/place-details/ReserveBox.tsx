@@ -3,14 +3,20 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { usePlaces } from '../../../../hooks'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
+import MyCalendar from '../../common/calendar/Calendar'
 
 const ReserveBox = () => {
   const [clickArrow, setClickArrow] = useState(false)
+  const [clickCheckIn, setClickCheckIn] = useState(false)
   const { places, loading } = usePlaces()
   const { id, category } = useParams()
 
   const handleArrowClick = () => {
     setClickArrow(!clickArrow)
+  }
+
+  const handleCheckInClick = () => {
+    setClickCheckIn(!clickCheckIn)
   }
 
   if (loading) {
@@ -34,15 +40,15 @@ const ReserveBox = () => {
 
       <div className="check-in-out-guests-wrapper">
         <div className="check-in-out-guests-box">
-          <div>
+          <button onClick={handleCheckInClick}>
             <span>CHECK-IN</span>
             <p>2/23/2024</p>
-          </div>
+          </button>
           <div className="vertical-line"></div>
-          <div>
+          <button>
             <span>CHECK-OUT</span>
             <p>3/19/2024</p>
-          </div>
+          </button>
         </div>
 
         <div className="horizontal-line"></div>
@@ -54,7 +60,7 @@ const ReserveBox = () => {
               <p>1 guest</p>
             </div>
             <div className="arrow-down-up">
-              <span onClick={handleArrowClick}>
+              <span onClick={() => {}}>
                 {clickArrow ? <FaChevronUp /> : <FaChevronDown />}
               </span>
             </div>
@@ -62,6 +68,8 @@ const ReserveBox = () => {
         </div>
       </div>
       <button>Reserve</button>
+
+      {clickCheckIn && <MyCalendar className="calendar" />}
     </div>
   )
 }

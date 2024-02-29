@@ -5,6 +5,7 @@
   justify-content: center;
   padding: 1rem;
   position: relative;
+  width: 100%;
 }
 
 .calendar-header {

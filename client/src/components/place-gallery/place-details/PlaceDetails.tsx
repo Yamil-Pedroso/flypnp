@@ -72,12 +72,6 @@ const PlaceDetails = () => {
         <div className="place-desc-wrapper">
           <p>{place.description}</p>
           <p>{place.perks.join(' - ')}</p>
-          {/*<p>Address: {place.address}</p>
-          <p>Perks: {place.perks.join(', ')}</p>
-          <p>Extra Info: {place.extraInfo}</p>
-          <p>Max Guests: {place.maxGuests}</p>
-          <p>Rating: {place.rating}</p>
-          <p>Price: CHF {place.price} per night</p>*/}
 
           <div className="fav-guest-wrapper">
             <div className="fav-guest-cont">

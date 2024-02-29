@@ -5,7 +5,11 @@ import './styles.css'
 import 'react-calendar/dist/Calendar.css'
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from 'react-icons/fa'
 
-const MyCalendar = () => {
+interface MyCalendarProps {
+  className?: string
+}
+
+const MyCalendar = ({ className }: MyCalendarProps) => {
   const [checkInMonth, setCheckInMonth] = useState(new Date())
   const [checkOutMonth, setCheckOutMonth] = useState(
     new Date(new Date().setMonth(new Date().getMonth() + 1)),
@@ -26,47 +30,49 @@ const MyCalendar = () => {
   }
 
   return (
-    <div className="calendar-container">
-      <div className="calendar-wrapper first">
-        <div className="month-arrow-first">
-          <div className="calendar-header">
-            <p>{formatMonthYear(checkInMonth)}</p>
+    <div className={`calendar-container ${className}`}>
+      <div className="calendar-wrapper" style={{ display: 'flex' }}>
+        <div className="calendar-wrapper first">
+          <div className="month-arrow-first">
+            <div className="calendar-header">
+              <p>{formatMonthYear(checkInMonth)}</p>
+            </div>
+            <button
+              className="arrow-left navigation-arrow"
+              onClick={() => navigateMonths(-1)}
+            >
+              <FaArrowAltCircleLeft
+                style={{ color: '#949494', fontSize: '1.5rem' }}
+              />
+            </button>
           </div>
-          <button
-            className="arrow-left navigation-arrow"
-            onClick={() => navigateMonths(-1)}
-          >
-            <FaArrowAltCircleLeft
-              style={{ color: '#949494', fontSize: '1.5rem' }}
-            />
-          </button>
+          <Calendar
+            onChange={() => {}}
+            value={checkInMonth}
+            showNavigation={false}
+          />
         </div>
-        <Calendar
-          onChange={() => {}}
-          value={checkInMonth}
-          showNavigation={false}
-        />
-      </div>
 
-      <div className="calendar-wrapper second">
-        <div className="month-arrow-second">
-          <div className="calendar-header">
-            <p>{formatMonthYear(checkOutMonth)}</p>
+        <div className="calendar-wrapper second">
+          <div className="month-arrow-second">
+            <div className="calendar-header">
+              <p>{formatMonthYear(checkOutMonth)}</p>
+            </div>
+            <button
+              className="arrow-right navigation-arrow"
+              onClick={() => navigateMonths(1)}
+            >
+              <FaArrowAltCircleRight
+                style={{ color: '#949494', fontSize: '1.5rem' }}
+              />
+            </button>
           </div>
-          <button
-            className="arrow-right navigation-arrow"
-            onClick={() => navigateMonths(1)}
-          >
-            <FaArrowAltCircleRight
-              style={{ color: '#949494', fontSize: '1.5rem' }}
-            />
-          </button>
+          <Calendar
+            onChange={() => {}}
+            value={checkOutMonth}
+            showNavigation={false}
+          />
         </div>
-        <Calendar
-          onChange={() => {}}
-          value={checkOutMonth}
-          showNavigation={false}
-        />
       </div>
     </div>
   )
