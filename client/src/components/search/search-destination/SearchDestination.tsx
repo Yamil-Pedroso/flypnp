@@ -38,8 +38,9 @@ const SearchDestination = () => {
   const [bgWhiteActive, setBgWhiteActive] = useState(false)
   const [defaultSearchDest, setDefaultSearchDest] = useState<boolean>(true)
 
-  const handleBgWhiteActive = () => {
-    setBgWhiteActive(true)
+  const handleBgWhiteActive = (e: any) => {
+    e.stopPropagation()
+    setBgWhiteActive(!bgWhiteActive)
     setDefaultSearchDest(false)
     handleGrowSearchIcon()
   }
@@ -69,8 +70,12 @@ const SearchDestination = () => {
     }
   }, [])
 
+  const handleInnerClick = (e: any) => {
+    e.stopPropagation()
+  }
+
   return (
-    <SearchDestinationContainer onClick={handleBgWhiteActive}>
+    <SearchDestinationContainer onClick={handleInnerClick}>
       <div className="search-dest-wrapper">
         {bgWhiteActive ? (
           <div className="input-wrapper">
@@ -78,7 +83,10 @@ const SearchDestination = () => {
             <input type="text" placeholder="Search destinations" />
           </div>
         ) : (
-          <div className="default-search-dest-wrapper">
+          <div
+            className="default-search-dest-wrapper"
+            onClick={handleBgWhiteActive}
+          >
             <p>Where</p>
             <p>Search destinations</p>
           </div>

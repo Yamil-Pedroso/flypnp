@@ -19,6 +19,7 @@ const AddGuests = () => {
   }
 
   const handleClickChildren = (count: number) => {
+    if (count < 0) return
     if (adult === 0 && children === 0) {
       setAdult(1)
       setChildren(1)
@@ -29,6 +30,7 @@ const AddGuests = () => {
   }
 
   const handleClickInfants = (count: number) => {
+    if (count < 0) return
     if (adult === 0 && infants === 0) {
       setAdult(1)
       setInfants(1)
@@ -39,6 +41,7 @@ const AddGuests = () => {
   }
 
   const handleClickPets = (count: number) => {
+    if (count < 0) return
     if (adult === 0 && pets === 0) {
       setAdult(1)
       setPets(1)
@@ -120,7 +123,7 @@ const AddGuests = () => {
             <p>Add guests</p>
           </div>
         )}
-        <div className="guests-dropdown">
+        <div className={`guests-dropdown ${bgWhiteActive ? 'show' : ''}`}>
           <div className="section adults-cont">
             <div className="guest">
               <p>Adults</p>

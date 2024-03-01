@@ -81,7 +81,7 @@ export const AddGuestsContainer = styled.div`
         border-radius: 1.5rem;
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         padding: 1.5rem 3rem 0rem 2rem;
-        //display: none;
+        display: none;
         z-index: 1000;
 
         &.show {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react'
 import { CheckInOutContainer } from './styles'
 import CalendarComp from '../../common/calendar/CalendarComp'
@@ -10,7 +11,8 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
   const [bgWhiteActive, setBgWhiteActive] = useState(false)
   const [bgWhiteActiveTwo, setBgWhiteActiveTwo] = useState(false)
 
-  const handleBgWhiteActive = (type: 'check-in' | 'check-out') => {
+  const handleBgWhiteActive = (type: 'check-in' | 'check-out', e: any) => {
+    e.stopPropagation()
     if (type === 'check-in') {
       setBgWhiteActive(true)
       setBgWhiteActiveTwo(false)
@@ -22,15 +24,27 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
     handleGrowSearchIcon()
   }
 
-  const clickOutside = (e: MouseEvent) => {
-    const wrapper = document.querySelector('.check-in, .check-out')
-    const searchIcon = document.querySelector('.search-wrapper')
-    if (wrapper && !wrapper.contains(e.target as Node)) {
-      if (searchIcon) {
-        searchIcon.classList.remove('search-wrapper-ready')
+  useEffect(() => {
+    const clickOutside = (e: any) => {
+      // Asegúrate de seleccionar el contenedor principal del calendario o los elementos específicos adecuadamente
+      const wrapper = document.querySelector('.check-in-out-wrapper')
+      if (wrapper && !wrapper.contains(e.target)) {
+        setBgWhiteActive(false)
+        setBgWhiteActiveTwo(false)
+        const searchIcon = document.querySelector('.search-wrapper')
+        if (searchIcon) {
+          searchIcon.classList.remove('search-wrapper-ready')
+        }
       }
     }
-  }
+
+    // Agrega el listener al documento
+    document.addEventListener('click', clickOutside)
+    return () => {
+      // Asegura remover el listener al desmontar
+      document.removeEventListener('click', clickOutside)
+    }
+  }, [])
 
   const handleGrowSearchIcon = () => {
     const searchIcon = document.querySelector('.search-wrapper')
@@ -39,15 +53,12 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
     }
   }
 
-  useEffect(() => {
-    document.addEventListener('click', clickOutside)
-    return () => {
-      document.removeEventListener('click', clickOutside)
-    }
-  }, [])
+  const handleInnerClick = (e: any) => {
+    e.stopPropagation()
+  }
 
   return (
-    <CheckInOutContainer>
+    <CheckInOutContainer onClick={handleInnerClick}>
       <div className="check-in-out-wrapper">
         <div className="check-in-out-divider"></div>
         {menuClick ? (
@@ -66,7 +77,7 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
           <>
             <div
               className={bgWhiteActive ? 'check-in' : 'check-in-two'}
-              onClick={() => handleBgWhiteActive('check-in')}
+              onClick={(e: any) => handleBgWhiteActive('check-in', e)}
             >
               <p className="check-in-text">Check in</p>
               <p>Add dates</p>
@@ -74,7 +85,7 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
             <div className="check-in-out-divider"></div>
             <div
               className={bgWhiteActiveTwo ? 'check-out' : 'check-out-two'}
-              onClick={() => handleBgWhiteActive('check-out')}
+              onClick={(e) => handleBgWhiteActive('check-out', e)}
             >
               <p className="check-out-text">Check out</p>
               <p>Add dates</p>
