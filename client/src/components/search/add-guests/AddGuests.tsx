@@ -2,6 +2,9 @@
 import { useState, useEffect } from 'react'
 import { AddGuestsContainer } from './styles'
 import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa'
+import { FaPerson, FaBaby } from 'react-icons/fa6'
+import { MdPets, MdChildCare } from 'react-icons/md'
+import { FaSearch } from 'react-icons/fa'
 
 const AddGuests = () => {
   const [bgWhiteActive, setBgWhiteActive] = useState(false)
@@ -9,6 +12,7 @@ const AddGuests = () => {
   const [children, setChildren] = useState(0)
   const [infants, setInfants] = useState(0)
   const [pets, setPets] = useState(0)
+  const [clickMainContainer, setClickMainContainer] = useState(false)
 
   const handleClickAdults = (count: number) => {
     if ((children > 0 || infants > 0 || pets > 0) && count < 1) return
@@ -68,17 +72,18 @@ const AddGuests = () => {
       !headerGuests.contains(e.target)
     ) {
       setBgWhiteActive(false)
-      const searchIcon = document.querySelector('.search-wrapper')
-      if (searchIcon) {
-        searchIcon.classList.remove('search-wrapper-ready')
-      }
+    }
+
+    const searchIconWrapper = document.querySelector('.search-guests-wrapper')
+    if (searchIconWrapper) {
+      searchIconWrapper.classList.remove('search-wrapper-ready')
     }
   }
 
   const handleGrowSearchIcon = () => {
-    const searchIcon = document.querySelector('.search-wrapper')
-    if (searchIcon) {
-      searchIcon.classList.add('search-wrapper-ready')
+    const searchIconWrapper = document.querySelector('.search-guests-wrapper')
+    if (searchIconWrapper) {
+      searchIconWrapper.classList.toggle('search-wrapper-ready')
     }
   }
 
@@ -206,6 +211,65 @@ const AddGuests = () => {
             </div>
           </div>
         </div>
+        {bgWhiteActive && adult > 0 && (
+          <div className="guests-tiny-box">
+            <div className="adult-cont">
+              {adult > 0 && (
+                <div className="adult-wrapper">
+                  {Array.from({ length: adult > 5 ? 5 : adult }, (_, index) => (
+                    <FaPerson key={index} size={24} />
+                  ))}
+                  {adult > 5 && <span>+</span>}
+                </div>
+              )}
+            </div>
+            <div className="child-cont">
+              {children > 0 && (
+                <div className="child-wrapper">
+                  {Array.from(
+                    { length: children > 5 ? 5 : children },
+                    (_, index) => (
+                      <MdChildCare key={index} size={24} />
+                    ),
+                  )}
+                  {children > 5 && <span>+</span>}
+                </div>
+              )}
+            </div>
+            <div className="infant-cont">
+              {infants > 0 && (
+                <div className="infant-wrapper">
+                  {Array.from(
+                    { length: infants > 5 ? 5 : infants },
+                    (_, index) => (
+                      <FaBaby key={index} size={24} />
+                    ),
+                  )}
+                  {infants > 5 && <span>+</span>}
+                </div>
+              )}
+            </div>
+            <div className="pet-cont">
+              {pets > 0 && (
+                <div className="pet-wrapper">
+                  {Array.from({ length: pets > 5 ? 5 : pets }, (_, index) => (
+                    <MdPets key={index} size={24} />
+                  ))}
+                  {pets > 5 && <span>+</span>}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div
+        className={`search-guests-wrapper ${
+          clickMainContainer ? 'search-wrapper-ready' : ''
+        }`}
+      >
+        <FaSearch className="search-icon" />
+        <p>Search</p>
       </div>
     </AddGuestsContainer>
   )

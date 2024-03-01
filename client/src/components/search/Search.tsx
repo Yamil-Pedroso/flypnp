@@ -18,7 +18,7 @@ const Search = ({ menuClick }: SearchProps) => {
   }
 
   const handleGrowSearchIcon = () => {
-    const searchIcon = document.querySelector('.search-wrapper')
+    const searchIcon = document.querySelector('.search-guests-wrapper')
     if (searchIcon) {
       searchIcon.classList.add('search-wrapper-ready')
     }
@@ -31,14 +31,6 @@ const Search = ({ menuClick }: SearchProps) => {
       <SearchDestination />
       <CheckInCheckOut menuClick={menuClick} />
       <AddGuests />
-      <div
-        className={`search-wrapper ${
-          clickMainContainer ? 'search-wrapper-ready' : ''
-        }`}
-      >
-        <FaSearch className="search-icon" />
-        <p>Search</p>
-      </div>
     </SearchContainer>
   )
 }

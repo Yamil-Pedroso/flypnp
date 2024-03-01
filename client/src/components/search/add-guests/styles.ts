@@ -1,4 +1,25 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const guestsTinyBoxJump = keyframes`
+   0% {
+      transform: translateY(-10px);
+    }
+    50% {
+      transform: translateY(10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+`;
+
+const growWrapperIcon = keyframes`
+  from {
+    width: 3.6rem;
+  }
+  to {
+    width: 7rem;
+  }
+`;
 
 export const AddGuestsContainer = styled.div`
     width: 22rem;
@@ -67,6 +88,56 @@ export const AddGuestsContainer = styled.div`
         }
         }
 
+      }
+
+      .guests-tiny-box {
+        display: flex;
+        flex-direction: column;
+        background-color: #424242;
+        color: #fff;
+        height: auto;
+        position: absolute;
+        top: 5.2rem;
+        left: 17.6rem;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        z-index: 1000;
+        animation: ${guestsTinyBoxJump} 0.3s ease-in-out;
+
+        div {
+          margin-bottom: .3rem;
+        }
+
+        .adult-wrapper {
+          display: flex;
+        }
+
+        .child-wrapper {
+          display: flex;
+
+          * {
+            margin-right: 0.3rem;
+          }
+        }
+        .infant-wrapper {
+          display: flex;
+
+          * {
+            margin-right: 0.3rem;
+          }
+        }
+        .pet-wrapper {
+          display: flex;
+
+          * {
+            margin-right: 0.3rem;
+          }
+        }
+
+        span {
+          margin-left: 0.1rem;
+          font-size: 1.2rem;
+        }
       }
 
       .guests-dropdown {
@@ -140,4 +211,45 @@ export const AddGuestsContainer = styled.div`
           }
         }
       }
+
+      .search-guests-wrapper {
+      width: 3.6rem;
+      height: 3.6rem;
+      border-radius: 50%;
+      background-color: #0baa4e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: .8rem;
+      transition: all 0.3s;
+      position: absolute;
+      right: 0;
+
+
+      p {
+        display: none;
+      }
+
+      .search-icon {
+        font-size: 1.3rem;
+        color: #fff;
+      }
+
+      .bg-icon-color {
+        background-color: #0a8d3d;
+      }
+      .search-wrapper-ready {
+        width: 7rem;
+        background-color: #0baa4e;
+        border-radius: 3rem;
+        animation: ${growWrapperIcon} 0.5s;
+
+        p {
+          display: block;
+          margin-left: .5rem;
+          font-size: 1rem;
+          color: #fff;
+        }
+      }
+    }
 `;
