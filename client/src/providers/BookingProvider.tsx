@@ -11,6 +11,7 @@ interface Booking {
     adults: number
     children: number
     infants: number
+    pets: number
   }
   extraInfo: string
   status: string

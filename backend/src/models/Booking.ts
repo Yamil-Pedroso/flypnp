@@ -22,6 +22,7 @@ const bookingSchema = new Schema<IBooking>({
         adults: { type: Number, required: true },
         children: { type: Number, default: 0 },
         infants: { type: Number, default: 0 },
+        pets: { type: Number, default: 0 },
     },
     status: {
         type: String,
