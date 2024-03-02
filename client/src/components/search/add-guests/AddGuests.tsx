@@ -83,7 +83,7 @@ const AddGuests = () => {
   const handleGrowSearchIcon = () => {
     const searchIconWrapper = document.querySelector('.search-guests-wrapper')
     if (searchIconWrapper) {
-      searchIconWrapper.classList.toggle('search-wrapper-ready')
+      searchIconWrapper.classList.add('search-wrapper-ready')
     }
   }
 

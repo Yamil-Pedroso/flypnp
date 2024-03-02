@@ -220,7 +220,7 @@ export const AddGuestsContainer = styled.div`
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-right: .8rem;
+      margin-right: .4rem;
       transition: all 0.3s;
       position: absolute;
       right: 0;
@@ -238,18 +238,18 @@ export const AddGuestsContainer = styled.div`
       .bg-icon-color {
         background-color: #0a8d3d;
       }
-      .search-wrapper-ready {
-        width: 7rem;
-        background-color: #0baa4e;
-        border-radius: 3rem;
-        animation: ${growWrapperIcon} 0.5s;
+    }
+    .search-wrapper-ready {
+      width: 7rem;
+      background-color:  #0a8d3d;
+      border-radius: 3rem;
+      animation: ${growWrapperIcon} 0.5s;
 
-        p {
-          display: block;
-          margin-left: .5rem;
-          font-size: 1rem;
-          color: #fff;
-        }
+      p {
+        display: block;
+        margin-left: .5rem;
+        font-size: 1rem;
+        color: #fff;
       }
     }
 `;

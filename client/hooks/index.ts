@@ -18,7 +18,7 @@ export const useAuth = () => {
 }
 
 export const useProvideAuth = () => {
-    const [user, setUser] = useState(null)
+    const [user, setUser] = useState(null) as any
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -40,17 +40,21 @@ export const useProvideAuth = () => {
     }
 
     const register = async (formData: any) => {
-        const { name, email, password } = formData;
+        const { name, email, password, avatar } = formData;
+        const form = new FormData();
+        form.append('name', name);
+        form.append('email', email);
+        form.append('password', password);
+        if (avatar) form.append('avatar', avatar);
 
         try {
-            const { data } = await axiosInstance.post('/register', {
-                name,
-                email,
-                password,
+            const { data } = await axiosInstance.post('/register', form, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+
             });
             if (data.user && data.token) {
                 setUser(data.user)
-                // save user and token in local storage
+
                 setItemsInLocalStorage('user', data.user)
                 setItemsInLocalStorage('token', data.token)
             }
@@ -101,6 +105,7 @@ export const useProvideAuth = () => {
         }
     }
 
+
     const logout = async () => {
         try {
             const { data } = await axiosInstance.get('/logout');
@@ -125,24 +130,39 @@ export const useProvideAuth = () => {
             const { data } = await axiosInstance.post('/upload-avatar', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
+
+            const updatedUserInfo = await updateUser({ avatar: data.url,} , user._id);
+
+            // Actualiza el estado del usuario en el frontend si es necesario
+            setUser(updatedUserInfo.user);
+
+            console.log(data.data)
             return data
         } catch (error) {
             console.log(error)
         }
     }
 
-    const updateUser = async (userDetails: any) => {
-        const { name, password, avatar } = userDetails;
-        const email = JSON.parse(getItemsFromLocalStorage('user') as any).email;
+    const updateUser = async (formData: any, id: string) => {
+
         try {
-            const { data } = await axiosInstance.put('/update-user', {
-                name, password, email, avatar
-            })
-            return data;
+            const { data } = await axiosInstance.put(`/update/${id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            if (data.success) {
+                console.log('User updated:', data.data);
+                setUser(data.user);
+                setItemsInLocalStorage('user', JSON.stringify(data.user));
+                return { success: true, user: data.user };
+            } else {
+
+                return { success: false };
+            }
         } catch (error) {
-            console.log(error)
+            console.error('Error updating user:', error);
+            return { success: false };
         }
-    }
+    };
 
 
     return {

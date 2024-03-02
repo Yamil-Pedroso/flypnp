@@ -9,6 +9,8 @@ import { UploadedFile } from 'express-fileupload';
 
 // Register user
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.body);
+    console.log(req.file);
     try {
         const { name, email, password } = req.body;
 
@@ -16,22 +18,31 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             throw new customError('Please fill in all fields', 400);
         }
 
-        // Check for existing user
         let user = await User.findOne({ email });
 
         if (user) {
             throw new customError('User already exists', 400);
         }
 
+        let myAvatar = 'https://res.cloudinary.com/ddgf7ijdc/image/upload/v1706787809/yami_lil00v.jpg';
+        if (req.file) {
+
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'userAvatars/Avatars',
+            });
+            myAvatar = result.secure_url;
+        }
+
+
         user = new User ({
             name,
             email,
             password,
+            avatar: myAvatar,
         });
 
         user = await User.create(user);
 
-        // After creating the user, we need to send the token to the client
         cookieToken(user, res);
 
     } catch (error: any) {
@@ -102,49 +113,52 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
 
 // Upload user avatar
 export const uploadAvatar = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const fileBuffer = req.file?.buffer as any;
-
-        if (!fileBuffer) {
-            throw new customError('No file uploaded', 400);
-        }
-
-        const result = await cloudinary.uploader.upload(fileBuffer, {
-            folder: 'NewAirbnb/Avatars',
-        });
-
-        res.status(200).json({ url: result.secure_url });
-
-    } catch (error: any) {
-        next(new customError(error.message, 500));
-    }
+    const { path } = req.file as any
+  try {
+    let result = await cloudinary.uploader.upload(path, {
+      folder: 'userAvatart/Avatars',
+    });
+    res.status(200).json(result.secure_url)
+  } catch (error) {
+    res.status(500).json({
+      error,
+      message: 'Internal server error',
+    });
+  }
 };
 
 // Update user
 export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { name, email, password, avatar } = req.body;
         const user = await User.findById(req.params.id);
 
         if (!user) {
             throw new customError('User not found', 404);
         }
 
-         user.name = name
-         if (avatar && !password) {
-            user.avatar = avatar;
-         } else if (password && !avatar) {
-            user.password = password;
-         } else {
-            user.avatar = avatar;
-            user.password = password;
-         }
-         const updatedUser = await user.save();
-         cookieToken(updatedUser, res);
+        if (req.file) {
+            const avatarUrl = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'userAvatars/Avatars',
+            }).then((result) => result.secure_url);
+
+            user.avatar = avatarUrl;
+        }
+
+        if (req.body.name) user.name = req.body.name;
+        if (req.body.password) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(req.body.password, salt);
+        }
+
+
+        const updatedUser = await user.save();
+
+        cookieToken(updatedUser, res);
     } catch (error: any) {
         next(new customError(error.message, 500));
     }
 };
+
 
 // Logout user
 export const logoutUser = async (req: Request, res: Response, next: NextFunction) => {

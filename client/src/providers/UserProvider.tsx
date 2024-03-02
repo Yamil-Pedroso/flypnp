@@ -6,6 +6,7 @@ const initialState = {
   user: null,
   getAllUsers: () => {},
   register: () => {},
+  updateUser: () => {},
   login: () => {},
   googleLogin: () => {},
   logout: () => {},

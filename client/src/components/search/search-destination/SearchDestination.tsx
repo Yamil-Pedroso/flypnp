@@ -57,7 +57,7 @@ const SearchDestination = () => {
   }
 
   const handleGrowSearchIcon = () => {
-    const searchIcon = document.querySelector('.search-wrapper')
+    const searchIcon = document.querySelector('.search-guests-wrapper')
     if (searchIcon) {
       searchIcon.classList.add('search-wrapper-ready')
     }

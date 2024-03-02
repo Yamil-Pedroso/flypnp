@@ -17,37 +17,47 @@ const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
     name: '',
     email: '',
     password: '',
+    avatar: '',
   })
   const [formErrors, setFormErrors] = useState({
     name: false,
     email: false,
     password: false,
+    avatar: false,
   })
 
   const [redirect, setRedirect] = useState(false)
   const auth = useAuth() as any
 
   const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    if (e.target.type !== 'file') {
+      const { name, value } = e.target
 
-    setFormData({
-      ...formData,
-      [name]: value,
-    })
+      setFormData({
+        ...formData,
+        [name]: value,
+      })
 
-    if (setFormErrors) {
-      setFormErrors({ ...formErrors, [name]: false })
+      if (setFormErrors) {
+        setFormErrors({ ...formErrors, [name]: false })
+      }
     }
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!formData.name || !formData.email || !formData.password) {
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.password ||
+      !formData.avatar
+    ) {
       setFormErrors({
         name: !formData.name,
         email: !formData.email,
         password: !formData.password,
+        avatar: !formData.avatar,
       })
       console.log('Register failed: Missing fields')
       return
@@ -75,6 +85,15 @@ const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
       setRedirect(true)
     } else {
       console.log(response.message)
+    }
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData({
+        ...formData,
+        avatar: e.target.files[0] as any,
+      })
     }
   }
 
@@ -116,6 +135,13 @@ const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
             value={formData.password}
             onChange={handleFormData}
             className={formErrors.password ? 'error-border' : ''}
+          />
+
+          <input
+            type="file"
+            name="avatar"
+            accept="image/*"
+            onChange={handleFileChange}
           />
 
           <button type="submit">Register</button>

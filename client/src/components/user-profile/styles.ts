@@ -1,10 +1,116 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const fadeInFromDown = keyframes`
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
 
 export const UserProfileContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
+
+  .user-update-profile-wrapper{
+     display: none;
+
+     &.show-update-profile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+
+        .form-upprofile-content {
+            animation: ${fadeInFromDown} 0.5s ease;
+        }
+
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem;
+            background-color: #fff;
+            box-shadow: 0 .5rem 5rem 5px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+            position: relative;
+
+            .or {
+                color: #7d7d7d;
+            }
+
+            .close-icon {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                font-size: 2rem;
+                color: #4c4c4c;
+                cursor: pointer;
+            }
+
+            h1 {
+                font-size: 2rem;
+                color: #4c4c4c;
+            }
+
+            form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+
+                input {
+                    width: 20rem;
+                    height: 3rem;
+                    padding: 1rem;
+                    border: 2px solid #e2e8f0;
+                    border-radius: .5rem;
+                    font-size: 1rem;
+                    color: #4c4c4c;
+                    transition: all .3s ease;
+
+                    &:focus {
+                        border: 2px solid #4c4c4c;
+                    }
+                }
+
+                button {
+                    width: 20rem;
+                    height: 3rem;
+                    background-color: #4c4c4c;
+                    color: #fff;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    border: 2px solid #4c4c4c;
+                    border-radius: .5rem;
+                    cursor: pointer;
+                    transition: all .3s ease;
+
+                    &:hover {
+                        background-color: #fff;
+                        color: #4c4c4c;
+                        border: 2px solid #4c4c4c;
+                    }
+                }
+            }
+
+        }
+     }
+  }
 
   .user-profile-wrapper {
     display: flex;
@@ -15,6 +121,7 @@ export const UserProfileContainer = styled.div`
     background-color: #fff;
     box-shadow: 0 .5rem 5rem 5px rgba(0, 0, 0, 0.1);
     border-radius: 1rem;
+
 
 
     .user-content {
@@ -72,6 +179,14 @@ export const UserProfileContainer = styled.div`
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
+            }
+        }
+
+        .edit-logout-wrapper {
+            margin-top: 1rem;
+            a {
+                color: #838a96;
+                font-size: 1rem;
             }
         }
 
@@ -229,7 +344,7 @@ export const UserProfileContainer = styled.div`
                   border-radius: 1rem;
                   padding: 1rem;
 
-                  .favorite-places-wrapper 
+                  .favorite-places-wrapper
                   {
                     display: flex;
                     align-items: center;
@@ -257,7 +372,7 @@ export const UserProfileContainer = styled.div`
                                 color: #4c4c4c;
                                 border: 2px solid #4c4c4c;
                             }
-                        
+
                         }
                     }
                      .desc a {
@@ -284,7 +399,7 @@ export const UserProfileContainer = styled.div`
                         width: 100%;
                         height: 100%;
                         object-fit: cover;
-                    
+
                  }
                 }
             }

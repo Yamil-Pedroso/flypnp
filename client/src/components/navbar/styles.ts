@@ -262,11 +262,22 @@ export const NavbarContainer = styled.div`
            font-size: 1.5rem;
        }
 
-       .user-menu-item .user-avatar {
-           width: 2.5rem;
-           height: 2.5rem;
-           border-radius: 50%;
+       .user-menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            overflow: hidden;
+
        }
+       .user-menu-item .user-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+       }
+
 
        .user-menu-item .user-icon {
            font-size: 1.9rem;
