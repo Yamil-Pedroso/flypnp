@@ -6,6 +6,7 @@ import place from './placeRoutes';
 import booking from './bookingRoutes';
 import notification  from './notificationRoutes';
 import wishlist from './wishlistRoutes';
+import payment from './paymentRoutes';
 
 const router = Router();
 
@@ -58,5 +59,6 @@ router.use('/', place);
 router.use('/', booking);
 router.use('/', notification);
 router.use('/', wishlist);
+router.use('/', payment);
 
 export default router;
