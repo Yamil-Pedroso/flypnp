@@ -256,6 +256,25 @@ export const Container = styled.div`
         border-radius: .5rem;
         border: 1px solid #dddddd;
         box-shadow: 0 1rem 2rem 1px rgba(0, 0, 0, 0.1);
+        position: relative;
+
+        .calendar {
+           display: flex;
+           justify-content: center;
+           width: 55rem;
+           height: 36rem;
+           border-radius: 1rem;
+           top: 10rem;
+           right: -2rem;
+           background-color: #fff;
+           box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+           position: absolute;
+           overflow: hidden;
+
+           .calendar-wrapper{
+              margin-bottom: 4rem;
+           }
+         }
 
         .check-in-out-guests-wrapper {
            margin-top: 1rem;
@@ -272,6 +291,12 @@ export const Container = styled.div`
            .check-in-out-guests-box {
              display: flex;
              justify-content: space-between;
+
+
+              button {
+                background-color: #2a2a2a;
+                padding: .5rem 2rem;
+              }
 
              .vertical-line {
                 width: 1px;
@@ -338,5 +363,4 @@ export const Container = styled.div`
       margin-left: .5rem;
     }
   }
-
 `;

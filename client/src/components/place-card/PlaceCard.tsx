@@ -47,6 +47,9 @@ const PlaceCard = (props: PlaceCardProps) => {
         <CreateWishListBox
           closeCreateWishList={handleClickCreateWishList}
           className="wishlist-box"
+          placeId={place._id}
+          title={title}
+          picture={mainPhotoUrl}
         />
       </div>
       <PlaceCardWrapper>

@@ -5,9 +5,12 @@ import { jwtDecode } from "jwt-decode";
 import { UserContext } from '../src/providers/UserProvider';
 import { PlacesContext } from '../src/providers/PlacesProvider';
 import { NotificationsContext } from '../src/providers/NotificationsProvider';
+import { WishlistContext } from '../src/providers/WishlistProvider';
+import { BookingContext } from '../src/providers/BookingProvider';
 import axiosInstance from '../src/utils/axios';
 
 import { setItemsInLocalStorage, getItemsFromLocalStorage, removeItemFromLocalStorage} from '../src/utils';
+
 
 // User context
 export const useAuth = () => {
@@ -15,7 +18,7 @@ export const useAuth = () => {
 }
 
 export const useProvideAuth = () => {
-    const [user, setUser] = useState(null)
+    const [user, setUser] = useState(null) as any
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -37,17 +40,21 @@ export const useProvideAuth = () => {
     }
 
     const register = async (formData: any) => {
-        const { name, email, password } = formData;
+        const { name, email, password, avatar } = formData;
+        const form = new FormData();
+        form.append('name', name);
+        form.append('email', email);
+        form.append('password', password);
+        if (avatar) form.append('avatar', avatar);
 
         try {
-            const { data } = await axiosInstance.post('/register', {
-                name,
-                email,
-                password,
+            const { data } = await axiosInstance.post('/register', form, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+
             });
             if (data.user && data.token) {
                 setUser(data.user)
-                // save user and token in local storage
+
                 setItemsInLocalStorage('user', data.user)
                 setItemsInLocalStorage('token', data.token)
             }
@@ -98,6 +105,7 @@ export const useProvideAuth = () => {
         }
     }
 
+
     const logout = async () => {
         try {
             const { data } = await axiosInstance.get('/logout');
@@ -122,24 +130,39 @@ export const useProvideAuth = () => {
             const { data } = await axiosInstance.post('/upload-avatar', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
+
+            const updatedUserInfo = await updateUser({ avatar: data.url,} , user._id);
+
+            // Actualiza el estado del usuario en el frontend si es necesario
+            setUser(updatedUserInfo.user);
+
+            console.log(data.data)
             return data
         } catch (error) {
             console.log(error)
         }
     }
 
-    const updateUser = async (userDetails: any) => {
-        const { name, password, avatar } = userDetails;
-        const email = JSON.parse(getItemsFromLocalStorage('user') as any).email;
+    const updateUser = async (formData: any, id: string) => {
+
         try {
-            const { data } = await axiosInstance.put('/update-user', {
-                name, password, email, avatar
-            })
-            return data;
+            const { data } = await axiosInstance.put(`/update/${id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            if (data.success) {
+                console.log('User updated:', data.data);
+                setUser(data.user);
+                setItemsInLocalStorage('user', JSON.stringify(data.user));
+                return { success: true, user: data.user };
+            } else {
+
+                return { success: false };
+            }
         } catch (error) {
-            console.log(error)
+            console.error('Error updating user:', error);
+            return { success: false };
         }
-    }
+    };
 
 
     return {
@@ -189,7 +212,6 @@ export const useProvidePlaces = () => {
     const getPlaces = async () => {
         try {
         const { data } = await axiosInstance.get('/all-places')
-        console.log(data.data)
         setPlaces(data.data)
         setLoading(false)
         } catch (error) {
@@ -224,7 +246,6 @@ export const useProvideNotifications = () => {
 
         try  {
         const { data } = await axiosInstance.get(`/notification/${userId}`)
-        console.log(data)
         setNotifications(data)
         setLoading(false)
     }   catch (error) {
@@ -257,6 +278,186 @@ export const useProvideNotifications = () => {
         notifications,
         deleteNotification,
         setNotifications,
+        loading,
+        setLoading,
+    }
+}
+
+// The Wishlist Provider
+interface Wishlist {
+    id: string;
+    placeId: string;
+    place: string;
+    title: string;
+    picture: string;
+}
+
+export const useWishlist = () => {
+    return useContext(WishlistContext)
+}
+
+export const useProvideWishlist = () => {
+    const [wishlist, setWishlist] = useState<Wishlist[]>([])
+    const [loading, setLoading] = useState(true)
+
+    const addWishlist = async (placeId: any, title: any, picture: any) => {
+        try {
+        //const user = JSON.parse(getItemsFromLocalStorage('user') as any)
+        const token = getItemsFromLocalStorage('token')
+
+        if (!token) {
+            console.log('User not authenticated or token expired')
+        }
+        const { data } = await axiosInstance.post('/add-place', {
+            placeId,
+            title,
+            picture,
+
+        },{
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+
+        })
+        console.log(data.data)
+        setWishlist(data.data)
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const getWishlist = async (  ) => {
+        try {
+          const { data } = await axiosInstance.get('/user-wishlist')
+            setWishlist(data.data)
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const deleteWishlist = async (placeId: any) => {
+        try {
+        const { data } = await axiosInstance.delete(`/remove-place/${placeId}`)
+
+        if (data.success) {
+            const newWishlist = wishlist.filter((wish: any) => wish.place !== placeId)
+            setWishlist(newWishlist)
+        }
+
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    useEffect(() => {
+        const user = JSON.parse(getItemsFromLocalStorage('user') as any)
+        if (user) {
+            getWishlist()
+        }
+    } , [])
+
+    return {
+        wishlist,
+        getWishlist,
+        addWishlist,
+        deleteWishlist,
+        loading,
+        setLoading,
+    }
+}
+
+// The Booking Provider
+
+interface Booking {
+    owner: string
+    place: string
+    checkIn: Date
+    checkOut: Date
+    numOfGuests: {
+        adults: number
+        children: number
+        infants: number
+        pets: number
+    }
+    extraInfo: string
+    status: string
+    name: string
+    phone: string
+    price: number
+}
+export const useBooking = () => {
+    return useContext(BookingContext)
+}
+
+export const useProvideBooking = () => {
+    const [bookings, setBookings] = useState<Booking[]>([])
+    const [loading, setLoading] = useState(true)
+
+    const addBooking = async (booking: Booking) => {
+        try {
+        const { data } = await axiosInstance.post('/create-booking', booking)
+        setBookings(prevBookings => [...prevBookings, data.data])
+        console.log(data.data)
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const getBookings = async () => {
+        try {
+          const { data } = await axiosInstance.get('/user-bookings')
+            setBookings(data.data)
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const getBookingDetails = async (id: any) => {
+        try {
+        const { data } = await axiosInstance.get(`/booking-details/${id}`)
+        return data.data
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const updateBooking = async (id: string, booking: Partial<Booking>) => {
+        try {
+            const { data } = await axiosInstance.put(`/update-booking/${id}`, booking);
+            return data.data;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const deleteBooking = async (id: any) => {
+        try {
+        const { data } = await axiosInstance.delete(`/delete-booking/${id}`)
+
+        if (data.success) {
+            const newBookings = bookings.filter((booking: any) => booking._id !== id)
+            setBookings(newBookings)
+        }
+
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    useEffect(() => {
+        const user = JSON.parse(getItemsFromLocalStorage('user') as any)
+        if (user) {
+            getBookings()
+        }
+    } , [])
+
+    return {
+        bookings,
+        getBookings,
+        addBooking,
+        deleteBooking,
+        getBookingDetails,
+        updateBooking,
         loading,
         setLoading,
     }

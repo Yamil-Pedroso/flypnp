@@ -1,78 +1,86 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
-import { Navigate, useParams, useNavigate, Link } from "react-router-dom";
-import { trending } from "../../data/trending";
-import { UserProfileContainer } from "./styles";
-import { usePlaces } from "../../../hooks";
+import { useState, useEffect } from 'react'
+import { Navigate, useParams, useNavigate, Link } from 'react-router-dom'
+import { trending } from '../../data/trending'
+import { UserProfileContainer } from './styles'
+import UpdateProfile from '../user-auth/UpdateProfile'
 
-import { Avatar, AvatarFallback, AvatarImage } from "./user-avatar/Avatar";
-import { FaCheck } from "react-icons/fa6";
-import { TiCamera } from "react-icons/ti";
-import { GrAchievement } from "react-icons/gr";
-import { GiAchievement } from "react-icons/gi";
-import { FaAward } from "react-icons/fa6";
-import { RiAwardFill } from "react-icons/ri";
-import { FaGithub, FaSquareGitlab, FaLinkedin } from "react-icons/fa6";
-import { CgWebsite } from "react-icons/cg";
+import { Avatar, AvatarFallback, AvatarImage } from './user-avatar/Avatar'
+import { FaCheck } from 'react-icons/fa6'
+import { TiCamera } from 'react-icons/ti'
+import { GrAchievement } from 'react-icons/gr'
+import { GiAchievement } from 'react-icons/gi'
+import { FaAward } from 'react-icons/fa6'
+import { RiAwardFill } from 'react-icons/ri'
+import { FaGithub, FaSquareGitlab, FaLinkedin } from 'react-icons/fa6'
+import { CgWebsite } from 'react-icons/cg'
 //import { Button } from './button/Button'
 
-import { useAuth } from "../../../hooks";
-import { LogOut } from "lucide-react";
-interface PlacesProps {
-  id: string;
-  owner: string;
-  address: string;
-  description: string;
-  extraInfo: string;
-  maxGuests: number;
-  price: number;
-  perks: string[];
-  photos: string[];
-  title: string;
-}
+import { useAuth } from '../../../hooks'
+import { LogOut } from 'lucide-react'
 
 const Profile = () => {
   //const { places } = usePlaces() as any
   //const [myPlaces, setMyPlaces] = useState<PlacesProps[]>([])
-  const auth = useAuth() as any;
-  const { user, logout } = auth;
-  const [redirect, setRedirect] = useState(null);
-  const [time, setTime] = useState(new Date());
-  const navigate = useNavigate();
+  const auth = useAuth() as any
+  const { user, logout, updateUser } = auth
+  const [userAvatar, setUserAvatar] = useState(user?.avatar)
+  const [userUpdateProfileOpen, setUserUpdateProfileOpen] = useState(false)
+  const [redirect, setRedirect] = useState(null)
+  const [time, setTime] = useState(new Date())
+  const navigate = useNavigate()
+
+  const handleClickBtnUpdateProfileToOpen = () => {
+    setUserUpdateProfileOpen(!userUpdateProfileOpen)
+  }
 
   useEffect(() => {
     const update = () => {
-      setTime(new Date());
-    };
-    const intervalId = setInterval(update, 1000);
+      setTime(new Date())
+    }
+    const intervalId = setInterval(update, 1000)
 
-    return () => clearInterval(intervalId);
-  }, []);
+    return () => clearInterval(intervalId)
+  }, [])
 
-  //useEffect(() => {
-  //  if (places) {
-  //    setMyPlaces(places);
-  //    console.log('places', places)
-  //  }
-  //}, [places]);
-
-  let { subpage } = useParams();
+  let { subpage } = useParams()
   if (!subpage) {
-    subpage = "profile";
+    subpage = 'profile'
   }
 
   const handleLogout = async () => {
-    const response = await logout();
+    const response = await logout()
     if (response.success) {
-      console.log("logout success");
-      navigate("/");
+      console.log('logout success')
+      navigate('/')
     } else {
-      console.log("logout failed");
+      console.log('logout failed')
     }
-  };
+  }
 
   if (!user && !redirect) {
-    return <Navigate to="/profile" />;
+    return <Navigate to="/profile" />
+  }
+
+  const handleAvatarChange = async (e: any) => {
+    const file = e.target.files[0]
+    const reader = new FileReader()
+
+    reader.onloadend = () => {
+      setUserAvatar(reader.result as string)
+    }
+
+    reader.readAsDataURL(file)
+
+    const formData = new FormData()
+    formData.append('avatar', file)
+
+    const response = await updateUser(formData, user._id)
+    if (response.success) {
+      console.log('Avatar updated')
+    } else {
+      console.log('Avatar update failed')
+    }
   }
 
   //if (redirect) {
@@ -81,16 +89,41 @@ const Profile = () => {
 
   return (
     <UserProfileContainer>
-      {subpage === "profile" && (
+      {subpage === 'profile' && (
         <div className="user-profile-wrapper">
           <div className="user-content">
             <Avatar>
               <div className="active-green-dot">
-                <TiCamera size={22} />
+                <TiCamera
+                  onClick={() =>
+                    document.getElementById('avatar-file')?.click()
+                  }
+                  size={22}
+                  style={{ cursor: 'pointer' }}
+                />
+                <input
+                  type="file"
+                  name="avatar"
+                  id="avatar-file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleAvatarChange}
+                />
               </div>
               {user.avatar ? (
                 <div className="user-avatar-img">
-                  <AvatarImage src={user.avatar} />
+                  <AvatarImage
+                    src={userAvatar ? userAvatar : user.avatar}
+                    className="object-cover"
+                    alt="user-avatar"
+                  />
+                  <input
+                    type="file"
+                    name="avatar"
+                    id="avatar"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                  />
                 </div>
               ) : (
                 <AvatarImage
@@ -102,8 +135,8 @@ const Profile = () => {
               <AvatarFallback>{user.name.slice([0], [1])}</AvatarFallback>
             </Avatar>
             <div className="user-desc">
-              <p className="text-gray-600">{user.name} Pedroso</p>
-              <span className="text-gray-600">{"Guest"}</span>
+              <p className="text-gray-600">{user.name}</p>
+              <span className="text-gray-600">{'Guest'}</span>
             </div>
 
             <div className="activities-wrapper">
@@ -126,7 +159,13 @@ const Profile = () => {
               <span>Verified email</span>
             </div>
             <div className="edit-logout-wrapper">
-              {/*<EditeProfileDialog />*/}
+              <a
+                href="#"
+                onClick={handleClickBtnUpdateProfileToOpen}
+                className="edit-profile-btn"
+              >
+                Edit profile
+              </a>
 
               <button onClick={handleLogout} className="logout-btn">
                 <LogOut />
@@ -214,10 +253,9 @@ const Profile = () => {
                 </div>
 
                 <div className="local-time">
-                  <p>
-                    ZURICH, SWITZERLAND
-                  </p>
-                  {time.toLocaleTimeString()}</div>
+                  <p>ZURICH, SWITZERLAND</p>
+                  {time.toLocaleTimeString()}
+                </div>
 
                 <div className="user-social">
                   <div className="social-wrapper">
@@ -241,8 +279,17 @@ const Profile = () => {
         </div>
       )}
       {/*{subpage === 'places' && <Places />}*/}
+      <div
+        className={`user-update-profile-wrapper ${
+          userUpdateProfileOpen && 'show-update-profile'
+        }`}
+      >
+        <div className="form-upprofile-content">
+          <UpdateProfile closeUserForm={handleClickBtnUpdateProfileToOpen} />
+        </div>
+      </div>
     </UserProfileContainer>
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile

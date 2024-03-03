@@ -5,9 +5,46 @@ export const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
-  padding: 0 20px;
+  margin-bottom: 0rem;
   box-sizing: border-box;
+  position: relative;
+
+  .calendar-opt-container {
+      position: relative;
+      ul {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        list-style: none;
+        position: absolute;
+        top: -3rem;
+        left: 35%;
+
+
+        li {
+          padding: .5rem 1rem;
+          cursor: pointer;
+          font-size: 1.2rem;
+          color: #686868;
+        }
+
+        .date, .months, .flexible {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          cursor: pointer;
+
+          .horizontal-line {
+            width: 4rem;
+            height: 2px;
+            background-color: #9b9b9b;
+            transition: all 0.5s ease;
+          }
+        }
+
+      }
+  }
 
   .exact-days-container {
     display: flex;
@@ -71,5 +108,21 @@ export const Container = styled.div`
 
   .content > div {
         margin: 0 0.1rem;
+    }
+
+    .months-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 53.0744rem;
+      height: 22.7813rem;
+    }
+
+    .flexible-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 53.0744rem;
+      height: 22.7813rem;
     }
 `;

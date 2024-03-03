@@ -22,6 +22,7 @@ export const isLoggedIn = async (req: AuthenticatedRequest, res: Response, next:
     try {
         // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+        console.log("Decoded token:", decoded.id);
 
         // Set the req.user to the user
         req.user = await User.findById(decoded.id);

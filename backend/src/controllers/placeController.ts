@@ -12,10 +12,11 @@ interface AuthenticatedRequest extends Request {
 // Add a new place to the database
 export const addPlace = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-
+        const userData = req.user;
         const { title, address, addedPhotos, category, description, perks, extraInfo, maxGuests, rating, reviews, price } = req.body;
 
-        const place = new Place({
+        const place = await Place.create({
+            owner: userData.id,
             title,
             address,
             photos: addedPhotos,
@@ -29,16 +30,16 @@ export const addPlace = async (req: AuthenticatedRequest, res: Response, next: N
             price,
         });
 
-        await Place.create(place);
-
         res.status(201).json({ success: true, data: place });
     } catch (error: any) {
+        console.error(error);
         res.status(500).json({
             message: 'Internal server error',
             error: error.message,
-          })
+        });
     }
-}
+};
+
 
 // Return to the user all the places that he has added
 export const getUserPlaces = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {

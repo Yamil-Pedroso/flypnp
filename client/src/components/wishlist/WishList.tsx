@@ -1,76 +1,104 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { WishListContainer } from './styles'
+import { useWishlist } from '../../../hooks'
+import { AiFillDelete } from 'react-icons/ai'
+import DeleteBox from './DeleteBox'
+import images from '../../assets/images/index'
+
+interface ShowDeleteIconState {
+  [key: string]: boolean
+}
 
 const WishList = () => {
-  const [items, setItems] = useState<string[]>([])
-  const [inputValues, setInputValues] = useState<string[]>([])
+  const [showDeleteIcon, setShowDeleteIcon] = useState<ShowDeleteIconState>({})
+  const [deleteBoxInfo, setDeleteBoxInfo] = useState({
+    show: false,
+    itemId: null as string | null,
+  })
+  const { wishlist, deleteWishlist } = useWishlist()
+  console.log(wishlist)
 
-  const addItemToWishList = () => {
-    const newItem = `Item ${
-      items.length + 1
-    } - ${new Date().toLocaleTimeString()}`
-    setItems((prevItems) => [...prevItems, newItem])
-    setInputValues((prevInputValues) => [...prevInputValues, ''])
+  const handleShowDeleteBox = (itemId: string) => {
+    setDeleteBoxInfo({ show: true, itemId })
   }
 
-  const updateItemInWishList = (index: number) => {
-    const updatedItems = [...items]
-    updatedItems[index] = inputValues[index]
-    setItems(updatedItems)
-    const updatedInputValues = [...inputValues]
-    updatedInputValues[index] = ''
-    setInputValues(updatedInputValues)
+  const handleCloseDeleteBox = () => {
+    setDeleteBoxInfo({ ...deleteBoxInfo, show: false })
   }
 
-  const deleteItemFromWishList = (index: number) => {
-    setItems((prevItems) => prevItems.filter((_item, i) => i !== index))
-    setInputValues((prevInputValues) =>
-      prevInputValues.filter((_item, i) => i !== index),
-    )
+  const overPicture = (place: string) => {
+    setShowDeleteIcon((prevState) => ({ ...prevState, [place]: true }))
   }
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index: number,
-  ) => {
-    const newInputValues = [...inputValues]
-    newInputValues[index] = e.target.value
-    setInputValues(newInputValues)
+  const leavePicture = (place: string) => {
+    setShowDeleteIcon((prevState) => ({ ...prevState, [place]: false }))
   }
 
   return (
     <WishListContainer>
       <div className="wishlist-wrapper">
-        <h1>Your wishlist is empty!</h1>
-        <p>
-          Start adding items to your wishlist by clicking the heart icon on the
-          item you want to save.
-        </p>
+        {wishlist.length === 0 ? (
+          <div className="empty-wishlist">
+            <h1>Your wishlist is empty!</h1>
+            <p>
+              Start adding items to your wishlist by clicking the heart icon on
+              the item you want to save.
+            </p>
 
-        <button onClick={addItemToWishList}>Add item</button>
-
-        <div className="wishlist-items">
-          {items.map((item, index) => (
-            <div key={index} className="wishlist-item">
-              <p>{item}</p>
-              <button onClick={() => deleteItemFromWishList(index)}>
-                Delete
-              </button>
-
-              <input
-                type="text"
-                value={inputValues[index]}
-                onChange={(e) => handleInputChange(e, index)}
-              />
-
-              <button onClick={() => updateItemInWishList(index)}>
-                Update
-              </button>
+            <div className="empty-box-wrapper">
+              <img src={images.emptyBox} alt="wishlist" />
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <>
+            <div>
+              <h1>Your wishlist</h1>
+            </div>
+            <div className="wishlist-content-wrapper">
+              {wishlist.map((wish) => (
+                <div
+                  key={wish.id}
+                  className="content-wrapper"
+                  onMouseEnter={() => overPicture(wish.place)}
+                  onMouseLeave={() => leavePicture(wish.place)}
+                >
+                  <div key={wish.id} className="content">
+                    <img src={wish.picture} alt={wish.title} />
+                  </div>
+                  <div
+                    className={`text-wrapper ${
+                      showDeleteIcon[wish.place] ? 'show' : ''
+                    }`}
+                  >
+                    <AiFillDelete
+                      className="close-icon"
+                      style={{ cursor: 'pointer' }}
+                      size={18}
+                      onClick={() => handleShowDeleteBox(wish.place)}
+                    />
+                  </div>
+                  <div
+                    style={{ width: '15rem', textAlign: 'center' }}
+                    className="name-wrapper"
+                  >
+                    <strong>{wish.title}</strong>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
+      <DeleteBox
+        className={deleteBoxInfo.show ? 'show' : ''}
+        handleCloseDeleteBox={handleCloseDeleteBox}
+        deleteItem={() => {
+          if (deleteBoxInfo.itemId) {
+            deleteWishlist(deleteBoxInfo.itemId)
+            handleCloseDeleteBox()
+          }
+        }}
+      />
     </WishListContainer>
   )
 }

@@ -6,6 +6,7 @@ import map4 from './jpeg/map4.jpeg';
 import map5 from './jpeg/map5.jpeg';
 import map6 from './jpeg/map6.jpeg';
 import logi from './png/logi.png';
+import emptyBox from './png/empty-box.png';
 
 
 interface Images {
@@ -20,7 +21,8 @@ const images: Images = {
     map4,
     map5,
     map6,
-    logi
+    logi,
+    emptyBox
 };
 
 export default images;

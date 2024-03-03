@@ -11,6 +11,8 @@ import  { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 import colors from 'colors';
 import connectDB from '../config/db';
+import fileUpload from 'express-fileupload';
+import multer from 'multer';
 
 //dotenv.config({ path: path.join(__dirname, '..', 'config', 'config.env') });
 dotenv.config({ path: path.resolve(__dirname, '..', 'config', 'config.env') });
@@ -38,6 +40,8 @@ app.use(cors({
     credentials: true,
 }));
 
+app.use(helmet());
+
 // Handle cookies
 app.use(cookieParser());
 const cookieTime = process.env.COOKIE_TIME as any;
@@ -52,6 +56,7 @@ app.use(
       httpOnly: true, // Makes the cookie accessible only on the server-side
     }),
   )
+
 
 // Routes
 import routes from '../routes/index';
