@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { usePlaces } from '../../../../hooks'
@@ -67,7 +68,9 @@ const ReserveBox = () => {
           </div>
         </div>
       </div>
-      <button>Reserve</button>
+      <Link to="/my-payment">
+        <button>Reserve</button>
+      </Link>
 
       {clickCheckIn && <MyCalendar className="calendar" />}
     </div>

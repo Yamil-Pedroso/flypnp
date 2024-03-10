@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useContext } from 'react';
 import { jwtDecode } from "jwt-decode";
@@ -7,6 +8,7 @@ import { PlacesContext } from '../src/providers/PlacesProvider';
 import { NotificationsContext } from '../src/providers/NotificationsProvider';
 import { WishlistContext } from '../src/providers/WishlistProvider';
 import { BookingContext } from '../src/providers/BookingProvider';
+import { PaymentContext } from '../src/providers/PaymentProvider';
 import axiosInstance from '../src/utils/axios';
 
 import { setItemsInLocalStorage, getItemsFromLocalStorage, removeItemFromLocalStorage} from '../src/utils';
@@ -370,7 +372,7 @@ export const useProvideWishlist = () => {
 
 interface Booking {
     owner: string
-    place: string
+    place: Place
     checkIn: Date
     checkOut: Date
     numOfGuests: {
@@ -461,4 +463,109 @@ export const useProvideBooking = () => {
         loading,
         setLoading,
     }
+}
+
+
+
+// The Payment Provider
+interface Payment {
+    user: string
+    booking: Booking
+    amount: number
+    currency: string
+    status: string
+    stripeId: string
+    paymentMethod: string
+    paymentDate: Date
+}
+
+export const usePayment = () => {
+    return useContext(PaymentContext)
+}
+
+export const useProvidePayment = () => {
+    const [payments, setPayments] = useState<Payment[]>([])
+    const [loading, setLoading] = useState(true)
+
+    console.log("Hola payment", payments)
+
+    const createPayment = async (payment: any) => {
+        try {
+        const { data } = await axiosInstance.post('/create-payment', payment)
+        setPayments(prevPayments => [...prevPayments, data.data])
+        console.log(data.data)
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const getPayments = async () => {
+        try {
+          const { data } = await axiosInstance.get('/payments')
+            console.log(data.data)
+            setPayments(data.data)
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const getSinglePayment = async (_id: any) => {
+        try {
+        const { data } = await axiosInstance.get(`/payment/65e3a4f63c8b22f5c8b5f69c`)
+        console.log(data.data)
+        return data.data
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const paymentDetailsWithPlace = async (_id: any) => {
+        try {
+        const { data } = await axiosInstance.get(`/payment/65edb86d4769e0342f2a9a4f/details-with-place`)
+        console.log("Mi ruta completa", data.data)
+        return data.data
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    const updatePayment = async (id: string, payment: any) => {
+        try {
+            const { data } = await axiosInstance.put(`/update-payment/${id}`, payment);
+            return data.data;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const deletePayment = async (id: any) => {
+        try {
+        const { data } = await axiosInstance.delete(`/delete-payment/${id}`)
+
+        if (data.success) {
+            const newPayments = payments.filter((payment: any) => payment._id !== id)
+            setPayments(newPayments)
+        }
+
+    }  catch (error) {
+        console.log(error)
+    }
+    }
+
+    useEffect(() => {
+        getPayments()
+    } , [])
+
+    return {
+        payments,
+        getPayments,
+        createPayment,
+        deletePayment,
+        getSinglePayment,
+        paymentDetailsWithPlace,
+        updatePayment,
+        loading,
+        setLoading,
+    }
+
 }

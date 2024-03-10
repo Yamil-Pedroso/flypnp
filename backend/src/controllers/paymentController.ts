@@ -45,6 +45,33 @@ export const createPayment = async (req: AuthenticatedRequest, res: Response, ne
     }
 }
 
+// Get Place data
+// En tu controller de Payment, modifica o crea un endpoint que siga este principio
+export const getPaymentDetailsWithPlace = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const paymentId = req.params.id;
+        const payment = await Payment.findById(paymentId).populate({
+            path: 'booking',
+            populate: {
+                path: 'place'
+            }
+        }) as any;
+
+        if (!payment) {
+            return res.status(404).json({ message: 'Payment not found' });
+        }
+
+        const place = payment.booking.place;
+
+        res.status(200).json({ success: true, data: place  });
+
+    } catch (error: any) {
+        console.error('Error fetching payment details with place:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+};
+
+
 // Get all payments
 export const getPayments = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const paymentQuantity = await Payment.countDocuments();
