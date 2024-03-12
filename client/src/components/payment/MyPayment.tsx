@@ -1,45 +1,42 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from 'react'
+//import { useEffect, useState } from 'react'
 import { PaymentContainer } from './styles'
 import { FaCcVisa, FaPaypal, FaCcMastercard, FaGooglePay } from 'react-icons/fa'
 import { GrAmex } from 'react-icons/gr'
-import { BsCreditCardFill } from 'react-icons/bs'
-import { IoIosLock } from 'react-icons/io'
-import { usePayment } from '../../../hooks'
+import MyStripeForm from './StripeForm'
+//import { usePayment } from '../../../hooks'
+//import { BsCreditCardFill } from 'react-icons/bs'
+//import { IoIosLock } from 'react-icons/io'
 
-interface Place {
-  _id: string
-  title: string
-  address: string
-  photos: string[]
-  category: string
-  description: string
-  perks: string[]
-  extraInfo: string
-  maxGuests: number
-  rating: number
-  reviews: number
-  price: number
-}
+//interface Place {
+//  _id: string
+//  title: string
+//  address: string
+//  photos: string[]
+//  category: string
+//  description: string
+//  perks: string[]
+//  extraInfo: string
+//  maxGuests: number
+//  rating: number
+//  reviews: number
+//  price: number
+//}
 
 const MyPayment = () => {
-  const { paymentDetailsWithPlace } = usePayment()
-  const [placeDetails, setPlaceDetails] = useState<Place | null>(null) as any
+  //const { paymentDetailsWithPlace } = usePayment()
+  //const [placeDetails, setPlaceDetails] = useState<Place | null>(null)
 
-  const paymentId = '' // must be dynamic
-
-  useEffect(() => {
-    const fetchPlaceDetails = async () => {
-      const details = await paymentDetailsWithPlace(paymentId)
-      setPlaceDetails(details)
-    }
-
-    fetchPlaceDetails()
-  }, [paymentDetailsWithPlace, paymentId])
-
-  if (!placeDetails) {
-    return <div>Loading place details...</div>
-  }
+  //useEffect(() => {
+  //  // Supongamos que este es el ID dinámico de tu lugar
+  //  const placeId = 'PLACE_ID'
+  //  paymentDetailsWithPlace(placeId).then(setPlaceDetails as any)
+  //}, [paymentDetailsWithPlace])
+  //
+  //const onSuccessfulCheckout = () => {
+  //  // Aquí manejas lo que sucede después de un pago exitoso
+  //  console.log('Pago realizado con éxito')
+  //}
 
   return (
     <PaymentContainer>
@@ -73,7 +70,8 @@ const MyPayment = () => {
               <FaGooglePay size="28" />
             </div>
           </div>
-          <form>
+          <MyStripeForm />
+          {/*<form>
             <div className="input-wrapper credit-card">
               <BsCreditCardFill size="18" className="credit-card-icon" />
               <input
@@ -120,13 +118,13 @@ const MyPayment = () => {
             </div>
 
             <button type="submit">Pay</button>
-          </form>
+  </form>*/}
         </div>
       </div>
 
       <hr />
 
-      <div className="right-cont">
+      {/*<div className="right-cont">
         <div className="place-rating-wrapper">
           <div className="place-desc">
             <img
@@ -154,7 +152,7 @@ const MyPayment = () => {
           <p>Total</p>
           <p>{placeDetails.price * 0.1 + placeDetails.price}</p>
         </div>
-      </div>
+     </div>*/}
     </PaymentContainer>
   )
 }

@@ -477,6 +477,7 @@ interface Payment {
     stripeId: string
     paymentMethod: string
     paymentDate: Date
+    clientSecret?: string
 }
 
 export const usePayment = () => {
@@ -486,23 +487,34 @@ export const usePayment = () => {
 export const useProvidePayment = () => {
     const [payments, setPayments] = useState<Payment[]>([])
     const [loading, setLoading] = useState(true)
-
-    console.log("Hola payment", payments)
+    const [clientSecret, setClientSecret] = useState('')
 
     const createPayment = async (payment: any) => {
         try {
-        const { data } = await axiosInstance.post('/create-payment', payment)
-        setPayments(prevPayments => [...prevPayments, data.data])
-        console.log(data.data)
-    }  catch (error) {
-        console.log(error)
-    }
-    }
+            const response = await axiosInstance.post('/create-payment', payment)
+
+            const data = response.data;
+
+            if (data.success && data.clientSecret) {
+                setClientSecret(data.clientSecret);
+                console.log("Client Secret:", data.clientSecret);
+                return { success: true, clientSecret: data.clientSecret };
+            } else {
+                console.error("Failed to retrieve client secret");
+                return { success: false, message: "Failed to retrieve client secret" };
+            }
+        } catch (error : any) {
+            console.error("Error creating payment:", error);
+            return { success: false, error: error.message || "An error occurred" };
+        }
+    };
+
+
 
     const getPayments = async () => {
         try {
           const { data } = await axiosInstance.get('/payments')
-            console.log(data.data)
+            console.log("get payments",data.data)
             setPayments(data.data)
     }  catch (error) {
         console.log(error)
@@ -511,7 +523,7 @@ export const useProvidePayment = () => {
 
     const getSinglePayment = async (_id: any) => {
         try {
-        const { data } = await axiosInstance.get(`/payment/65e3a4f63c8b22f5c8b5f69c`)
+        const { data } = await axiosInstance.get(`/payment/${_id}`)
         console.log(data.data)
         return data.data
     }  catch (error) {
@@ -521,7 +533,7 @@ export const useProvidePayment = () => {
 
     const paymentDetailsWithPlace = async (_id: any) => {
         try {
-        const { data } = await axiosInstance.get(`/payment/65edb86d4769e0342f2a9a4f/details-with-place`)
+        const { data } = await axiosInstance.get(`/payment/${_id}/details-with-place`)
         console.log("Mi ruta completa", data.data)
         return data.data
     }  catch (error) {

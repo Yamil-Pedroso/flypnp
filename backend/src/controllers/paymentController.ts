@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Payment, IPayment } from '../models/Payment';
-import { stripe, customerId } from '../config/stripe'; // Asegúrate de que la ruta sea correcta
+import { stripe, customerId } from '../config/stripe';
 
 interface AuthenticatedRequest extends Request {
     user?: any;
@@ -16,10 +16,10 @@ export const createPayment = async (req: AuthenticatedRequest, res: Response, ne
             amount,
             currency: currency || 'chf',
             customer: customerId,
-            payment_method: req.body.paymentMethod,
+            payment_method: paymentMethod,
             confirmation_method: 'manual',
-            confirm: true,
-            return_url: 'https://yampe-webdeveloper.netlify.app/',
+            confirm: false,
+            //return_url: 'https://yampe-webdeveloper.netlify.app/',
         }) as any;
 
         const payment: IPayment = {
@@ -28,14 +28,14 @@ export const createPayment = async (req: AuthenticatedRequest, res: Response, ne
             amount,
             currency,
             status,
-            stripeId,
+            stripeId: paymentIntent.id,
             paymentMethod,
             paymentDate,
         };
 
         await Payment.create(payment);
 
-        res.status(201).json({ success: true, data: payment, paymentIntent: paymentIntent });
+        res.status(201).json({ success: true, data: payment, clientSecret: paymentIntent.client_secret });
     } catch (error: any) {
         console.error('Error to create payment:', error);
         res.status(500).json({

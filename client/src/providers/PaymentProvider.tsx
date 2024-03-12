@@ -50,18 +50,29 @@ interface Payment {
 
 interface PaymentContextType {
   payments: Payment[]
+  clientSecret: string | undefined
   getPayments: () => Promise<void>
   getSinglePayment: (id: string) => Promise<void>
   paymentDetailsWithPlace: (id: string) => Promise<void>
+  createPayment: (
+    payment: Payment,
+  ) => Promise<{
+    success: boolean
+
+    message?: string
+    error?: string
+  }>
   loading: boolean
   setLoading: (loading: boolean) => void
 }
 
 const initialState: PaymentContextType = {
   payments: [],
+  clientSecret: undefined,
   getPayments: async () => {},
   getSinglePayment: async () => {},
   paymentDetailsWithPlace: async () => {},
+  createPayment: async () => ({ success: false }),
   loading: true,
   setLoading: () => {},
 }
@@ -73,7 +84,7 @@ interface PaymentProviderProps {
 }
 
 export const PaymentProvider = ({ children }: PaymentProviderProps) => {
-  const allPayments = useProvidePayment()
+  const allPayments = useProvidePayment() as any
 
   return (
     <PaymentContext.Provider value={allPayments}>
