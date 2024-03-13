@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-//import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { PaymentContainer } from './styles'
+import { useLocation } from 'react-router-dom'
 import { FaCcVisa, FaPaypal, FaCcMastercard, FaGooglePay } from 'react-icons/fa'
 import { GrAmex } from 'react-icons/gr'
 import TestStripePayment from './TestStripePayment'
@@ -24,7 +25,12 @@ import TestStripePayment from './TestStripePayment'
 //  price: number
 //}
 
-const MyPayment = () => {
+interface MyPaymentProps {
+  myPrice: string
+}
+
+const MyPayment = ({ myPrice }: MyPaymentProps) => {
+  const location = useLocation()
   //const { paymentDetailsWithPlace } = usePayment()
   //const [placeDetails, setPlaceDetails] = useState<Place | null>(null)
 
@@ -39,6 +45,20 @@ const MyPayment = () => {
   //  console.log('Pago realizado con éxito')
   //}
 
+  const useQuery = new URLSearchParams(location.search)
+  const user = useQuery.get('user')
+  const booking = useQuery.get('booking')
+  const checkIn = useQuery.get('checkIn')
+  const checkOut = useQuery.get('checkOut')
+  const guests = useQuery.get('guests')
+  const price = useQuery.get('price')
+  const photo = useQuery.get('photo') as string
+  const title = useQuery.get('title')
+  const description = useQuery.get('description')
+  const rating = useQuery.get('rating')
+
+  console.log('booking', booking)
+
   return (
     <PaymentContainer>
       <div className="left-cont">
@@ -47,14 +67,16 @@ const MyPayment = () => {
           <div className="dates-cont">
             <div className="dates-wapper">
               <p>Dates</p>
-              <p>MM/DD/YYYY</p>
+              <p>
+                {checkIn} - {checkOut}
+              </p>
             </div>
             <div className="edit-wrapper">Edit</div>
           </div>
           <div className="guests-cont">
             <div className="guests-wapper">
               <p>Guests</p>
-              <p>Number of guests</p>
+              <p>{guests} guests</p>
             </div>
             <div className="edit-wrapper">Edit</div>
           </div>
@@ -125,35 +147,34 @@ const MyPayment = () => {
 
       <hr />
 
-      {/*<div className="right-cont">
+      <div className="right-cont">
         <div className="place-rating-wrapper">
+          <img src={photo} alt="" width={200} />
           <div className="place-desc">
-            <img
-              src={placeDetails.photos[0].main}
-              alt={placeDetails.title}
-              width={200}
-            />
-            <h2>{placeDetails.title}</h2>
-            <p>{placeDetails.rating}</p>
+            <h2>{title}</h2>
+            <p>{description}</p>
+            <p>{rating}</p>
           </div>
         </div>
         <hr />
         <div className="price-details-wrapper">
           <div className="price-in-nights">
             <p>
-              {placeDetails.price} x 3 nights
-              <span>3 nights</span>
+              <span>nights</span>
             </p>
-            <p>{placeDetails.price * 3}</p>
+            <p></p>
           </div>
-          <div className="service-fee">{placeDetails.price * 0.1}</div>
+          <div className="service-fee">{Number(price) * 0.1}</div>
         </div>
         <hr />
         <div className="total-price-wrapper">
           <p>Total</p>
-          <p>{placeDetails.price * 0.1 + placeDetails.price}</p>
+          <p>
+            {Number(price) + Number(price) * 0.1}
+            CHF
+          </p>
         </div>
-     </div>*/}
+      </div>
     </PaymentContainer>
   )
 }

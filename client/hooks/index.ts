@@ -23,6 +23,8 @@ export const useProvideAuth = () => {
     const [user, setUser] = useState(null) as any
     const [loading, setLoading] = useState(true)
 
+     console.log("myUser", user)
+
     useEffect(() => {
         const storedUser = getItemsFromLocalStorage('user');
         if (storedUser) {
@@ -371,6 +373,7 @@ export const useProvideWishlist = () => {
 // The Booking Provider
 
 interface Booking {
+    id: string
     owner: string
     place: Place
     checkIn: Date
@@ -394,8 +397,6 @@ export const useBooking = () => {
 export const useProvideBooking = () => {
     const [bookings, setBookings] = useState<Booking[]>([])
     const [loading, setLoading] = useState(true)
-
-    console.log(bookings)
 
     const addBooking = async (booking: Booking) => {
         try {
@@ -472,7 +473,7 @@ export const useProvideBooking = () => {
 // The Payment Provider
 interface Payment {
     user?: string
-    booking?: Booking
+    bookingId?: Booking
     amount?: number
     currency?: string
     status?: string
@@ -489,21 +490,32 @@ export const useProvidePayment = () => {
     const [payments, setPayments] = useState<Payment[]>([])
     const [loading, setLoading] = useState(true)
     const [clientSecret, setClientSecret] = useState('')
+    //const [bookingDetails, setBookingDetails] = useState<Booking | null>(null)
 
-    const createPayment = async (payment: any) => {
+    const createPayment = async (bookingDetails: Booking) => {
         try {
-            const response = await axiosInstance.post('/create-payment', payment)
+            //const { _id, owner, status, place } = bookingDetails;
+            const response = await axiosInstance.post('/create-payment', {
+                user: '65e3a4f63c8b22f5c8b5f69c',
+                bookingId: '65e440a55475a2eca6ebe911',
+                amount: 500.00,
+                currency: "chf",
+                status: 'pending',
+                stripeId: 'pi_3OqDGhBO47rgKbjy0Gwl6Gui',
+                paymentMethod: 'pm_1OqDGgBO47rgKbjyySEck3dX',
+                paymentDate: '2023-03-15T00:00:00.000Z'
+            })
 
             const data = response.data;
 
             if (data.success && data.clientSecret) {
                 setClientSecret(data.clientSecret);
-                console.log("Client Secret:", data.clientSecret);
                 return { success: true, clientSecret: data.clientSecret };
             } else {
                 console.error("Failed to retrieve client secret");
                 return { success: false, message: "Failed to retrieve client secret" };
             }
+
         } catch (error : any) {
             console.error("Error creating payment:", error);
             return { success: false, error: error.message || "An error occurred" };

@@ -19,6 +19,7 @@ import PlaceDetailsPage from './pages/PlaceDetailsPage'
 import BookingPage from './pages/BookingPage'
 import NotificationsPage from './pages/NotificationsPage'
 import PaymentPage from './pages/PaymentPage'
+import SucceededPaymentPage from './pages/SucceededPaymentPage'
 import TripsPage from './pages/TripsPage'
 import WishListPage from './pages/WishListPage'
 
@@ -69,6 +70,10 @@ function App({ menuClick }: AppProps) {
                       <Route path="/trips" element={<TripsPage />} />
                       <Route path="/wishlist" element={<WishListPage />} />
                       <Route path="/my-payment" element={<PaymentPage />} />
+                      <Route
+                        path="/succeeded-payment"
+                        element={<SucceededPaymentPage />}
+                      />
                       <Route path="*" element={<NotFoundPage />} />
                     </Routes>
                   </Router>

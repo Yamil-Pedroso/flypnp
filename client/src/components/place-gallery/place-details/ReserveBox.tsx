@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { usePlaces } from '../../../../hooks'
+import { useBooking } from '../../../../hooks'
+import { useAuth } from '../../../../hooks'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import MyCalendar from '../../common/calendar/Calendar'
 
@@ -11,10 +13,14 @@ const ReserveBox = () => {
   const [clickCheckIn, setClickCheckIn] = useState(false)
   const { places, loading } = usePlaces()
   const { id, category } = useParams()
+  const [checkInDate, setCheckInDate] = useState('2024-02-23') // setStates to play with the data dynamically
+  const [checkOutDate, setCheckOutDate] = useState('2024-03-19') // setStates to play with the data dynamically
+  const [guests, setGuests] = useState(1) // setStates to play with the data dynamically
+  const { user } = useAuth() as any
+  const { bookings } = useBooking() as any
+  //console.log('places', places[0]._id)
 
-  const handleArrowClick = () => {
-    setClickArrow(!clickArrow)
-  }
+  const navigate = useNavigate()
 
   const handleCheckInClick = () => {
     setClickCheckIn(!clickCheckIn)
@@ -30,6 +36,14 @@ const ReserveBox = () => {
 
   if (!place) {
     return <div>Image not found</div>
+  }
+
+  const mainPhoto = place.photos[0]?.main || ''
+
+  const handleReserveClick = () => {
+    navigate(
+      `/my-payment?checkIn=${checkInDate}&checkOut=${checkOutDate}&guests=${guests}&price=${place.price}&photo=${mainPhoto}&title=${place.title}&description=${place.description}&rating=${place.rating}&user=${user._id}&place=${place._id}`,
+    )
   }
 
   return (
@@ -68,9 +82,10 @@ const ReserveBox = () => {
           </div>
         </div>
       </div>
-      <Link to="/my-payment">
-        <button>Reserve</button>
-      </Link>
+
+      <button onClick={handleReserveClick} className="reserve-button">
+        Reserve
+      </button>
 
       {clickCheckIn && <MyCalendar className="calendar" />}
     </div>
