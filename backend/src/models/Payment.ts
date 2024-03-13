@@ -2,7 +2,8 @@ import { Schema, model, Types } from "mongoose";
 
 interface IPayment {
     user: Types.ObjectId;
-    booking: Types.ObjectId;
+    //booking: Types.ObjectId;
+    place: Types.ObjectId;
     amount: number;
     currency: string;
     status: string;
@@ -14,7 +15,8 @@ interface IPayment {
 
 const paymentSchema = new Schema<IPayment>({
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    booking: { type: Schema.Types.ObjectId, ref: "Booking", required: true },
+    //booking: { type: Schema.Types.ObjectId, ref: "Booking", required: true },
+    place: { type: Schema.Types.ObjectId, ref: "Place", required: true },
     amount: { type: Number, required: true },
     currency: { type: String, required: true, default: "chf" },
     clientSecret: { type: String },

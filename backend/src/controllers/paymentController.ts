@@ -10,7 +10,7 @@ interface AuthenticatedRequest extends Request {
 export const createPayment = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const userData = req.user;
-        const { bookingId, amount, currency, status, stripeId, paymentMethod, paymentDate } = req.body;
+        const { placeId, amount, currency, status, stripeId, paymentMethod, paymentDate } = req.body;
 
         const paymentIntent = await stripe.paymentIntents.create({
             amount,
@@ -24,7 +24,7 @@ export const createPayment = async (req: AuthenticatedRequest, res: Response, ne
 
         const payment: IPayment = {
             user: userData.id,
-            booking: bookingId,
+            place: placeId,
             amount,
             currency,
             status,
