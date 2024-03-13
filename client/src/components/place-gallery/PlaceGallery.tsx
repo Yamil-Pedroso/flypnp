@@ -4,6 +4,7 @@ import { PlaceGalleryContainer, MenuWrapper } from './styles'
 import Trending from './trending/Trending'
 import Beachfront from './beachfront/BeachFront'
 import IconicCities from './iconic-cities/IconicCities'
+import { ToastContainer } from 'react-toastify'
 //import { usePlaces } from '../../../hooks'
 //import Spinner from '../common/progress/Progress'
 
@@ -137,6 +138,7 @@ const PlaceGallery = () => {
           {activeComponent && components[activeComponent].component}
         </div>
       </div>
+      <ToastContainer />
     </PlaceGalleryContainer>
   )
 }

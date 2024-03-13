@@ -9,6 +9,7 @@ interface IPayment {
     stripeId: string;
     paymentMethod: string;
     paymentDate: Date;
+    clientSecret?: string;
 }
 
 const paymentSchema = new Schema<IPayment>({
@@ -16,6 +17,7 @@ const paymentSchema = new Schema<IPayment>({
     booking: { type: Schema.Types.ObjectId, ref: "Booking", required: true },
     amount: { type: Number, required: true },
     currency: { type: String, required: true, default: "chf" },
+    clientSecret: { type: String },
     status: {
         type: String,
         enum: ["pending", "confirmed", "cancelled"],

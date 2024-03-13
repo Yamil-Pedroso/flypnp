@@ -395,6 +395,8 @@ export const useProvideBooking = () => {
     const [bookings, setBookings] = useState<Booking[]>([])
     const [loading, setLoading] = useState(true)
 
+    console.log(bookings)
+
     const addBooking = async (booking: Booking) => {
         try {
         const { data } = await axiosInstance.post('/create-booking', booking)
@@ -469,15 +471,14 @@ export const useProvideBooking = () => {
 
 // The Payment Provider
 interface Payment {
-    user: string
-    booking: Booking
-    amount: number
-    currency: string
-    status: string
-    stripeId: string
-    paymentMethod: string
-    paymentDate: Date
-    clientSecret?: string
+    user?: string
+    booking?: Booking
+    amount?: number
+    currency?: string
+    status?: string
+    stripeId?: string
+    paymentMethod?: string
+    paymentDate?: Date
 }
 
 export const usePayment = () => {
@@ -570,6 +571,7 @@ export const useProvidePayment = () => {
 
     return {
         payments,
+        clientSecret,
         getPayments,
         createPayment,
         deletePayment,

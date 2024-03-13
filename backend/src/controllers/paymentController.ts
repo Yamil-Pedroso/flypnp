@@ -17,7 +17,7 @@ export const createPayment = async (req: AuthenticatedRequest, res: Response, ne
             currency: currency || 'chf',
             customer: customerId,
             payment_method: paymentMethod,
-            confirmation_method: 'manual',
+            confirmation_method: 'automatic',
             confirm: false,
             //return_url: 'https://yampe-webdeveloper.netlify.app/',
         }) as any;
@@ -77,7 +77,7 @@ export const getPayments = async (req: AuthenticatedRequest, res: Response, next
     const paymentQuantity = await Payment.countDocuments();
 
     try {
-        const payments = await Payment.find();
+        const payments = await Payment.find().populate('clientSecret');
 
         res.status(200).json({ success: true, qt: paymentQuantity, data: payments });
     } catch (error: any) {

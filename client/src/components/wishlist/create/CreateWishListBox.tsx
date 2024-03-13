@@ -4,6 +4,8 @@ import { CreateWishListContainer } from './styles'
 import { IoCloseSharp } from 'react-icons/io5'
 import { FaCircleExclamation } from 'react-icons/fa6'
 import { useWishlist } from '../../../../hooks'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 interface CreateWishListProps {
   closeCreateWishList: () => void
@@ -22,12 +24,14 @@ const CreateWishListBox = ({
   const [wishListName, setWishListName] = useState('')
   const [errorCharLimit, setErrorCharLimit] = useState(false)
   const { addWishlist } = useWishlist()
+  const notify = () => toast('Wishlist created successfully!')
 
   const handleCreateWishList = () => {
     if (wishListName.trim() && !errorCharLimit) {
       addWishlist(placeId, wishListName, picture)
       console.log(wishListName)
       closeCreateWishList()
+      notify()
       setWishListName('')
     }
   }

@@ -3,7 +3,8 @@
 import { PaymentContainer } from './styles'
 import { FaCcVisa, FaPaypal, FaCcMastercard, FaGooglePay } from 'react-icons/fa'
 import { GrAmex } from 'react-icons/gr'
-import MyStripeForm from './StripeForm'
+import TestStripePayment from './TestStripePayment'
+//import MyStripeForm from './StripeForm'
 //import { usePayment } from '../../../hooks'
 //import { BsCreditCardFill } from 'react-icons/bs'
 //import { IoIosLock } from 'react-icons/io'
@@ -70,7 +71,7 @@ const MyPayment = () => {
               <FaGooglePay size="28" />
             </div>
           </div>
-          <MyStripeForm />
+          <TestStripePayment />
           {/*<form>
             <div className="input-wrapper credit-card">
               <BsCreditCardFill size="18" className="credit-card-icon" />

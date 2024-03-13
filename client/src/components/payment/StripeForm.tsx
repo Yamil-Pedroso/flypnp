@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePayment } from '../../../hooks'
 import { loadStripe } from '@stripe/stripe-js'
 import {
@@ -9,81 +9,86 @@ import {
   useElements,
 } from '@stripe/react-stripe-js'
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
-
 interface CheckoutFormProps {
   onSuccessfulCheckout: () => void
-  clientSecret?: string | undefined
-  handlePayment: () => Promise<void>
+  clientSecret: string
 }
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
 
 const CheckoutForm = ({
   onSuccessfulCheckout,
   clientSecret,
-  handlePayment,
 }: CheckoutFormProps) => {
   const stripe = useStripe()
   const elements = useElements()
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(null) as any
   const [isLoading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!stripe || !elements || !clientSecret) {
-      console.log(
-        'Stripe.js has not been loaded yet, or clientSecret is missing.',
-      )
+    if (!stripe || !elements) {
+      // Manejo de errores: Stripe.js aún no se ha cargado.
       return
     }
 
     setLoading(true)
-    await handlePayment()
-    const cardElement = elements.getElement(CardElement) as any
 
-    const result = (await stripe.confirmCardPayment(clientSecret, {
+    const cardElement = elements.getElement(CardElement)
+
+    const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
         card: cardElement,
+        // Agregar información adicional aquí si es necesario
       },
-    })) as any
+    } as any)
 
     setLoading(false)
 
     if (result.error) {
       setError(result.error.message)
-      console.log(result.error.message)
-    } else {
-      if (result.paymentIntent.status === 'succeeded') {
-        console.log('Payment succeeded!')
-        onSuccessfulCheckout()
-      }
+    } else if (
+      result.paymentIntent &&
+      result.paymentIntent.status === 'succeeded'
+    ) {
+      onSuccessfulCheckout()
     }
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <CardElement />
-      <button disabled={isLoading || !stripe || !elements}>
-        {isLoading ? 'Processing...' : 'Pay'}
-      </button>
+      <button disabled={isLoading || !stripe}>Pay</button>
       {error && <div>{error}</div>}
     </form>
   )
 }
 
 const MyStripeForm = () => {
-  const { clientSecret, createPayment } = usePayment()
+  const { clientSecret, createPayment } = usePayment() as any
+  const [isClientSecretReady, setIsClientSecretReady] = useState(false)
 
-  const handlePayment = async () => {
-    await createPayment({
-      amount: 3000,
-      currency: 'chf',
-    } as any)
+  useEffect(() => {
+    const preparePayment = async () => {
+      await createPayment({
+        amount: 3000,
+        currency: 'chf',
+      } as any)
+      setIsClientSecretReady(true)
+    }
+
+    if (!clientSecret) {
+      preparePayment()
+    }
+  }, [clientSecret, createPayment])
+
+  if (!isClientSecretReady) {
+    return <div>Loading...</div> // O cualquier otro indicador de carga
   }
 
   return (
     <Elements stripe={stripePromise} options={{ clientSecret }}>
       <CheckoutForm
-        handlePayment={handlePayment}
         clientSecret={clientSecret}
         onSuccessfulCheckout={() => console.log('Payment successful!')}
       />
