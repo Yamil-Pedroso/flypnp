@@ -2,7 +2,9 @@ import { createContext } from 'react'
 
 import { useProvideBooking } from '../../hooks'
 
+
 interface Booking {
+  _id: string
   owner: string
   place: string
   checkIn: Date
@@ -16,7 +18,6 @@ interface Booking {
   extraInfo: string
   status: string
   name: string
-  phone: string
   price: number
 }
 

@@ -373,9 +373,9 @@ export const useProvideWishlist = () => {
 // The Booking Provider
 
 interface Booking {
-    id: string
+    _id: string
     owner: string
-    place: Place
+    place: string
     checkIn: Date
     checkOut: Date
     numOfGuests: {
@@ -387,7 +387,6 @@ interface Booking {
     extraInfo: string
     status: string
     name: string
-    phone: string
     price: number
 }
 export const useBooking = () => {
