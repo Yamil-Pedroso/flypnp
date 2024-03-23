@@ -9,18 +9,22 @@ interface AuthenticatedRequest extends Request {
 export const createBookings = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const userData = req.user;
-        const { place, checkIn, checkOut,numOfGuests, extraInfo, status, name, phone, price } = req.body;
+        const { place, checkIn, checkOut,numOfGuests, extraInfo, status, name, price } = req.body;
 
         const booking: IBooking = {
             owner: userData.id,
             place,
             checkIn,
             checkOut,
-            numOfGuests,
+            numOfGuests: {
+                adults: numOfGuests.adults,
+                children: numOfGuests.children || 0,
+                infants: numOfGuests.infants || 0,
+                pets: numOfGuests.pets || 0,
+            },
             status,
             extraInfo,
             name,
-            phone,
             price,
         };
 

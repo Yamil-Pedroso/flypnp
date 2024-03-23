@@ -51,13 +51,13 @@ const MyPayment = ({ myPrice }: MyPaymentProps) => {
   const checkIn = useQuery.get('checkIn')
   const checkOut = useQuery.get('checkOut')
   const guests = useQuery.get('guests')
+  const infants = useQuery.get('infants')
+  const pets = useQuery.get('pets')
   const price = useQuery.get('price')
   const photo = useQuery.get('photo') as string
   const title = useQuery.get('title')
   const description = useQuery.get('description')
   const rating = useQuery.get('rating')
-
-  console.log('booking', booking)
 
   return (
     <PaymentContainer>
@@ -76,7 +76,11 @@ const MyPayment = ({ myPrice }: MyPaymentProps) => {
           <div className="guests-cont">
             <div className="guests-wapper">
               <p>Guests</p>
-              <p>{guests} guests</p>
+              <p>
+                {guests} guests
+                {infants ? `, ${infants} infant${Number(infants) > 1 ? 's' : ''}` : ''}
+                {pets ? `, ${pets} pet${Number(pets) > 1 ? 's' : ''}` : ''}
+              </p>
             </div>
             <div className="edit-wrapper">Edit</div>
           </div>

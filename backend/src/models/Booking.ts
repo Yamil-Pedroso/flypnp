@@ -5,11 +5,15 @@ interface IBooking {
     place: Types.ObjectId;
     checkIn: Date;
     checkOut: Date;
-    numOfGuests: number;
+    numOfGuests: {
+        adults: number;
+        children: number;
+        infants: number;
+        pets: number;
+    }
     status: string;
     extraInfo: string;
     name: string;
-    phone: string;
     price: number;
 }
 
@@ -31,7 +35,6 @@ const bookingSchema = new Schema<IBooking>({
     },
     extraInfo: { type: String },
     name: { type: String, required: true },
-    phone: { type: String, required: true },
     price: { type: Number, required: true },
 }, {
     timestamps: true,
