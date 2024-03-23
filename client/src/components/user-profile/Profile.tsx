@@ -16,7 +16,7 @@ import { FaGithub, FaSquareGitlab, FaLinkedin } from 'react-icons/fa6'
 import { CgWebsite } from 'react-icons/cg'
 //import { Button } from './button/Button'
 
-import { useAuth } from '../../../hooks'
+import { useAuth, useWishlist } from '../../../hooks'
 import { LogOut } from 'lucide-react'
 
 const Profile = () => {
@@ -24,6 +24,7 @@ const Profile = () => {
   //const [myPlaces, setMyPlaces] = useState<PlacesProps[]>([])
   const auth = useAuth() as any
   const { user, logout, updateUser } = auth
+  const { wishlist } = useWishlist()
   const [userAvatar, setUserAvatar] = useState(user?.avatar)
   const [userUpdateProfileOpen, setUserUpdateProfileOpen] = useState(false)
   const [redirect, setRedirect] = useState(null)
@@ -141,7 +142,7 @@ const Profile = () => {
 
             <div className="activities-wrapper">
               <div className=" acti acti-1">
-                <span>5</span>
+                <span>{wishlist.length}</span>
                 <span>Places</span>
               </div>
               <div className=" acti acti-2">

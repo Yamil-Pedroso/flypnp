@@ -24,6 +24,7 @@ export const createPayment = async (req: AuthenticatedRequest, res: Response, ne
 
         const payment: IPayment = {
             user: userData.id,
+            name: userData.name,
             place: placeId,
             amount,
             currency,

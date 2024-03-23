@@ -25,7 +25,14 @@ const IconicCities = () => {
   }
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: '1.5rem' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        marginTop: '1.5rem',
+      }}
+    >
       {iconicCityPlaces.map((place: any, idx: number) => (
         <PlaceCard key={idx} place={place} />
       ))}

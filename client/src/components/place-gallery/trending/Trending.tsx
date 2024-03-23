@@ -27,6 +27,7 @@ const Trending = () => {
 
   return (
     <div
+      className="trending-places-wrapper"
       style={{
         display: 'flex',
         justifyContent: 'center',

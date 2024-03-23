@@ -39,8 +39,12 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
   //  getClientSecret()
   //}, [])
 
+  interface Name {
+    name: string
+  }
+
   const useQuery = new URLSearchParams(location.search)
-  const user = useQuery.get('user')
+  const user = (useQuery.get('user') as unknown) as Name
   //const booking = useQuery.get('booking')
   const price = useQuery.get('price')
   const place = useQuery.get('place')
@@ -50,6 +54,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
       try {
         const response = await axiosInstance.post('/create-payment', {
           user: user,
+          name: user.name,
           placeId: place,
           amount: price,
           currency: 'chf',
@@ -75,7 +80,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
     }
 
     createPaymentClientSecret()
-  }, [])
+  }, [user.name, place, price, user])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

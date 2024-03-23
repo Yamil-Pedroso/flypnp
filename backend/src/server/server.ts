@@ -1,5 +1,6 @@
 import express from 'express';
 import { Request, Response } from 'express';
+import chalk from 'chalk';
 import cors from 'cors';
 import path from 'path';
 import morgan from 'morgan';
@@ -14,8 +15,17 @@ import connectDB from '../config/db';
 import fileUpload from 'express-fileupload';
 import multer from 'multer';
 
+//console.log(chalk.blue('Hello, world!'));
 //dotenv.config({ path: path.join(__dirname, '..', 'config', 'config.env') });
 dotenv.config({ path: path.resolve(__dirname, '..', 'config', 'config.env') });
+
+//console.log("Hello, world!".green); // Texto en verde
+//console.log("Hello, world!".underline.red);
+//console.log(process.env.CLOUD_NAME);
+//const log = console.log;
+
+// Combine styled and normal strings
+//log(chalk.blue('Hello') + ' World' + chalk.red('!'));
 
 
 const PORT = process.env.PORT || 8080;

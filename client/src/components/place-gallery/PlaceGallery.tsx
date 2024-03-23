@@ -38,63 +38,63 @@ const PlaceGallery = () => {
 
   const components: Record<string, ComponentType> = {
     trending: {
-      icon: <FaFireAlt size={32} style={{ color: '#515151' }} />,
+      icon: <FaFireAlt size={32} />,
       component: <Trending />,
     },
     beachfront: {
-      icon: <FaUmbrellaBeach size={32} style={{ color: '#515151' }} />,
+      icon: <FaUmbrellaBeach size={32} />,
       component: <Beachfront />,
     },
     iconicCities: {
-      icon: <FaTreeCity size={32} style={{ color: '#515151' }} />,
+      icon: <FaTreeCity size={32} />,
       component: <IconicCities />,
     },
     tinyHomes: {
-      icon: <FaLaptopHouse size={32} style={{ color: '#515151' }} />,
+      icon: <FaLaptopHouse size={32} />,
       component: <IconicCities />,
     },
     mansions: {
-      icon: <GiFamilyHouse size={32} style={{ color: '#515151' }} />,
+      icon: <GiFamilyHouse size={32} />,
       component: <IconicCities />,
     },
     huts: {
-      icon: <FaShuttleVan size={32} style={{ color: '#515151' }} />,
+      icon: <FaShuttleVan size={32} />,
       component: <IconicCities />,
     },
     ski: {
-      icon: <FaSkiing size={32} style={{ color: '#515151' }} />,
+      icon: <FaSkiing size={32} />,
       component: <IconicCities />,
     },
     amazingViews: {
-      icon: <AiFillPicture size={32} style={{ color: '#515151' }} />,
+      icon: <AiFillPicture size={32} />,
       component: <IconicCities />,
     },
     luxe: {
-      icon: <MdFoodBank size={32} style={{ color: '#515151' }} />,
+      icon: <MdFoodBank size={32} />,
       component: <IconicCities />,
     },
     design: {
-      icon: <PiWarehouseFill size={32} style={{ color: '#515151' }} />,
+      icon: <PiWarehouseFill size={32} />,
       component: <IconicCities />,
     },
     tropical: {
-      icon: <GiTropicalFish size={32} style={{ color: '#515151' }} />,
+      icon: <GiTropicalFish size={32} />,
       component: <IconicCities />,
     },
     historicalHomes: {
-      icon: <MdCastle size={32} style={{ color: '#515151' }} />,
+      icon: <MdCastle size={32} />,
       component: <IconicCities />,
     },
     surfing: {
-      icon: <MdOutlineSurfing size={32} style={{ color: '#515151' }} />,
+      icon: <MdOutlineSurfing size={32} />,
       component: <IconicCities />,
     },
     caves: {
-      icon: <GiCaveEntrance size={32} style={{ color: '#515151' }} />,
+      icon: <GiCaveEntrance size={32} />,
       component: <IconicCities />,
     },
     camping: {
-      icon: <GiCampingTent size={32} style={{ color: '#515151' }} />,
+      icon: <GiCampingTent size={32} />,
       component: <IconicCities />,
     },
   }
@@ -114,7 +114,12 @@ const PlaceGallery = () => {
       <div className="place-gallery-wrapper">
         <MenuWrapper>
           {Object.keys(components).map((key) => (
-            <div key={key} className="btn-wrapper">
+            <div
+              key={key}
+              className={`btn-wrapper ${
+                activeComponent === key ? 'border' : ''
+              }`}
+            >
               <button
                 className={activeComponent === key ? 'active' : 'inactive'}
                 onClick={(e) => handleClick(key as keyof typeof components, e)}

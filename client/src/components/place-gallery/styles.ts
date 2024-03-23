@@ -1,13 +1,36 @@
 import styled from 'styled-components';
 
 export const PlaceGalleryContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
   .place-gallery-wrapper {
     margin-top: -2rem;
     border-top: 1px solid #dddddd;
+
+    @media (max-width: 1500px) {
+      button.active {
+        color: #f94a51;
+        p {
+          color: #2a2a2a;
+        }
+      }
+
+      button.inactive {
+        color: #515151;
+      }
+
+      .btn-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 1rem 2rem;
+        height: 6rem;
+        background-color: #ffffff;
+        border-radius: .5rem;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-wrapper.border {
+        border: 1px solid #2a2a2a;
+      }
   }
 
   ul {
@@ -22,6 +45,7 @@ export const PlaceGalleryContainer = styled.div`
             cursor: pointer;
         }
     }
+
 `;
 
 export const MenuWrapper = styled.div`
@@ -74,5 +98,12 @@ export const MenuWrapper = styled.div`
     border: none;
     transition: all .3s ease;
     background-color: transparent;
+  }
+
+  @media (max-width: 1500px) {
+     flex-wrap: wrap;
+      .underlineIndicator {
+        display: none;
+      }
   }
 `;
