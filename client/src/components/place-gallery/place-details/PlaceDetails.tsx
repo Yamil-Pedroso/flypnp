@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { usePlaces } from '../../../../hooks'
 import { Container } from './styles'
@@ -18,6 +19,11 @@ import {
 const PlaceDetails = () => {
   const { id, category } = useParams<{ id: string; category: string }>()
   const { places, loading } = usePlaces()
+  const [ reserveBoxVisible, setReserveBoxVisible ] = useState(false)
+
+  const handleClickReserveBox = () => {
+    setReserveBoxVisible(!reserveBoxVisible)
+  }
 
   if (loading) {
     return <div>Loading...</div>
@@ -70,8 +76,19 @@ const PlaceDetails = () => {
       </div>
       <div className="desc-reserve-wrapper">
         <div className="place-desc-wrapper">
-          <p>{place.description}</p>
-          <p>{place.perks.join(' - ')}</p>
+          <div className="setting-reservation-wrapper">
+            <div>
+              <p>{place.description}</p>
+              <p>{place.perks.join(' - ')}</p>
+            </div>
+            <div>
+              <button
+                onClick={handleClickReserveBox}
+              >
+                Setting your reservation
+              </button>
+            </div>
+          </div>
 
           <div className="fav-guest-wrapper">
             <div className="fav-guest-cont">
@@ -151,7 +168,14 @@ const PlaceDetails = () => {
           </div>
         </div>
 
-        <ReserveBox />
+        <div 
+      
+          className={`reserve-box-wrapper ${
+            reserveBoxVisible ? 'visible' : 'hidden'
+          }`}
+        >
+          <ReserveBox />
+        </div>
       </div>
     </Container>
   )
