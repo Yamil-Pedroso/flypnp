@@ -30,6 +30,7 @@ jobs:
       run: |
         cd client
         npm run lint
+        npm config set legacy-peer-deps=true
 
     - name: Build
       run: |

@@ -25,6 +25,7 @@ jobs:
     - name: Install dependencies
       run: |
         cd backend
+        npm config set legacy-peer-deps=true
         npm ci
     - name: Build
       run: |
