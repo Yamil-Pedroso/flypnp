@@ -7,7 +7,7 @@
     "start": "nodemon --exec ts-node src/server/server.ts",
     "dev": "nodemon --exec ts-node src/server/server.ts",
     "import-data": "ts-node src/utils/importData.ts",
-    "build": "tsc"
+    "build": "npm i"
   },
   "keywords": [],
   "author": "",
