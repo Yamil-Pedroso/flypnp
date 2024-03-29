@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "start": "ts-node src/server/server.ts",
-    "dev": "ts-node src/server/server.ts",
+    "start": "nodemon --exec ts-node src/server/server.ts",
+    "dev": "nodemon --exec ts-node src/server/server.ts",
     "import-data": "ts-node src/utils/importData.ts",
     "build": "npm i"
   },
@@ -22,7 +22,6 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/morgan": "^1.9.9",
     "@types/multer": "^1.4.11",
-    "@types/node": "^20.11.30",
     "typescript": "^5.4.3"
   },
   "dependencies": {
@@ -49,4 +48,5 @@
   "engines": {
     "node": "20.12.0"
   }
+
 }

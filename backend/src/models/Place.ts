@@ -7,7 +7,7 @@ interface Photo {
 interface IPlace {
     owner?: Types.ObjectId;
     title: string;
-    address: string;
+    address?: string;
     photos: Photo[];
     category: string;
     description: string;
