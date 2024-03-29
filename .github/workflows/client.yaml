@@ -18,17 +18,15 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
-        cache-dependency-path: backend/package-lock.json
+        cache-dependency-path: client/package-lock.json
         cache: 'npm'
 
     - name: Install dependencies
-      run: |
-        cd client
+      run:
         npm ci
 
     - name: Run linter
-      run: |
-        cd client
+      run:
         npm run lint
         npm config set legacy-peer-deps=true
 
