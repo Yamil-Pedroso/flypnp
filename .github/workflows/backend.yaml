@@ -20,9 +20,9 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 20
-        cache: 'npm'
-        cache-dependency-path: backend/package-lock.json
-    #this is the part that fails
+         # Comentar temporalmente para diagnosticar problemas
+    # cache: 'npm'
+    # cache-dependency-path: backend/package-lock.json
     - name: Install dependencies
       run: |
         cd backend
