@@ -12,6 +12,17 @@ const rebound = keyframes`
   }
 `;
 
+const smoothReserveBox = keyframes`
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -27,6 +38,11 @@ export const Container = styled.div`
     display: flex;
     justify-content: space-between;
     padding-bottom: 1rem;
+
+    @media (max-width: 1120px) {
+      width: 100%;
+      padding: 0 1rem;
+    }
   }
 
   .share-save-wrapper {
@@ -79,6 +95,25 @@ export const Container = styled.div`
         object-fit: cover;
       }
     }
+
+    @media (max-width: 1120px) {
+      .img-thumbnail-wrapper  {
+        display: none;
+      }
+
+      .img-wrapper {
+        width: 100%;
+        overflow: hidden;
+  
+        margin-top: 1rem;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        
+        }
+      }
+    }
   }
 
   .desc-reserve-wrapper {
@@ -88,6 +123,37 @@ export const Container = styled.div`
     padding-top: 1rem;
 
     .place-desc-wrapper {
+      .setting-reservation-wrapper {
+        display: flex;
+        justify-content: space-between;
+        width: 40rem;
+        
+        button {
+          padding: 1rem 2rem;
+          border: none;
+          border-radius: 5px;
+          background-color: #f1356d;
+          color: white;
+          cursor: pointer;
+          transition: 0.3s;
+          display: none;
+
+          &:hover {
+              background-color: #f1356d;
+              opacity: 0.8;
+          }
+        }
+
+        @media (max-width: 1120px) {
+          align-items: center;
+          gap: 1rem;
+
+          button {
+            display: block;
+          }
+        
+        }
+      }
       .superhost-wrapper {
         display: flex;
         align-items: center;
@@ -388,6 +454,10 @@ export const Container = styled.div`
             }
           }
         }
+
+        @media (max-width: 1120px) {
+          height: 25vh;
+        }
     }
 
     .reserve-box-container button {
@@ -405,6 +475,29 @@ export const Container = styled.div`
             opacity: 0.8;
         }
     }
+  }
+
+  @media (max-width: 1120px) {
+    .desc-reserve-wrapper {
+      justify-content: center;
+      flex-direction: column-reverse;
+      align-items: center;
+      margin-top: 1rem;
+      gap: 1rem;
+    }
+    
+    .reserve-box-wrapper {
+      &.visible {
+        display: block;
+        animation: ${smoothReserveBox} .5s ease-in-out;
+      }
+
+      &.hidden {
+        display: none;
+      }
+
+    }
+
   }
 
   .show-all-photos-container {
