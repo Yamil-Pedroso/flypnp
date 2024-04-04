@@ -19,3 +19,4 @@
 - Wish list: The client can choose his favorite places.
 - Booking System: Easy-to-use booking system that allows users to reserve accommodations with a few clicks.
 - Ratings and Reviews: Users can rate their stay and leave reviews for properties they have booked.
+- Payment method: Stripe
