@@ -1,5 +1,5 @@
 # flypnp 
-![flypnp](src/assets/images/png/flypnp.png)
+![flypnp](client/src/assets/images/png/flypnp.png)
 
 1. [Intro](#intro)
 2. [Tech Stack](#tech-stack)
