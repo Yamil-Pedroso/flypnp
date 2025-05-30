@@ -1,49 +1,49 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Container, PlaceCardWrapper, PlaceCardImageWrapper } from './styles'
-import { MdStar } from 'react-icons/md'
-import { MdStarBorder } from 'react-icons/md'
-import { MdStarHalf } from 'react-icons/md'
-import { FaRegHeart } from 'react-icons/fa'
-import CreateWishListBox from '../wishlist/create/CreateWishListBox'
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Container, PlaceCardWrapper, PlaceCardImageWrapper } from "./styles";
+import { MdStar } from "react-icons/md";
+import { MdStarBorder } from "react-icons/md";
+import { MdStarHalf } from "react-icons/md";
+import { FaRegHeart } from "react-icons/fa";
+import CreateWishListBox from "../wishlist/create/CreateWishListBox";
 
 interface Photo {
-  main: string
-  thumbnails: string[]
+  main: string;
+  thumbnails: string[];
 }
 interface PlaceCardProps {
   place: {
-    _id: string
-    category: string
-    placeId?: number
-    title: string
-    address: string
-    photos: Photo[]
-    description?: string
-    perks?: string[]
-    extraInfo?: string
-    maxGuests?: number
-    rating: number
-    price: number
-  }
+    _id: string;
+    category: string;
+    placeId?: number;
+    title: string;
+    address: string;
+    photos: Photo[];
+    description?: string;
+    perks?: string[];
+    extraInfo?: string;
+    maxGuests?: number;
+    rating: number;
+    price: number;
+  };
 }
 
 const PlaceCard = (props: PlaceCardProps) => {
-  const [showCreateWishList, setShowCreateWishList] = useState(false)
+  const [showCreateWishList, setShowCreateWishList] = useState(false);
   //const [isFavorited, setIsFavorited] = useState(false)
-  const { place } = props
-  const { title, address, photos, rating, price } = place
+  const { place } = props;
+  const { title, address, photos, rating, price } = place;
 
-  const mainPhotoUrl = photos?.[0]?.main
-  console.log('mainPhotoUrl', mainPhotoUrl)
+  const mainPhotoUrl = photos?.[0]?.main;
+  console.log("mainPhotoUrl", mainPhotoUrl);
 
   const handleClickCreateWishList = () => {
-    setShowCreateWishList(!showCreateWishList)
-  }
+    setShowCreateWishList(!showCreateWishList);
+  };
 
   return (
     <Container>
-      <div className={`overlay ${showCreateWishList && 'show'}`}>
+      <div className={`overlay ${showCreateWishList && "show"}`}>
         <CreateWishListBox
           closeCreateWishList={handleClickCreateWishList}
           className="wishlist-box"
@@ -72,7 +72,7 @@ const PlaceCard = (props: PlaceCardProps) => {
           <p className="">{address}</p>
           <p className="">
             {rating === 5 ? (
-              <div style={{ color: '#ff8c91' }}>
+              <div style={{ color: "#ff8c91" }}>
                 <MdStar />
                 <MdStar />
                 <MdStar />
@@ -162,7 +162,7 @@ const PlaceCard = (props: PlaceCardProps) => {
         </div>
       </PlaceCardWrapper>
     </Container>
-  )
-}
+  );
+};
 
-export default PlaceCard
+export default PlaceCard;
