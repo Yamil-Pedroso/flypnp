@@ -11,24 +11,24 @@ import { iconicCities } from "../data/iconicCities";
 
 colors.enable();
 
-dotenv.config({ path: path.resolve(__dirname, '..', 'config', 'config.env') });
+dotenv.config({ path: path.resolve(__dirname, "..", "config", "config.env") });
 
 const importData = async () => {
-    try {
-        await connectDB();
+  try {
+    await connectDB();
 
-        await Place.deleteMany();
+    await Place.deleteMany();
 
-        const datasets = [...trending, ...beachFront, ...iconicCities];
+    const datasets = [...trending, ...beachFront, ...iconicCities];
 
-        await Place.insertMany(datasets);
+    await Place.insertMany(datasets);
 
-        console.log("Data Imported...".green.inverse);
-        process.exit();
-    } catch (error: any) {
-        console.error(`Error: ${error.message}`.red.inverse);
-        process.exit(1);
-    }
+    console.log("Data Imported...".green.inverse);
+    process.exit();
+  } catch (error: any) {
+    console.error(`Error: ${error.message}`.red.inverse);
+    process.exit(1);
+  }
 };
 
 importData();

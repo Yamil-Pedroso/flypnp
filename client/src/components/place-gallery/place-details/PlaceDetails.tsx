@@ -1,44 +1,45 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { usePlaces } from '../../../../hooks'
-import { Container } from './styles'
-import { IoShareSocial } from 'react-icons/io5'
-import { FaRegHeart } from 'react-icons/fa6'
-import ReserveBox from './ReserveBox'
-import ShowAllPhotos from './ShowAllPhotos'
-import { GiOlive } from 'react-icons/gi'
-import { FaStar } from 'react-icons/fa'
-import { BsAwardFill } from 'react-icons/bs'
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { usePlaces } from "../../../../hooks";
+import { Container } from "./styles";
+import { IoShareSocial } from "react-icons/io5";
+import { FaRegHeart } from "react-icons/fa6";
+import ReserveBox from "./ReserveBox";
+import ShowAllPhotos from "./ShowAllPhotos";
+import { GiOlive } from "react-icons/gi";
+import { FaStar } from "react-icons/fa";
+import { BsAwardFill } from "react-icons/bs";
 import {
   MdOutlineBedroomParent,
   MdOutlineHouse,
   MdOutlineBathroom,
-} from 'react-icons/md'
+} from "react-icons/md";
 
+// Change to Tailwind CSS
 const PlaceDetails = () => {
-  const { id, category } = useParams<{ id: string; category: string }>()
-  const { places, loading } = usePlaces()
-  const [ reserveBoxVisible, setReserveBoxVisible ] = useState(false)
+  const { id, category } = useParams<{ id: string; category: string }>();
+  const { places, loading } = usePlaces();
+  const [reserveBoxVisible, setReserveBoxVisible] = useState(false);
 
   const handleClickReserveBox = () => {
-    setReserveBoxVisible(!reserveBoxVisible)
-  }
+    setReserveBoxVisible(!reserveBoxVisible);
+  };
 
   if (loading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   const place = places.find(
-    (place) => place._id === id && place.category === category,
-  )
+    (place) => place._id === id && place.category === category
+  );
 
   if (!place) {
-    return <div>Place not found</div>
+    return <div>Place not found</div>;
   }
 
-  const mainPhoto = place.photos[0]?.main || ''
-  const thumbnails = place.photos[0]?.thumbnails || []
+  const mainPhoto = place.photos[0]?.main || "";
+  const thumbnails = place.photos[0]?.thumbnails || [];
 
   return (
     <Container>
@@ -79,12 +80,10 @@ const PlaceDetails = () => {
           <div className="setting-reservation-wrapper">
             <div>
               <p>{place.description}</p>
-              <p>{place.perks.join(' - ')}</p>
+              <p>{place.perks.join(" - ")}</p>
             </div>
             <div>
-              <button
-                onClick={handleClickReserveBox}
-              >
+              <button onClick={handleClickReserveBox}>
                 Setting your reservation
               </button>
             </div>
@@ -168,17 +167,12 @@ const PlaceDetails = () => {
           </div>
         </div>
 
-        <div 
-      
-          className={`reserve-box-wrapper ${
-            reserveBoxVisible ? 'visible' : 'hidden'
-          }`}
-        >
+        <div className={`reserve-box-wrapper `}>
           <ReserveBox />
         </div>
       </div>
     </Container>
-  )
-}
+  );
+};
 
-export default PlaceDetails
+export default PlaceDetails;

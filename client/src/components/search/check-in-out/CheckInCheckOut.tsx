@@ -1,106 +1,114 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from 'react'
-import { CheckInOutContainer } from './styles'
-import CalendarComp from '../../common/calendar/CalendarComp'
+import { useState, useEffect } from "react";
+import CalendarComp from "../../common/calendar/CalendarComp";
 
 interface CheckInCheckOutProps {
-  menuClick: boolean
+  menuClick: boolean;
 }
 
 const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
-  const [bgWhiteActive, setBgWhiteActive] = useState(false)
-  const [bgWhiteActiveTwo, setBgWhiteActiveTwo] = useState(false)
+  const [bgWhiteActive, setBgWhiteActive] = useState(false);
+  const [bgWhiteActiveTwo, setBgWhiteActiveTwo] = useState(false);
 
-  const handleBgWhiteActive = (type: 'check-in' | 'check-out', e: any) => {
-    e.stopPropagation()
-    if (type === 'check-in') {
-      setBgWhiteActive(true)
-      setBgWhiteActiveTwo(false)
+  const handleBgWhiteActive = (
+    type: "check-in" | "check-out",
+    e: React.MouseEvent<HTMLDivElement>
+  ) => {
+    e.stopPropagation();
+    if (type === "check-in") {
+      setBgWhiteActive(true);
+      setBgWhiteActiveTwo(false);
     } else {
-      setBgWhiteActive(false)
-      setBgWhiteActiveTwo(true)
+      setBgWhiteActive(false);
+      setBgWhiteActiveTwo(true);
     }
-
-    handleGrowSearchIcon()
-  }
+    handleGrowSearchIcon();
+  };
 
   useEffect(() => {
-    const clickOutside = (e: any) => {
-      // Asegúrate de seleccionar el contenedor principal del calendario o los elementos específicos adecuadamente
-      const wrapper = document.querySelector('.check-in-out-wrapper')
-      if (wrapper && !wrapper.contains(e.target)) {
-        setBgWhiteActive(false)
-        setBgWhiteActiveTwo(false)
-        const searchIcon = document.querySelector('.search-wrapper')
+    const clickOutside = (e: MouseEvent) => {
+      const wrapper = document.querySelector(".check-in-out-wrapper");
+      if (wrapper && !wrapper.contains(e.target as Node)) {
+        setBgWhiteActive(false);
+        setBgWhiteActiveTwo(false);
+        const searchIcon = document.querySelector(".search-wrapper");
         if (searchIcon) {
-          searchIcon.classList.remove('search-wrapper-ready')
+          searchIcon.classList.remove("search-wrapper-ready");
         }
       }
-    }
+    };
 
-    // Agrega el listener al documento
-    document.addEventListener('click', clickOutside)
+    document.addEventListener("click", clickOutside);
     return () => {
-      // Asegura remover el listener al desmontar
-      document.removeEventListener('click', clickOutside)
-    }
-  }, [])
+      document.removeEventListener("click", clickOutside);
+    };
+  }, []);
 
   const handleGrowSearchIcon = () => {
-    const searchIcon = document.querySelector('.search-guests-wrapper')
+    const searchIcon = document.querySelector(".search-guests-wrapper");
     if (searchIcon) {
-      searchIcon.classList.add('search-wrapper-ready')
+      searchIcon.classList.add("search-wrapper-ready");
     }
-  }
+  };
 
-  const handleInnerClick = (e: any) => {
-    e.stopPropagation()
-  }
+  const handleInnerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+  };
 
   return (
-    <CheckInOutContainer onClick={handleInnerClick}>
-      <div className="check-in-out-wrapper">
-        <div className="check-in-out-divider"></div>
+    <div
+      className="relative w-[25rem] h-full text-sm"
+      onClick={handleInnerClick}
+    >
+      <div className="flex justify-around items-center w-full h-full bg-white text-[#2a2a2a] check-in-out-wrapper">
+        <div className="w-[0.1rem] h-10 bg-[#dbdbdb]" />
         {menuClick ? (
           bgWhiteActive ? (
-            <div className="check-date">
-              <p className="check-date-text">Date</p>
-              <p>Check in</p>
+            <div className="w-full ml-6 flex flex-col justify-center hover:bg-[#dbdbdb] hover:rounded-full cursor-pointer">
+              <p className="ml-6">Date</p>
+              <p className="ml-6 text-[#909090] text-base">Check in</p>
             </div>
           ) : (
-            <div className="check-date-two">
-              <p className="check-date-text">Date</p>
-              <p>Add dates</p>
+            <div className="w-full ml-6 flex flex-col justify-center hover:bg-[#dbdbdb] hover:rounded-full cursor-pointer">
+              <p className="ml-6">Date</p>
+              <p className="ml-6 text-[#909090] text-base">Add dates</p>
             </div>
           )
         ) : (
           <>
             <div
-              className={bgWhiteActive ? 'check-in' : 'check-in-two'}
-              onClick={(e: any) => handleBgWhiteActive('check-in', e)}
+              className={`${
+                bgWhiteActive
+                  ? "bg-[#424242] text-white shadow-lg rounded-full"
+                  : ""
+              } w-full h-full flex flex-col justify-center cursor-pointer hover:bg-[#dbdbdb] hover:rounded-full`}
+              onClick={(e) => handleBgWhiteActive("check-in", e)}
             >
-              <p className="check-in-text">Check in</p>
-              <p>Add dates</p>
+              <p className="ml-6">Check in</p>
+              <p className="ml-6 text-[#909090] text-base">Add dates</p>
             </div>
-            <div className="check-in-out-divider"></div>
+            <div className="w-[0.1rem] h-10 bg-[#dbdbdb]" />
             <div
-              className={bgWhiteActiveTwo ? 'check-out' : 'check-out-two'}
-              onClick={(e) => handleBgWhiteActive('check-out', e)}
+              className={`${
+                bgWhiteActiveTwo
+                  ? "bg-[#424242] text-white shadow-lg rounded-full"
+                  : ""
+              } w-full h-full flex flex-col justify-center cursor-pointer hover:bg-[#dbdbdb] hover:rounded-full`}
+              onClick={(e) => handleBgWhiteActive("check-out", e)}
             >
-              <p className="check-out-text">Check out</p>
-              <p>Add dates</p>
+              <p className="ml-6">Check out</p>
+              <p className="ml-6 text-[#909090] text-base">Add dates</p>
             </div>
           </>
         )}
-        <div className="check-in-out-divider"></div>
+        <div className="w-[0.1rem] h-10 bg-[#dbdbdb]" />
       </div>
-      {bgWhiteActive || bgWhiteActiveTwo ? (
-        <div className="test-check-menu">
+      {(bgWhiteActive || bgWhiteActiveTwo) && (
+        <div className="absolute top-20 right-[-17.5rem] w-[55rem] h-[35rem] bg-white shadow-lg rounded-[3rem] z-[999] flex justify-center items-center">
           <CalendarComp />
         </div>
-      ) : null}
-    </CheckInOutContainer>
-  )
-}
+      )}
+    </div>
+  );
+};
 
-export default CheckInCheckOut
+export default CheckInCheckOut;

@@ -210,10 +210,24 @@ export const useProvidePlaces = () => {
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const API_BASE = import.meta.env.VITE_BASE_URL.replace("/api/v1", "");
+
   const getPlaces = async () => {
     try {
       const { data } = await axiosInstance.get("/all-places");
-      setPlaces(data?.data ?? []);
+      const placesWithFullPhotoUrls = (data?.data ?? []).map((place: Place) => {
+        const photos = place.photos.map((photo) => ({
+          ...photo,
+          main: photo.main.startsWith("http")
+            ? photo.main
+            : `${API_BASE}${photo.main}`,
+          thumbnails: photo.thumbnails.map((thumb) =>
+            thumb.startsWith("http") ? thumb : `${API_BASE}${thumb}`
+          ),
+        }));
+        return { ...place, photos };
+      });
+      setPlaces(placesWithFullPhotoUrls);
       setLoading(false);
     } catch (error) {
       console.log(error);

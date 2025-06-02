@@ -1,186 +1,114 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react'
-import { PaymentContainer } from './styles'
-import { useLocation } from 'react-router-dom'
-import { FaCcVisa, FaPaypal, FaCcMastercard, FaGooglePay } from 'react-icons/fa'
-import { GrAmex } from 'react-icons/gr'
-import TestStripePayment from './TestStripePayment'
-//import MyStripeForm from './StripeForm'
-//import { usePayment } from '../../../hooks'
-//import { BsCreditCardFill } from 'react-icons/bs'
-//import { IoIosLock } from 'react-icons/io'
-
-//interface Place {
-//  _id: string
-//  title: string
-//  address: string
-//  photos: string[]
-//  category: string
-//  description: string
-//  perks: string[]
-//  extraInfo: string
-//  maxGuests: number
-//  rating: number
-//  reviews: number
-//  price: number
-//}
+import { useLocation } from "react-router-dom";
+import {
+  FaCcVisa,
+  FaPaypal,
+  FaCcMastercard,
+  FaGooglePay,
+} from "react-icons/fa";
+import { GrAmex } from "react-icons/gr";
+import TestStripePayment from "./TestStripePayment";
 
 interface MyPaymentProps {
-  myPrice: string
+  myPrice: string;
 }
 
 const MyPayment = ({ myPrice }: MyPaymentProps) => {
-  const location = useLocation()
-  //const { paymentDetailsWithPlace } = usePayment()
-  //const [placeDetails, setPlaceDetails] = useState<Place | null>(null)
-
-  //useEffect(() => {
-  //  // Supongamos que este es el ID dinámico de tu lugar
-  //  const placeId = 'PLACE_ID'
-  //  paymentDetailsWithPlace(placeId).then(setPlaceDetails as any)
-  //}, [paymentDetailsWithPlace])
-  //
-  //const onSuccessfulCheckout = () => {
-  //  // Aquí manejas lo que sucede después de un pago exitoso
-  //  console.log('Pago realizado con éxito')
-  //}
-
-  const useQuery = new URLSearchParams(location.search)
-  const user = useQuery.get('user')
-  const booking = useQuery.get('booking')
-  const checkIn = useQuery.get('checkIn')
-  const checkOut = useQuery.get('checkOut')
-  const guests = useQuery.get('guests')
-  const infants = useQuery.get('infants')
-  const pets = useQuery.get('pets')
-  const price = useQuery.get('price')
-  const photo = useQuery.get('photo') as string
-  const title = useQuery.get('title')
-  const description = useQuery.get('description')
-  const rating = useQuery.get('rating')
+  const location = useLocation();
+  const useQuery = new URLSearchParams(location.search);
+  const user = useQuery.get("user");
+  const booking = useQuery.get("booking");
+  const checkIn = useQuery.get("checkIn");
+  const checkOut = useQuery.get("checkOut");
+  const guests = useQuery.get("guests");
+  const infants = useQuery.get("infants");
+  const pets = useQuery.get("pets");
+  const price = useQuery.get("price");
+  const photo = useQuery.get("photo") as string;
+  const title = useQuery.get("title");
+  const description = useQuery.get("description");
+  const rating = useQuery.get("rating");
 
   return (
-    <PaymentContainer>
-      <div className="left-cont">
-        <h2>Your trip</h2>
-        <div className="date-guests-wrapper">
-          <div className="dates-cont">
-            <div className="dates-wapper">
-              <p>Dates</p>
-              <p>
+    <div className="flex flex-col md:flex-row justify-between gap-8 max-w-5xl mx-auto p-6">
+      <div className="w-full md:w-1/2 space-y-6">
+        <h2 className="text-xl font-semibold">Your trip</h2>
+
+        <div className="space-y-4">
+          <div className="flex justify-between items-center border-b pb-2">
+            <div>
+              <p className="text-gray-700 font-medium">Dates</p>
+              <p className="text-gray-600">
                 {checkIn} - {checkOut}
               </p>
             </div>
-            <div className="edit-wrapper">Edit</div>
+            <div className="text-pink-600 underline cursor-pointer">Edit</div>
           </div>
-          <div className="guests-cont">
-            <div className="guests-wapper">
-              <p>Guests</p>
-              <p>
-                {guests} guests
-                {infants ? `, ${infants} infant${Number(infants) > 1 ? 's' : ''}` : ''}
-                {pets ? `, ${pets} pet${Number(pets) > 1 ? 's' : ''}` : ''}
+
+          <div className="flex justify-between items-center border-b pb-2">
+            <div>
+              <p className="text-gray-700 font-medium">Guests</p>
+              <p className="text-gray-600">
+                {guests} guest{Number(guests) > 1 ? "s" : ""}
+                {infants
+                  ? `, ${infants} infant${Number(infants) > 1 ? "s" : ""}`
+                  : ""}
+                {pets ? `, ${pets} pet${Number(pets) > 1 ? "s" : ""}` : ""}
               </p>
             </div>
-            <div className="edit-wrapper">Edit</div>
+            <div className="text-pink-600 underline cursor-pointer">Edit</div>
           </div>
         </div>
-        <hr />
-        <div className="payment-form">
-          <div className="payment-header">
-            <h2>Pay with</h2>
-            <div className="pay-mode-wrapper">
-              <FaCcVisa size="18" />
-              <FaPaypal size="18" />
-              <FaCcMastercard size="18" />
-              <GrAmex size="28" />
-              <FaGooglePay size="28" />
+
+        <div className="mt-6 space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold">Pay with</h2>
+            <div className="flex gap-2 items-center text-gray-600">
+              <FaCcVisa size={18} />
+              <FaPaypal size={18} />
+              <FaCcMastercard size={18} />
+              <GrAmex size={28} />
+              <FaGooglePay size={28} />
             </div>
           </div>
+
           <TestStripePayment />
-          {/*<form>
-            <div className="input-wrapper credit-card">
-              <BsCreditCardFill size="18" className="credit-card-icon" />
-              <input
-                type="email"
-                id="email"
-                placeholder="Credit or debit card"
-              />
-            </div>
-            <div className="input-wrapper">
-              <div className="card-number">
-                <input type="text" id="card" placeholder="Card number" />
-                <IoIosLock size="19" className="lock-icon" />
-              </div>
-              <div className="exp-cvv-wrapper">
-                <input type="text" id="expiry" placeholder="MM/YY" />
-                <input type="text" id="cvv" placeholder="CVV" />
-              </div>
-            </div>
-            <div className="input-wrapper">
-              <h3>Billing address</h3>
-
-              <div className="billing-address-wrapper">
-                <input type="text" id="address" placeholder="Street address" />
-                <input
-                  type="text"
-                  id="city"
-                  placeholder="Apt or suite number"
-                />
-                <div>
-                  <input type="text" id="zip" placeholder="City" />
-                  <div className="state-zip-wrapper">
-                    <input type="text" id="state" placeholder="State" />
-                    <input type="text" id="zip" placeholder="Zip code" />
-                  </div>
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    id="country"
-                    placeholder="Country/region"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <button type="submit">Pay</button>
-  </form>*/}
         </div>
       </div>
 
-      <hr />
-
-      <div className="right-cont">
-        <div className="place-rating-wrapper">
-          <img src={photo} alt="" width={200} />
-          <div className="place-desc">
-            <h2>{title}</h2>
-            <p>{description}</p>
-            <p>{rating}</p>
-          </div>
-        </div>
-        <hr />
-        <div className="price-details-wrapper">
-          <div className="price-in-nights">
-            <p>
-              <span>nights</span>
+      <div className="w-full md:w-1/2 border border-gray-300 rounded-md p-4 space-y-4 h-fit">
+        <div className="flex gap-4 items-start">
+          <img
+            src={photo}
+            alt={title || ""}
+            className="w-32 h-24 object-cover rounded-md"
+          />
+          <div className="flex flex-col">
+            <h2 className="font-semibold text-lg">{title}</h2>
+            <p className="text-sm text-gray-600 line-clamp-3">{description}</p>
+            <p className="text-sm font-medium text-yellow-600">
+              Rating: {rating}
             </p>
-            <p></p>
           </div>
-          <div className="service-fee">{Number(price) * 0.1}</div>
         </div>
+
         <hr />
-        <div className="total-price-wrapper">
-          <p>Total</p>
+
+        <div className="flex justify-between text-sm text-gray-700">
           <p>
-            {Number(price) + Number(price) * 0.1}
-            CHF
+            <span className="font-medium">Service fee</span>
           </p>
+          <p>{(Number(price) * 0.1).toFixed(2)} CHF</p>
+        </div>
+
+        <hr />
+
+        <div className="flex justify-between text-base font-semibold">
+          <p>Total</p>
+          <p>{(Number(price) + Number(price) * 0.1).toFixed(2)} CHF</p>
         </div>
       </div>
-    </PaymentContainer>
-  )
-}
+    </div>
+  );
+};
 
-export default MyPayment
+export default MyPayment;

@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { usePlaces } from "../../../../hooks";
-import { useBooking } from "../../../../hooks";
-import { useAuth } from "../../../../hooks";
+import { usePlaces, useBooking, useAuth } from "../../../../hooks";
 import {
   FaChevronDown,
   FaChevronUp,
@@ -18,86 +15,59 @@ const ReserveBox = () => {
   const [clickCheckIn, setClickCheckIn] = useState(false);
   const { places, loading } = usePlaces();
   const { id, category } = useParams();
-  const [checkInDate, setCheckInDate] = useState("2024-02-23"); // setStates to play with the data dynamically
-  const [checkOutDate, setCheckOutDate] = useState("2024-03-19"); // setStates to play with the data dynamically
-  const { user } = useAuth() as any;
-  const { addBooking } = useBooking() as any;
+  const [checkInDate, setCheckInDate] = useState("2024-02-23");
+  const [checkOutDate, setCheckOutDate] = useState("2024-03-19");
+  const { user } = useAuth();
+  const { addBooking } = useBooking();
   const [adult, setAdult] = useState(0);
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
   const [pets, setPets] = useState(0);
   const [guests, setGuests] = useState(0);
 
-  console.log("user", user.phone);
-
   useEffect(() => {
     setGuests(adult + children);
   }, [adult, children]);
 
-  const handleClickAdults = (count: number) => {
-    if ((children > 0 || infants > 0 || pets > 0) && count < 1) return;
-
-    if (count >= 0 && count <= 16) {
-      setAdult(count);
-    }
-  };
-
-  const handleClickChildren = (count: number) => {
-    if (count < 0) return;
-    if (adult === 0 && children === 0) {
-      setAdult(1);
-      setChildren(1);
-    }
-    if (count >= 0 && count <= 15) {
-      setChildren(count);
-    }
-  };
-
-  const handleClickInfants = (count: number) => {
-    if (count < 0) return;
-    if (adult === 0 && infants === 0) {
-      setAdult(1);
-      setInfants(1);
-    }
-    if (count >= 0 && count <= 5) {
-      setInfants(count);
-    }
-  };
-
-  const handleClickPets = (count: number) => {
-    if (count < 0) return;
-    if (adult === 0 && pets === 0) {
-      setAdult(1);
-      setPets(1);
-    }
-    if (count >= 0 && count <= 5) {
-      setPets(count);
-    }
-  };
-
-  const navigate = useNavigate();
-
-  const handleClickArrow = () => {
-    setClickArrow(!clickArrow);
-  };
-
-  const handleCheckInClick = () => {
-    setClickCheckIn(!clickCheckIn);
-  };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   const place = places.find(
     (place) => place._id === id && place.category === category
   );
+  if (loading) return <div>Loading...</div>;
+  if (!place) return <div>Image not found</div>;
 
-  if (!place) {
-    return <div>Image not found</div>;
-  }
-
+  const navigate = useNavigate();
   const mainPhoto = place.photos[0]?.main || "";
+
+  const handleClickAdults = (count: number) => {
+    const hasDependents = children > 0 || infants > 0 || pets > 0;
+    if (count < 1 && hasDependents) return;
+
+    if (count === 0) {
+      setChildren(0);
+      setInfants(0);
+      setPets(0);
+    }
+
+    if (count >= 0 && count <= 16) setAdult(count);
+  };
+
+  const handleClickChildren = (count: number) => {
+    if (count < 0 || count > 15) return;
+    if (count > 0 && adult === 0) setAdult(1);
+    setChildren(count);
+  };
+
+  const handleClickInfants = (count: number) => {
+    if (count < 0 || count > 5) return;
+    if (count > 0 && adult === 0) setAdult(1);
+    setInfants(count);
+  };
+
+  const handleClickPets = (count: number) => {
+    if (count < 0 || count > 5) return;
+    if (count > 0 && adult === 0) setAdult(1);
+    setPets(count);
+  };
 
   const handleReserveClick = async () => {
     const booking = {
@@ -105,12 +75,7 @@ const ReserveBox = () => {
       place: place._id,
       checkIn: new Date(checkInDate),
       checkOut: new Date(checkOutDate),
-      numOfGuests: {
-        adults: adult,
-        children: children,
-        infants: infants,
-        pets: pets,
-      },
+      numOfGuests: { adults: adult, children, infants, pets },
       status: "pending",
       extraInfo: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       name: user.name,
@@ -119,7 +84,6 @@ const ReserveBox = () => {
 
     try {
       await addBooking(booking);
-      console.log(addBooking(booking) );
       navigate(
         `/my-payment?checkIn=${checkInDate}&checkOut=${checkOutDate}&guests=${
           adult + children
@@ -135,149 +99,113 @@ const ReserveBox = () => {
   };
 
   return (
-    <div className="reserve-box-container">
-      <div className="price-wrapper">
+    <div className="w-[23rem] h-[28rem] p-4 border border-gray-300 shadow-xl rounded-lg relative bg-white">
+      <div className="flex justify-between text-lg font-semibold mb-4">
         <span>{place.price} CHF</span>
         <span>/ night</span>
       </div>
 
-      <div className="check-in-out-guests-wrapper">
-        <div className="check-in-out-guests-box">
-          <button onClick={handleCheckInClick}>
-            <span>CHECK-IN</span>
-            <p>2/23/2024</p>
+      <div className="border rounded-md p-3">
+        <div className="flex justify-between mb-2">
+          <button onClick={() => setClickCheckIn(!clickCheckIn)}>
+            <span className="block text-xs font-semibold">CHECK-IN</span>
+            <p>{checkInDate}</p>
           </button>
-          <div className="vertical-line"></div>
+          <div className="w-px bg-gray-400" />
           <button>
-            <span>CHECK-OUT</span>
-            <p>3/19/2024</p>
+            <span className="block text-xs font-semibold">CHECK-OUT</span>
+            <p>{checkOutDate}</p>
           </button>
         </div>
 
-        <div className="horizontal-line"></div>
+        <div className="h-px bg-gray-400 mb-2" />
 
-        <div className="guests-box">
-          <div className="dropdown-guests-wrapper">
+        <div>
+          <div className="flex justify-between items-center">
             <div>
-              <p>Guests</p>
-              {adult + children > 0 ? (
-                <p>
-                  {adult + children} guests
-                  {infants > 0 || pets > 0
-                    ? `, ${
-                        infants
-                          ? infants === 1
-                            ? infants + " infant,"
-                            : infants + " infants,"
-                          : ""
-                      }
-                  ${pets ? (pets === 1 ? pets + " pet" : pets + " pets") : ""}`
-                    : ""}
-                </p>
-              ) : (
-                <p>Add guest</p>
-              )}
+              <p className="font-semibold">Guests</p>
+              <p className="text-sm text-gray-600">
+                {guests > 0
+                  ? `${guests} guests${infants ? `, ${infants} infant` : ""}${
+                      pets ? `, ${pets} pet` : ""
+                    }`
+                  : "Add guest"}
+              </p>
             </div>
-            <div className="arrow-down-up">
-              <span onClick={handleClickArrow}>
-                {clickArrow ? <FaChevronUp /> : <FaChevronDown />}
-              </span>
+            <div
+              onClick={() => setClickArrow(!clickArrow)}
+              className="cursor-pointer"
+            >
+              {clickArrow ? <FaChevronUp /> : <FaChevronDown />}
             </div>
           </div>
         </div>
       </div>
 
-      <button onClick={handleReserveClick} className="reserve-button">
+      <button
+        onClick={handleReserveClick}
+        className="w-full bg-pink-600 text-white py-2 mt-4 rounded hover:opacity-80"
+      >
         Reserve
       </button>
 
       {clickArrow && (
-        <div className="guests-dropdown">
-          <div className="section adults-cont">
-            <div className="guest">
-              <p>Adults</p>
-              <span>Age 13 or above</span>
+        <div className="absolute bg-white p-4 shadow-lg border rounded-lg top-[15rem] right-0 w-[27rem] z-50">
+          {[
+            {
+              label: "Adults",
+              note: "Age 13 or above",
+              value: adult,
+              set: handleClickAdults,
+            },
+            {
+              label: "Children",
+              note: "Age 2-12",
+              value: children,
+              set: handleClickChildren,
+            },
+            {
+              label: "Infants",
+              note: "Under 2",
+              value: infants,
+              set: handleClickInfants,
+            },
+            {
+              label: "Pets",
+              note: <a href="#">Bringing a service animal?</a>,
+              value: pets,
+              set: handleClickPets,
+            },
+          ].map(({ label, note, value, set }, idx) => (
+            <div
+              key={idx}
+              className="flex justify-between items-center border-b py-2"
+            >
+              <div>
+                <p className="font-semibold">{label}</p>
+                <span className="text-sm text-gray-500">{note}</span>
+              </div>
+              <div className="flex items-center text-gray-500">
+                <FaMinusCircle
+                  onClick={() => set(value - 1)}
+                  className={`text-xl cursor-pointer ${
+                    value === 0 ? "text-gray-300 cursor-not-allowed" : ""
+                  }`}
+                />
+                <span className="mx-3 text-base">{value}</span>
+                <FaPlusCircle
+                  onClick={() => set(value + 1)}
+                  className="text-xl cursor-pointer"
+                />
+              </div>
             </div>
-            <div className="counter">
-              <FaMinusCircle
-                onClick={() => handleClickAdults(adult - 1)}
-                className={`counter-icon ${
-                  adult === 0 || children >= 1 || infants >= 1 || pets >= 1
-                    ? "disabled"
-                    : ""
-                }`}
-              />
-
-              <span>{adult}</span>
-
-              <FaPlusCircle
-                onClick={() => handleClickAdults(adult + 1)}
-                className="counter-icon"
-              />
-            </div>
-          </div>
-          <div className="section children-cont">
-            <div className="guest">
-              <p>Children</p>
-              <span>Age 2-12</span>
-            </div>
-            <div className="counter">
-              <FaMinusCircle
-                onClick={() => handleClickChildren(children - 1)}
-                className={`counter-icon ${children === 0 ? "disabled" : ""}`}
-              />
-
-              <span>{children}</span>
-              <FaPlusCircle
-                onClick={() => handleClickChildren(children + 1)}
-                className="counter-icon"
-              />
-            </div>
-          </div>
-          <div className="section infants-cont">
-            <div className="guest">
-              <p>Infants</p>
-              <span>Under 2</span>
-            </div>
-            <div className="counter">
-              <FaMinusCircle
-                onClick={() => handleClickInfants(infants - 1)}
-                className={`counter-icon ${infants === 0 ? "disabled" : ""}`}
-              />
-
-              <span>{infants}</span>
-
-              <FaPlusCircle
-                onClick={() => handleClickInfants(infants + 1)}
-                className="counter-icon"
-              />
-            </div>
-          </div>
-          <div className="section pets-cont">
-            <div className="guest">
-              <p>Pets</p>
-              <span>
-                <a href="#">Bringing a service animal?</a>
-              </span>
-            </div>
-            <div className="counter">
-              <FaMinusCircle
-                onClick={() => handleClickPets(pets - 1)}
-                className={`counter-icon ${pets === 0 ? "disabled" : ""}`}
-              />
-
-              <span>{pets}</span>
-
-              <FaPlusCircle
-                onClick={() => handleClickPets(pets + 1)}
-                className="counter-icon"
-              />
-            </div>
-          </div>
+          ))}
         </div>
       )}
 
-      {clickCheckIn && <MyCalendar className="calendar" />}
+      {clickCheckIn && (
+        <MyCalendar className="absolute top-[10rem] right-[-2rem] w-[55rem] h-[36rem] rounded-xl shadow-md overflow-hidden" />
+      )}
     </div>
   );
 };

@@ -27,15 +27,7 @@ const Trending = () => {
   }
 
   return (
-    <div
-      className="trending-places-wrapper"
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        flexWrap: "wrap",
-        marginTop: "1.5rem",
-      }}
-    >
+    <div className="flex justify-center items-center flex-wrap gap-4 mt-6">
       {trendingPlaces.map((place: any, idx: number) => (
         <PlaceCard key={idx} place={place} />
       ))}

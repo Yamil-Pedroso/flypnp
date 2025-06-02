@@ -1,278 +1,235 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from 'react'
-import { AddGuestsContainer } from './styles'
-import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa'
-import { FaPerson, FaBaby } from 'react-icons/fa6'
-import { MdPets, MdChildCare } from 'react-icons/md'
-import { FaSearch } from 'react-icons/fa'
+import { useState, useEffect } from "react";
+import {
+  FaPlusCircle,
+  FaMinusCircle,
+  FaSearch,
+  FaUser,
+  FaBaby,
+} from "react-icons/fa";
+import { MdPets, MdChildCare } from "react-icons/md";
 
 const AddGuests = () => {
-  const [bgWhiteActive, setBgWhiteActive] = useState(false)
-  const [adult, setAdult] = useState(0)
-  const [children, setChildren] = useState(0)
-  const [infants, setInfants] = useState(0)
-  const [pets, setPets] = useState(0)
-  const [clickMainContainer, setClickMainContainer] = useState(false)
+  const [bgWhiteActive, setBgWhiteActive] = useState(false);
+  const [adult, setAdult] = useState(0);
+  const [children, setChildren] = useState(0);
+  const [infants, setInfants] = useState(0);
+  const [pets, setPets] = useState(0);
+  const [clickMainContainer, setClickMainContainer] = useState(false);
 
   const handleClickAdults = (count: number) => {
-    if ((children > 0 || infants > 0 || pets > 0) && count < 1) return
-
-    if (count >= 0 && count <= 16) {
-      setAdult(count)
-    }
-  }
+    if ((children > 0 || infants > 0 || pets > 0) && count < 1) return;
+    if (count >= 0 && count <= 16) setAdult(count);
+  };
 
   const handleClickChildren = (count: number) => {
-    if (count < 0) return
+    if (count < 0) return;
     if (adult === 0 && children === 0) {
-      setAdult(1)
-      setChildren(1)
+      setAdult(1);
+      setChildren(1);
+    } else if (count <= 15) {
+      setChildren(count);
     }
-    if (count >= 0 && count <= 15) {
-      setChildren(count)
-    }
-  }
+  };
 
   const handleClickInfants = (count: number) => {
-    if (count < 0) return
+    if (count < 0) return;
     if (adult === 0 && infants === 0) {
-      setAdult(1)
-      setInfants(1)
+      setAdult(1);
+      setInfants(1);
+    } else if (count <= 5) {
+      setInfants(count);
     }
-    if (count >= 0 && count <= 5) {
-      setInfants(count)
-    }
-  }
+  };
 
   const handleClickPets = (count: number) => {
-    if (count < 0) return
+    if (count < 0) return;
     if (adult === 0 && pets === 0) {
-      setAdult(1)
-      setPets(1)
+      setAdult(1);
+      setPets(1);
+    } else if (count <= 5) {
+      setPets(count);
     }
-    if (count >= 0 && count <= 5) {
-      setPets(count)
-    }
-  }
+  };
 
   const handleBgWhiteActive = (e: any) => {
-    e.stopPropagation()
-    setBgWhiteActive(!bgWhiteActive)
-    handleGrowSearchIcon()
-  }
+    e.stopPropagation();
+    setBgWhiteActive(!bgWhiteActive);
+    handleGrowSearchIcon();
+  };
 
   const clickOutside = (e: any) => {
-    const wrapper = document.querySelector('.add-guests-wrapper')
+    const wrapper = document.querySelector(".add-guests-wrapper");
     const headerGuests = document.querySelector(
-      '.header-guests, .header-guests-two',
-    ) as HTMLElement
+      ".header-guests, .header-guests-two"
+    ) as HTMLElement;
     if (
       wrapper &&
       !wrapper.contains(e.target) &&
       !headerGuests.contains(e.target)
     ) {
-      setBgWhiteActive(false)
+      setBgWhiteActive(false);
     }
-
-    const searchIconWrapper = document.querySelector('.search-guests-wrapper')
+    const searchIconWrapper = document.querySelector(".search-guests-wrapper");
     if (searchIconWrapper) {
-      searchIconWrapper.classList.remove('search-wrapper-ready')
+      searchIconWrapper.classList.remove("search-wrapper-ready");
     }
-  }
+  };
 
   const handleGrowSearchIcon = () => {
-    const searchIconWrapper = document.querySelector('.search-guests-wrapper')
+    const searchIconWrapper = document.querySelector(".search-guests-wrapper");
     if (searchIconWrapper) {
-      searchIconWrapper.classList.add('search-wrapper-ready')
+      searchIconWrapper.classList.add("search-wrapper-ready");
     }
-  }
+  };
 
   useEffect(() => {
-    document.addEventListener('click', clickOutside)
+    document.addEventListener("click", clickOutside);
     return () => {
-      document.removeEventListener('click', clickOutside)
-    }
-  }, [])
+      document.removeEventListener("click", clickOutside);
+    };
+  }, []);
 
-  const handleDropdownClick = (e: any) => {
-    e.stopPropagation()
-  }
+  const handleDropdownClick = (e: any) => e.stopPropagation();
 
   return (
-    <AddGuestsContainer onClick={handleBgWhiteActive}>
-      <div className="add-guests-wrapper" onClick={handleDropdownClick}>
-        {bgWhiteActive ? (
-          <div className="header-guests" onClick={handleBgWhiteActive}>
-            <p>Who</p>
-            {adult + children > 0 ? (
-              <p>
-                {adult + children} guests
-                {infants > 0 || pets > 0
-                  ? `, ${
-                      infants
-                        ? infants === 1
-                          ? infants + ' infant'
-                          : infants + ' infants'
-                        : ''
-                    }
-                  ${pets ? (pets === 1 ? pets + ' pet' : pets + ' pets') : ''}`
-                  : ''}
-              </p>
-            ) : (
-              <p>Add guests</p>
-            )}
-          </div>
-        ) : (
-          <div className="header-guests-two" onClick={handleBgWhiteActive}>
-            <p>Who</p>
-            <p>Add guests</p>
-          </div>
-        )}
-        <div className={`guests-dropdown ${bgWhiteActive ? 'show' : ''}`}>
-          <div className="section adults-cont">
-            <div className="guest">
-              <p>Adults</p>
-              <span>Age 13 or above</span>
-            </div>
-            <div className="counter">
-              <FaMinusCircle
-                onClick={() => handleClickAdults(adult - 1)}
-                className={`counter-icon ${
-                  adult === 0 || children >= 1 || infants >= 1 || pets >= 1
-                    ? 'disabled'
-                    : ''
-                }`}
-              />
-
-              <span>{adult}</span>
-
-              <FaPlusCircle
-                onClick={() => handleClickAdults(adult + 1)}
-                className="counter-icon"
-              />
-            </div>
-          </div>
-          <div className="section children-cont">
-            <div className="guest">
-              <p>Children</p>
-              <span>Age 2-12</span>
-            </div>
-            <div className="counter">
-              <FaMinusCircle
-                onClick={() => handleClickChildren(children - 1)}
-                className={`counter-icon ${children === 0 ? 'disabled' : ''}`}
-              />
-
-              <span>{children}</span>
-              <FaPlusCircle
-                onClick={() => handleClickChildren(children + 1)}
-                className="counter-icon"
-              />
-            </div>
-          </div>
-          <div className="section infants-cont">
-            <div className="guest">
-              <p>Infants</p>
-              <span>Under 2</span>
-            </div>
-            <div className="counter">
-              <FaMinusCircle
-                onClick={() => handleClickInfants(infants - 1)}
-                className={`counter-icon ${infants === 0 ? 'disabled' : ''}`}
-              />
-
-              <span>{infants}</span>
-
-              <FaPlusCircle
-                onClick={() => handleClickInfants(infants + 1)}
-                className="counter-icon"
-              />
-            </div>
-          </div>
-          <div className="section pets-cont">
-            <div className="guest">
-              <p>Pets</p>
-              <span>
-                <a href="#">Bringing a service animal?</a>
-              </span>
-            </div>
-            <div className="counter">
-              <FaMinusCircle
-                onClick={() => handleClickPets(pets - 1)}
-                className={`counter-icon ${pets === 0 ? 'disabled' : ''}`}
-              />
-
-              <span>{pets}</span>
-
-              <FaPlusCircle
-                onClick={() => handleClickPets(pets + 1)}
-                className="counter-icon"
-              />
-            </div>
-          </div>
+    <div
+      className="relative flex items-center bg-white text-gray-900 w-[22rem] h-full rounded-full"
+      onClick={handleBgWhiteActive}
+    >
+      <div
+        className="add-guests-wrapper flex justify-between items-center w-full h-full relative hover:bg-gray-300 rounded-full cursor-pointer"
+        onClick={handleDropdownClick}
+      >
+        <div
+          className={`flex flex-col justify-center h-full px-4 rounded-full ${
+            bgWhiteActive ? "bg-neutral-800 text-white shadow-md" : ""
+          }`}
+        >
+          <p className="text-sm">Who</p>
+          <p className="text-base text-gray-400">
+            {adult + children > 0
+              ? `${adult + children} guests${
+                  infants > 0 || pets > 0
+                    ? `, ${
+                        infants
+                          ? `${infants} infant${infants > 1 ? "s" : ""}`
+                          : ""
+                      }${infants && pets ? ", " : ""}${
+                        pets ? `${pets} pet${pets > 1 ? "s" : ""}` : ""
+                      }`
+                    : ""
+                }`
+              : "Add guests"}
+          </p>
         </div>
+
+        <div
+          className={`absolute top-[5rem] right-0 z-50 bg-white rounded-2xl shadow-lg p-6 pt-4 w-[27rem] ${
+            bgWhiteActive ? "block" : "hidden"
+          }`}
+        >
+          {[
+            {
+              label: "Adults",
+              sub: "Age 13 or above",
+              count: adult,
+              setter: setAdult,
+              handler: handleClickAdults,
+              disableMinus:
+                adult === 0 && (children > 0 || infants > 0 || pets > 0),
+            },
+            {
+              label: "Children",
+              sub: "Age 2-12",
+              count: children,
+              setter: setChildren,
+              handler: handleClickChildren,
+              disableMinus: children === 0,
+            },
+            {
+              label: "Infants",
+              sub: "Under 2",
+              count: infants,
+              setter: setInfants,
+              handler: handleClickInfants,
+              disableMinus: infants === 0,
+            },
+            {
+              label: "Pets",
+              sub: "Bringing a service animal?",
+              count: pets,
+              setter: setPets,
+              handler: handleClickPets,
+              disableMinus: pets === 0,
+              isLink: true,
+            },
+          ].map(({ label, sub, count, handler, disableMinus, isLink }, i) => (
+            <div
+              key={i}
+              className="flex justify-between items-center border-b py-4"
+            >
+              <div>
+                <p className="text-lg font-medium">{label}</p>
+                {isLink ? (
+                  <a href="#" className="text-gray-400 text-sm">
+                    {sub}
+                  </a>
+                ) : (
+                  <span className="text-gray-400 text-sm">{sub}</span>
+                )}
+              </div>
+              <div className="flex items-center">
+                <FaMinusCircle
+                  onClick={() => handler(count - 1)}
+                  className={`text-2xl ${
+                    disableMinus
+                      ? "text-gray-300 cursor-not-allowed"
+                      : "text-gray-400 cursor-pointer"
+                  }`}
+                />
+                <span className="mx-4 text-gray-500 text-lg">{count}</span>
+                <FaPlusCircle
+                  onClick={() => handler(count + 1)}
+                  className="text-2xl text-gray-400 cursor-pointer"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
         {bgWhiteActive && adult > 0 && (
-          <div className="guests-tiny-box">
-            <div className="adult-cont">
-              {adult > 0 && (
-                <div className="adult-wrapper">
-                  {Array.from({ length: adult > 5 ? 5 : adult }, (_, index) => (
-                    <FaPerson key={index} size={24} />
+          <div className="absolute top-[5.2rem] left-[17.6rem] bg-neutral-800 text-white p-4 rounded-lg z-50 flex flex-col animate-bounce">
+            {[
+              { count: adult, icon: FaUser },
+              { count: children, icon: MdChildCare },
+              { count: infants, icon: FaBaby },
+              { count: pets, icon: MdPets },
+            ].map(({ count, icon: Icon }, idx) =>
+              count > 0 ? (
+                <div key={idx} className="flex mb-1">
+                  {Array.from({ length: Math.min(count, 5) }, (_, i) => (
+                    <Icon key={i} size={24} className="mr-1" />
                   ))}
-                  {adult > 5 && <span>+</span>}
+                  {count > 5 && <span className="ml-1 text-lg">+</span>}
                 </div>
-              )}
-            </div>
-            <div className="child-cont">
-              {children > 0 && (
-                <div className="child-wrapper">
-                  {Array.from(
-                    { length: children > 5 ? 5 : children },
-                    (_, index) => (
-                      <MdChildCare key={index} size={24} />
-                    ),
-                  )}
-                  {children > 5 && <span>+</span>}
-                </div>
-              )}
-            </div>
-            <div className="infant-cont">
-              {infants > 0 && (
-                <div className="infant-wrapper">
-                  {Array.from(
-                    { length: infants > 5 ? 5 : infants },
-                    (_, index) => (
-                      <FaBaby key={index} size={24} />
-                    ),
-                  )}
-                  {infants > 5 && <span>+</span>}
-                </div>
-              )}
-            </div>
-            <div className="pet-cont">
-              {pets > 0 && (
-                <div className="pet-wrapper">
-                  {Array.from({ length: pets > 5 ? 5 : pets }, (_, index) => (
-                    <MdPets key={index} size={24} />
-                  ))}
-                  {pets > 5 && <span>+</span>}
-                </div>
-              )}
-            </div>
+              ) : null
+            )}
           </div>
         )}
       </div>
 
       <div
-        className={`search-guests-wrapper ${
-          clickMainContainer ? 'search-wrapper-ready' : ''
+        className={`search-guests-wrapper absolute right-0 mr-1 w-14 h-14 rounded-full bg-green-600 flex justify-center items-center transition-all duration-300 ${
+          clickMainContainer ? "w-[7rem] rounded-full bg-green-700" : ""
         }`}
       >
-        <FaSearch className="search-icon" />
-        <p>Search</p>
+        <FaSearch className="text-white text-xl" />
+        {clickMainContainer && (
+          <p className="text-white text-sm ml-2">Search</p>
+        )}
       </div>
-    </AddGuestsContainer>
-  )
-}
+    </div>
+  );
+};
 
-export default AddGuests
+export default AddGuests;

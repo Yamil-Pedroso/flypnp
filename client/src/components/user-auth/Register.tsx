@@ -1,52 +1,47 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
-import { GoogleLogin } from '@react-oauth/google'
-
-import { useAuth } from '../../../hooks'
-import { IoCloseSharp } from 'react-icons/io5'
-import { Container } from './styles'
+import { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { IoCloseSharp } from "react-icons/io5";
+import { useAuth } from "../../../hooks";
 
 interface RegisterProps {
-  closeUserForm: () => void
-  changeToLogin: () => void
+  closeUserForm: () => void;
+  changeToLogin: () => void;
 }
 
 const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    avatar: '',
-  })
+    name: "",
+    email: "",
+    password: "",
+    avatar: "",
+  });
+
   const [formErrors, setFormErrors] = useState({
     name: false,
     email: false,
     password: false,
     avatar: false,
-  })
+  });
 
-  const [redirect, setRedirect] = useState(false)
-  const auth = useAuth() as any
+  const [redirect, setRedirect] = useState(false);
+  const auth = useAuth() as any;
 
   const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.type !== 'file') {
-      const { name, value } = e.target
-
-      setFormData({
-        ...formData,
-        [name]: value,
-      })
-
-      if (setFormErrors) {
-        setFormErrors({ ...formErrors, [name]: false })
-      }
+    if (e.target.type !== "file") {
+      const { name, value } = e.target;
+      setFormData({ ...formData, [name]: value });
+      setFormErrors({ ...formErrors, [name]: false });
     }
-  }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData({ ...formData, avatar: e.target.files[0] as any });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
+    e.preventDefault();
     if (
       !formData.name ||
       !formData.email ||
@@ -58,83 +53,70 @@ const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
         email: !formData.email,
         password: !formData.password,
         avatar: !formData.avatar,
-      })
-      console.log('Register failed: Missing fields')
-      return
+      });
+      console.log("Register failed: Missing fields");
+      return;
     }
 
-    const response = await auth.register(formData)
+    const response = await auth.register(formData);
     if (response.success) {
-      console.log('User registered')
-      //setRedirect(true)
-      closeUserForm()
+      console.log("User registered");
+      closeUserForm();
     } else {
-      console.log(
-        "Couldn't register user, this user may already exist or there was an error",
-      )
+      console.log("Couldn't register user");
     }
-  }
-
-  const handleCloseForm = () => {
-    closeUserForm()
-  }
+  };
 
   const handleGoogleLogin = async (credential: any) => {
-    const response = await auth.googleLogin(credential)
+    const response = await auth.googleLogin(credential);
     if (response.success) {
-      setRedirect(true)
+      setRedirect(true);
     } else {
-      console.log(response.message)
+      console.log(response.message);
     }
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData({
-        ...formData,
-        avatar: e.target.files[0] as any,
-      })
-    }
-  }
-
-  //if (redirect) {
-  //  return <Navigate to="/" />
-  //}
+  };
 
   return (
-    <Container>
-      <div className="form-wrapper">
-        <h1>Register</h1>
-        <IoCloseSharp className="close-icon" onClick={handleCloseForm} />
-        <form action="" onSubmit={handleSubmit}>
+    <div className="absolute top-[20rem] w-full max-w-md p-5 border border-gray-200 rounded-lg bg-white flex flex-col items-center">
+      <div className="relative w-full flex flex-col gap-4">
+        <h1 className="text-2xl font-semibold mb-4 text-center">Register</h1>
+        <IoCloseSharp
+          onClick={closeUserForm}
+          className="absolute top-2 right-2 text-2xl cursor-pointer"
+        />
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="text"
             name="name"
-            id="name"
-            value={formData.name}
             placeholder="John Doe"
+            value={formData.name}
             onChange={handleFormData}
-            className={formErrors.name ? 'error-border' : ''}
+            className={`p-3 rounded-md border w-full ${
+              formErrors.name ? "border-red-500" : "border-gray-200"
+            }`}
           />
 
           <input
             type="email"
             name="email"
-            id="email"
-            placeholder="youremail@email.conm"
+            placeholder="youremail@email.com"
             value={formData.email}
             onChange={handleFormData}
-            className={formErrors.email ? 'error-border' : ''}
+            className={`p-3 rounded-md border w-full ${
+              formErrors.email ? "border-red-500" : "border-gray-200"
+            }`}
           />
 
           <input
             type="password"
             name="password"
-            id="password"
             placeholder="********"
             value={formData.password}
             onChange={handleFormData}
-            className={formErrors.password ? 'error-border' : ''}
+            className={`p-3 rounded-md border w-full ${
+              formErrors.password ? "border-red-500" : "border-gray-200"
+            }`}
           />
 
           <input
@@ -142,39 +124,45 @@ const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
             name="avatar"
             accept="image/*"
             onChange={handleFileChange}
+            className={`p-3 rounded-md border w-full ${
+              formErrors.avatar ? "border-red-500" : "border-gray-200"
+            }`}
           />
 
-          <button type="submit">Register</button>
+          <button
+            type="submit"
+            className="p-3 bg-black text-white rounded-md font-semibold hover:bg-gray-900"
+          >
+            Register
+          </button>
         </form>
 
-        <div className="or-wrapper">
-          <p className="">or</p>
+        <div className="flex items-center justify-center gap-2 my-4">
+          <span className="text-gray-500">or</span>
         </div>
 
-        <div className="google-wrapper">
+        <div className="flex justify-center">
           <GoogleLogin
-            onSuccess={(credentialResponse) => {
+            onSuccess={(credentialResponse) =>
               handleGoogleLogin(credentialResponse)
-            }}
-            onError={() => console.log('Google login failed')}
+            }
+            onError={() => console.log("Google login failed")}
             width="350"
           />
         </div>
 
-        <div className="question-btn-wrapper">
-          Already a member?
+        <div className="flex justify-center gap-2 mt-5 text-sm">
+          <span>Already a member?</span>
           <p
-            className="link"
-            onClick={() => {
-              changeToLogin()
-            }}
+            onClick={changeToLogin}
+            className="text-red-500 underline cursor-pointer"
           >
             Login
           </p>
         </div>
       </div>
-    </Container>
-  )
-}
+    </div>
+  );
+};
 
-export default Register
+export default Register;

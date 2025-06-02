@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Container, PlaceCardWrapper, PlaceCardImageWrapper } from "./styles";
-import { MdStar } from "react-icons/md";
-import { MdStarBorder } from "react-icons/md";
-import { MdStarHalf } from "react-icons/md";
+import { MdStar, MdStarBorder, MdStarHalf } from "react-icons/md";
 import { FaRegHeart } from "react-icons/fa";
 import CreateWishListBox from "../wishlist/create/CreateWishListBox";
+import WebpImage from "./WebpImage";
 
 interface Photo {
   main: string;
   thumbnails: string[];
 }
+
 interface PlaceCardProps {
   place: {
     _id: string;
@@ -28,141 +27,89 @@ interface PlaceCardProps {
   };
 }
 
-const PlaceCard = (props: PlaceCardProps) => {
+const PlaceCard = ({ place }: PlaceCardProps) => {
   const [showCreateWishList, setShowCreateWishList] = useState(false);
-  //const [isFavorited, setIsFavorited] = useState(false)
-  const { place } = props;
-  const { title, address, photos, rating, price } = place;
 
-  const mainPhotoUrl = photos?.[0]?.main;
-  console.log("mainPhotoUrl", mainPhotoUrl);
+  const { title, address, photos, rating, price, category, _id } = place;
+  const mainPhotoUrl = photos?.[0]?.main ?? "";
 
   const handleClickCreateWishList = () => {
     setShowCreateWishList(!showCreateWishList);
   };
 
   return (
-    <Container>
-      <div className={`overlay ${showCreateWishList && "show"}`}>
-        <CreateWishListBox
-          closeCreateWishList={handleClickCreateWishList}
-          className="wishlist-box"
-          placeId={place._id}
-          title={title}
-          picture={mainPhotoUrl}
-        />
-      </div>
-      <PlaceCardWrapper>
-        {mainPhotoUrl && (
-          <PlaceCardImageWrapper>
-            <Link to={`/place/${place.category}/${place._id}`}>
-              <img src={mainPhotoUrl} className="" alt="place" width="300" />
-            </Link>
+    <div className="relative w-full max-w-[320px] mx-auto">
+      {/* Overlay Wishlist */}
+      {showCreateWishList && (
+        <div className="fixed inset-0 bg-black/50 z-[999] animate-fadeInFromDown">
+          <CreateWishListBox
+            closeCreateWishList={handleClickCreateWishList}
+            className="wishlist-box"
+            placeId={_id}
+            title={title}
+            picture={mainPhotoUrl}
+          />
+        </div>
+      )}
 
+      {/* Card Wrapper */}
+      <div className="rounded-xl cursor-pointer transition-transform duration-300 hover:scale-105 relative shadow-md overflow-hidden flex flex-col h-[450px]">
+        {/* Image */}
+        {mainPhotoUrl && (
+          <div className="relative h-[200px] w-full overflow-hidden">
+            <Link to={`/place/${category}/${_id}`}>
+              <WebpImage
+                src={mainPhotoUrl}
+                alt="place"
+                className="w-full h-full object-cover"
+              />
+            </Link>
             <div
-              className="favorite-heart"
-              onClick={() => handleClickCreateWishList()}
+              className="absolute top-2 right-2 text-2xl text-[#ff8c91] hover:text-red-500 animate-heart cursor-pointer"
+              onClick={handleClickCreateWishList}
             >
               <FaRegHeart />
             </div>
-          </PlaceCardImageWrapper>
+          </div>
         )}
-        <div className="content-wrapper">
-          <p className="">{title}</p>
-          <p className="">{address}</p>
-          <p className="">
-            {rating === 5 ? (
-              <div style={{ color: "#ff8c91" }}>
-                <MdStar />
-                <MdStar />
-                <MdStar />
-                <MdStar />
-                <MdStar />
-                {rating}
-              </div>
-            ) : rating === 4.5 ? (
-              <>
-                <MdStar />
-                <MdStar />
-                <MdStar />
-                <MdStar />
-                <MdStarHalf />
-                {rating}
-              </>
-            ) : rating === 4 ? (
-              <>
-                <MdStar />
-                <MdStar />
-                <MdStar />
-                <MdStar />
-                <MdStarBorder />
-              </>
-            ) : rating === 3.5 ? (
-              <>
-                <MdStar />
-                <MdStar />
-                <MdStar />
-                <MdStarHalf />
-                <MdStarBorder />
-              </>
-            ) : rating === 3 ? (
-              <>
-                <MdStar />
-                <MdStar />
-                <MdStar />
-                <MdStarBorder />
-                <MdStarBorder />
-              </>
-            ) : rating === 2.5 ? (
-              <>
-                <MdStar />
-                <MdStar />
-                <MdStarHalf />
-                <MdStarBorder />
-                <MdStarBorder />
-              </>
-            ) : rating === 2 ? (
-              <>
-                <MdStar />
-                <MdStar />
-                <MdStarBorder />
-                <MdStarBorder />
-                <MdStarBorder />
-              </>
-            ) : rating === 1.5 ? (
-              <>
-                <MdStar />
-                <MdStarHalf />
-                <MdStarBorder />
-                <MdStarBorder />
-                <MdStarBorder />
-              </>
-            ) : rating === 1 ? (
-              <>
-                <MdStar />
-                <MdStarBorder />
-                <MdStarBorder />
-                <MdStarBorder />
-                <MdStarBorder />
-              </>
-            ) : (
-              <>
-                <MdStarBorder />
-                <MdStarBorder />
-                <MdStarBorder />
-                <MdStarBorder />
-                <MdStarBorder />
-              </>
-            )}
-          </p>
-          <div className="">
-            <span className="">CHF{price} </span>
-            per night
+
+        {/* Content */}
+        <div className="p-4 flex flex-col justify-between flex-grow">
+          <div>
+            <p className="font-semibold text-lg">{title}</p>
+            <p className="text-sm text-gray-600">{address}</p>
+            <p className="flex items-center gap-1 text-[#ff8c91]">
+              {renderRatingStars(rating)}
+              <span className="text-gray-800">{rating}</span>
+            </p>
+          </div>
+          <div className="text-sm mt-2">
+            <span className="font-bold">CHF{price} </span>per night
           </div>
         </div>
-      </PlaceCardWrapper>
-    </Container>
+      </div>
+    </div>
   );
 };
+
+function renderRatingStars(rating: number) {
+  const fullStars = Math.floor(rating);
+  const halfStar = rating % 1 >= 0.5;
+  const stars = [];
+
+  for (let i = 0; i < fullStars; i++) {
+    stars.push(<MdStar key={`star-${i}`} />);
+  }
+
+  if (halfStar) {
+    stars.push(<MdStarHalf key="half" />);
+  }
+
+  while (stars.length < 5) {
+    stars.push(<MdStarBorder key={`border-${stars.length}`} />);
+  }
+
+  return <span className="flex text-[#ff8c91]">{stars}</span>;
+}
 
 export default PlaceCard;

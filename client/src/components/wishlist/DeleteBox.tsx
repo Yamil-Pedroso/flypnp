@@ -1,10 +1,10 @@
-import { IoCloseSharp } from 'react-icons/io5'
+import { IoCloseSharp } from "react-icons/io5";
 
 interface DeleteBoxProps {
-  className?: string
-  handleCloseDeleteBox: () => void
-  deleteItem: () => void
-  itemIdToDelete?: string
+  className?: string;
+  handleCloseDeleteBox: () => void;
+  deleteItem: () => void;
+  itemIdToDelete?: string;
 }
 
 const DeleteBox = ({
@@ -16,9 +16,10 @@ const DeleteBox = ({
     <div className={`delete-box-wrapper ${className}`}>
       <IoCloseSharp
         size={24}
-        className="close-icon"
+        className="absolute top-2 right-2 cursor-pointer text-black hover:text-gray-800"
         onClick={handleCloseDeleteBox}
       />
+
       <h3>Are you sure you want to delete this item?</h3>
       <div className="btn-box-wrapper">
         <button className="cancel-btn" onClick={handleCloseDeleteBox}>
@@ -29,7 +30,7 @@ const DeleteBox = ({
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DeleteBox
+export default DeleteBox;
