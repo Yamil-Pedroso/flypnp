@@ -1,38 +1,33 @@
-import { useState, useEffect } from 'react'
-import SearchDestination from './search-destination/SearchDestination'
-import CheckInCheckOut from './check-in-out/CheckInCheckOut'
-import AddGuests from './add-guests/AddGuests'
-import { SearchContainer } from './index'
-import { FaSearch } from 'react-icons/fa'
+import { useState, useEffect } from "react";
+import SearchDestination from "./search-destination/SearchDestination";
+import CheckInCheckOut from "./check-in-out/CheckInCheckOut";
+import AddGuests from "./add-guests/AddGuests";
+import "./search.css";
 
 interface SearchProps {
-  menuClick: boolean
+  menuClick: boolean;
 }
 
 const Search = ({ menuClick }: SearchProps) => {
-  const [clickMainContainer, setClickMainContainer] = useState(false)
+  const [clickMainContainer, setClickMainContainer] = useState(false);
+
+  console.log("click main container", clickMainContainer);
 
   const handleClickedMainContainer = () => {
-    setClickMainContainer(true)
-    handleGrowSearchIcon()
-  }
+    setClickMainContainer(true);
+    const el = document.querySelector(".search-guests-wrapper");
+    if (el) el.classList.add("search-wrapper-ready");
+  };
 
-  const handleGrowSearchIcon = () => {
-    const searchIcon = document.querySelector('.search-guests-wrapper')
-    if (searchIcon) {
-      searchIcon.classList.add('search-wrapper-ready')
-    }
-  }
-
-  useEffect(() => {}, [])
+  useEffect(() => {}, []);
 
   return (
-    <SearchContainer onClick={handleClickedMainContainer}>
+    <div className="search-container" onClick={handleClickedMainContainer}>
       <SearchDestination />
       <CheckInCheckOut menuClick={menuClick} />
       <AddGuests />
-    </SearchContainer>
-  )
-}
+    </div>
+  );
+};
 
-export default Search
+export default Search;
