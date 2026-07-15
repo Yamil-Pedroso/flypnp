@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "sonner";
 import {
   ArrowUpRight,
   Compass,
@@ -24,6 +25,7 @@ const WishList = () => {
   const confirmDelete = async () => {
     if (!itemToDelete) return;
     await deleteWishlist(itemToDelete.place);
+    toast.success("Successfully deleted the place");
     setItemToDelete(null);
   };
 

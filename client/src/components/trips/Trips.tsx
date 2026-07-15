@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "sonner";
 import {
   ArrowUpRight,
   Compass,
@@ -95,6 +96,7 @@ const Trips = () => {
       setDeleting(true);
       setDeleteError("");
       await deleteBooking(tripToDelete._id);
+      toast.success("Successfully deleted the place");
       setTripToDelete(null);
     } catch (cause) {
       setDeleteError(getErrorMessage(cause, "We couldn't remove this trip. Please try again."));

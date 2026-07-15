@@ -6,6 +6,7 @@ import { WishlistProvider } from "./providers/WishlistProvider";
 import { BookingProvider } from "./providers/BookingProvider";
 import { PaymentProvider } from "./providers/PaymentProvider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { Toaster } from "sonner";
 import "./index.css";
 
 import WithNavbarLayout from "./layouts/WithNavbarLayout";
@@ -36,6 +37,7 @@ import WelcomeModal from "./components/welcome/WelcomeModal";
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <Toaster position="bottom-right" richColors />
       <UserProvider>
         <WelcomeModal />
         <PlacesProvider>
