@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import { Booking } from "../models/Booking";
 import { Place } from "../models/Place";
+import { Payment } from "../models/Payment";
+import { stripe } from "../config/stripe";
 import CustomError from "../utils/customError";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -10,6 +12,11 @@ const parseDates = (checkInValue: unknown, checkOutValue: unknown) => {
   const checkOut = new Date(String(checkOutValue));
   if (Number.isNaN(checkIn.getTime()) || Number.isNaN(checkOut.getTime()) || checkOut <= checkIn) {
     throw new CustomError("checkOut must be after checkIn", 400);
+  }
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  if (checkIn < today) {
+    throw new CustomError("checkIn cannot be in the past", 400);
   }
   return { checkIn, checkOut, nights: Math.ceil((checkOut.getTime() - checkIn.getTime()) / DAY_MS) };
 };
@@ -81,7 +88,10 @@ export const createBookings = async (req: Request, res: Response) => {
 };
 
 export const getUserBookings = async (req: Request, res: Response) => {
-  const bookings = await Booking.find({ owner: req.user!._id }).populate("place");
+  const bookings = await Booking.find({
+    owner: req.user!._id,
+    archivedAt: { $exists: false },
+  }).populate("place");
   res.status(200).json({ success: true, count: bookings.length, data: bookings });
 };
 
@@ -137,6 +147,19 @@ export const deleteBooking = async (req: Request, res: Response) => {
   const booking = await Booking.findById(req.params.id);
   if (!booking) throw new CustomError("Booking not found", 404);
   assertBookingOwner(booking.owner.toString(), req);
-  await booking.deleteOne();
-  res.status(200).json({ success: true });
+  if (booking.status === "pending") {
+    const payment = await Payment.findOne({
+      booking: booking._id,
+      status: { $in: ["pending", "failed"] },
+    });
+    if (payment) {
+      await stripe.paymentIntents.cancel(payment.stripeId);
+      payment.status = "cancelled";
+      await payment.save();
+    }
+    booking.status = "cancelled";
+  }
+  booking.archivedAt = new Date();
+  await booking.save();
+  res.status(200).json({ success: true, message: "Booking removed from trips" });
 };

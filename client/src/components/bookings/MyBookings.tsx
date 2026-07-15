@@ -1,4 +1,7 @@
+import { CreditCard } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useBooking } from '../../lib/hooks'
+import { getBookingPaymentPath } from '../../lib/payment'
 
 const MyBookings = () => {
   const { bookings } = useBooking()
@@ -34,6 +37,7 @@ const MyBookings = () => {
                 <div><p className="text-slate-400">Guests</p><p className="font-medium text-slate-800">{booking.numOfGuests.adults + booking.numOfGuests.children}</p></div>
                 <div><p className="text-slate-400">Total</p><p className="font-medium text-slate-800">CHF {booking.price}</p></div>
               </div>
+              {booking.status === 'pending' && <Link to={getBookingPaymentPath(booking)} className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-rose-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-rose-500/20 transition hover:-translate-y-0.5 hover:bg-rose-600"><CreditCard className="size-4" />Complete payment</Link>}
             </div>
           </article>
         ))}

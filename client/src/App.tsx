@@ -20,6 +20,7 @@ import PaymentPage from "./pages/PaymentPage";
 import SucceededPaymentPage from "./pages/SucceededPaymentPage";
 import TripsPage from "./pages/TripsPage";
 import WishListPage from "./pages/WishListPage";
+import { SearchProvider } from "./components/search/SearchContext";
 
 //interface AppProps {
 //  children: React.ReactNode
@@ -41,6 +42,7 @@ function App() {
               <BookingProvider>
                 <PaymentProvider>
                   <Router>
+                    <SearchProvider>
                     <Routes>
                       {/* Rutas con Navbar */}
                       <Route
@@ -72,6 +74,7 @@ function App() {
 
                       <Route path="*" element={<NotFoundPage />} />
                     </Routes>
+                    </SearchProvider>
                   </Router>
                 </PaymentProvider>
               </BookingProvider>

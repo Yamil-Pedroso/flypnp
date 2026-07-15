@@ -1,17 +1,31 @@
 import { useState, type FormEvent } from "react";
-import { CalendarDays, MapPin, Search as SearchIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search as SearchIcon } from "lucide-react";
 import { usePlaces } from "../../lib/hooks";
 import AddGuests from "./add-guests/AddGuests";
+import { getTravelParams, useTravelSearch } from "./SearchContext";
+import DateRangePicker from "./date-range/DateRangePicker";
+import DestinationPicker from "./destination/DestinationPicker";
 
 const Search = () => {
-  const [destination, setDestination] = useState("");
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
+  const { destination, checkIn, checkOut, guests } = useTravelSearch();
+  const [validationError, setValidationError] = useState("");
   const { search } = usePlaces();
+  const navigate = useNavigate();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if ((checkIn && !checkOut) || (!checkIn && checkOut)) {
+      setValidationError("Choose both check-in and check-out dates.");
+      return;
+    }
+    if (checkIn && checkOut && checkOut <= checkIn) {
+      setValidationError("Check-out must be after check-in.");
+      return;
+    }
+    setValidationError("");
     void search(destination);
+    navigate(`/?${getTravelParams({ destination, checkIn, checkOut, guests }).toString()}`);
   };
 
   return (
@@ -19,36 +33,11 @@ const Search = () => {
       <form
         aria-label="Search stays"
         onSubmit={handleSubmit}
-        className="grid grid-cols-[1fr_auto_auto] items-center gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_12px_35px_rgba(15,23,42,0.10)] md:grid-cols-[1.4fr_1fr_1fr_0.8fr_auto] md:rounded-full"
+        className="relative grid grid-cols-[1fr_auto_auto] items-center gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_12px_35px_rgba(15,23,42,0.10)] md:grid-cols-[1.4fr_1fr_1fr_0.8fr_auto] md:rounded-full"
       >
-        <label className="flex min-w-0 items-center gap-3 rounded-xl px-3 py-2 transition hover:bg-slate-50 md:rounded-full">
-          <MapPin className="size-5 shrink-0 text-emerald-600" aria-hidden="true" />
-          <span className="min-w-0 flex-1">
-            <span className="hidden text-xs font-semibold text-slate-900 md:block">Where</span>
-            <input
-              value={destination}
-              onChange={(event) => setDestination(event.target.value)}
-              className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-500"
-              placeholder="Search destinations"
-            />
-          </span>
-        </label>
+        <DestinationPicker />
 
-        <label className="hidden items-center gap-2 border-l border-slate-100 px-4 md:flex">
-          <CalendarDays className="size-4 shrink-0 text-slate-400" aria-hidden="true" />
-          <span className="min-w-0">
-            <span className="block text-xs font-semibold">Check in</span>
-            <input type="date" value={checkIn} onChange={(event) => setCheckIn(event.target.value)} className="w-full bg-transparent text-xs text-slate-500 outline-none" />
-          </span>
-        </label>
-
-        <label className="hidden items-center gap-2 border-l border-slate-100 px-4 md:flex">
-          <CalendarDays className="size-4 shrink-0 text-slate-400" aria-hidden="true" />
-          <span className="min-w-0">
-            <span className="block text-xs font-semibold">Check out</span>
-            <input type="date" value={checkOut} onChange={(event) => setCheckOut(event.target.value)} className="w-full bg-transparent text-xs text-slate-500 outline-none" />
-          </span>
-        </label>
+        <DateRangePicker />
 
         <AddGuests />
 
@@ -56,6 +45,7 @@ const Search = () => {
           <SearchIcon className="size-5" aria-hidden="true" />
         </button>
       </form>
+      {validationError && <p role="alert" className="mt-2 px-4 text-xs font-semibold text-rose-600">{validationError}</p>}
     </div>
   );
 };

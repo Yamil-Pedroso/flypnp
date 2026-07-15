@@ -1,137 +1,155 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { CardElement, Elements, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { CheckCircle2, CreditCard, LoaderCircle, LockKeyhole } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  CardElement,
-  Elements,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-//import { usePayment } from '../../../hooks'
-import { paymentsService } from "../../services";
+import { getErrorMessage, paymentsService } from "../../services";
+import { useBooking } from "../../lib/hooks";
 
 interface CheckoutFormProps {
   onSuccessfulCheckout: () => void;
-  status?: "pending" | "confirmed";
 }
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
+const cardOptions = {
+  style: {
+    base: {
+      color: "#0f172a",
+      fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
+      fontSize: "16px",
+      fontSmoothing: "antialiased",
+      "::placeholder": { color: "#94a3b8" },
+    },
+    invalid: { color: "#e11d48", iconColor: "#e11d48" },
+  },
+};
+
 const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
-  //const { clientSecret, createPayment } = usePayment() as any
   const stripe = useStripe();
   const elements = useElements();
-  const [error, setError] = useState("");
-  const [isLoading, setLoading] = useState(false);
-  const [clientSecret, setClientSecret] = useState("");
-  const [paymentStatus, setPaymentStatus] = useState<"pending" | "confirmed">("pending");
   const location = useLocation();
   const navigate = useNavigate();
-  const notify = () => toast("You have made the payment successfully!");
-
-  //useEffect(() => {
-  //  const getClientSecret = async () => {
-  //    const response = await createPayment()
-  //    return response.clientSecret
-  //  }
-  //  getClientSecret()
-  //}, [])
-
-  const useQuery = new URLSearchParams(location.search);
-  const place = useQuery.get("place");
+  const { refresh: refreshBookings } = useBooking();
+  const [error, setError] = useState("");
+  const [isLoading, setLoading] = useState(false);
+  const [isPreparing, setPreparing] = useState(true);
+  const [clientSecret, setClientSecret] = useState("");
+  const [paymentId, setPaymentId] = useState("");
+  const [successUrl, setSuccessUrl] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState<"pending" | "confirmed">("pending");
+  const bookingId = new URLSearchParams(location.search).get("booking");
 
   useEffect(() => {
-    const createPaymentClientSecret = async () => {
-      try {
-        if (!place) return { success: false, message: "Missing place" };
-        const data = await paymentsService.create({
-          placeId: place,
-          currency: "chf",
-        });
+    let active = true;
 
-        if (data.success && data.clientSecret) {
-          setClientSecret(data.clientSecret);
-          return { success: true, clientSecret: data.clientSecret };
-        } else {
-          console.error("Failed to retrieve client secret");
-          return {
-            success: false,
-            message: "Failed to retrieve client secret",
-          };
+    const preparePayment = async () => {
+      if (!bookingId) {
+        if (active) {
+          setError("Missing accommodation details. Return to the stay and try again.");
+          setPreparing(false);
         }
-      } catch {
-        console.error("Failed to retrieve client secret");
-        return { success: false, message: "Failed to retrieve client secret" };
+        return;
+      }
+
+      try {
+        const data = await paymentsService.create({ bookingId, currency: "chf" });
+        if (!data.success || !data.clientSecret) throw new Error("The secure payment session could not be created.");
+        if (data.alreadyPaid) {
+          await paymentsService.confirm(data.data._id);
+          await refreshBookings();
+          if (active) {
+            const returnLocation = new URL(data.successUrl, window.location.origin);
+            navigate(`${returnLocation.pathname}${returnLocation.search}`);
+          }
+          return;
+        }
+        if (active) {
+          setClientSecret(data.clientSecret);
+          setPaymentId(data.data._id);
+          setSuccessUrl(data.successUrl);
+        }
+      } catch (cause) {
+        if (active) setError(getErrorMessage(cause, "The secure payment session could not be created."));
+      } finally {
+        if (active) setPreparing(false);
       }
     };
 
-    createPaymentClientSecret();
-  }, [place]);
+    void preparePayment();
+    return () => { active = false; };
+  }, [bookingId, navigate, refreshBookings]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!stripe || !elements || !clientSecret) {
-      return;
-    }
-    setLoading(true);
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!stripe || !elements || !clientSecret || isLoading) return;
 
     const card = elements.getElement(CardElement);
-    if (!card) return;
-    const result = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card,
-      },
-    });
+    if (!card) {
+      setError("Card details are not ready yet. Please try again.");
+      return;
+    }
 
-    setLoading(false);
+    setLoading(true);
+    setError("");
 
-    if (result.error) {
-      setError(result.error.message ?? "Payment failed");
-    } else if (result.paymentIntent?.status === "succeeded") {
-      setError("");
-      notify();
-      setPaymentStatus("confirmed");
-      onSuccessfulCheckout();
-      navigate("/succeeded-payment");
+    try {
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: { card },
+        return_url: successUrl,
+      });
+      if (result.error) {
+        setError(result.error.message ?? "Payment failed. Please check your card details.");
+      } else if (result.paymentIntent?.status === "succeeded") {
+        if (!paymentId) throw new Error("Missing payment reference.");
+        await paymentsService.confirm(paymentId);
+        await refreshBookings();
+        setPaymentStatus("confirmed");
+        toast.success("Payment completed successfully.");
+        onSuccessfulCheckout();
+        const returnLocation = new URL(successUrl, window.location.origin);
+        navigate(`${returnLocation.pathname}${returnLocation.search}`);
+      }
+    } catch (cause) {
+      setError(getErrorMessage(cause, "The payment was received, but the booking could not be confirmed. Please try again."));
+    } finally {
+      setLoading(false);
     }
   };
 
+  const buttonDisabled = !stripe || !clientSecret || !paymentId || !successUrl || isPreparing || isLoading;
+
   return (
-    <form onSubmit={handleSubmit}>
-      <CardElement />
-      <button
-        className="w-full bg-pink-600 text-white py-2 rounded-md hover:opacity-90 disabled:opacity-50 mt-3.5"
-        disabled={isLoading}
-      >
-        Pay
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="mb-2 flex items-center justify-between gap-3 text-sm font-semibold text-slate-800">
+          <span className="flex items-center gap-2"><CreditCard className="size-4 text-emerald-700" /> Card information</span>
+          <span className="flex items-center gap-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-slate-400"><LockKeyhole className="size-3" /> Encrypted</span>
+        </label>
+        <div className={`rounded-2xl border bg-slate-50 px-4 py-4 transition ${error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200 focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-50"}`}>
+          <CardElement options={cardOptions} />
+        </div>
+      </div>
+
+      {isPreparing && <p className="flex items-center gap-2 text-xs font-medium text-slate-500"><LoaderCircle className="size-3.5 animate-spin" /> Preparing your secure payment…</p>}
+      {error && <p role="alert" className="rounded-xl bg-rose-50 px-3.5 py-3 text-sm font-medium leading-5 text-rose-700 ring-1 ring-rose-100">{error}</p>}
+      {paymentStatus === "confirmed" && <p className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3.5 py-3 text-sm font-semibold text-emerald-800"><CheckCircle2 className="size-4" /> Payment confirmed</p>}
+
+      <button type="submit" disabled={buttonDisabled} className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-600 to-rose-500 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-rose-500/20 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0">
+        {isLoading ? <><LoaderCircle className="size-4 animate-spin" /> Processing payment…</> : <><LockKeyhole className="size-4" /> Confirm and pay</>}
       </button>
-      <p
-        className={`mt-1.5
-          ${paymentStatus === "confirmed" ? "text-green-500" : "text-gray-700"}
-        `}
-      >
-        {paymentStatus === "pending"
-          ? "Payment pending"
-          : paymentStatus === "confirmed"
-          ? "Payment confirmed"
-          : ""}
-      </p>
-      {error && <div>{error}</div>}
-      <ToastContainer />
+      <p className="text-center text-[0.7rem] leading-5 text-slate-400">By confirming, you agree to Flypnp's booking terms and cancellation policy.</p>
+      <ToastContainer position="bottom-center" autoClose={3000} hideProgressBar theme="light" />
     </form>
   );
 };
 
-const MyStripeForm = () => {
-  return (
-    <Elements stripe={stripePromise}>
-      <CheckoutForm
-        onSuccessfulCheckout={() => console.log("Payment successful!")}
-      />
-    </Elements>
-  );
-};
+const MyStripeForm = () => (
+  <Elements stripe={stripePromise}>
+    <CheckoutForm onSuccessfulCheckout={() => undefined} />
+  </Elements>
+);
 
 export default MyStripeForm;

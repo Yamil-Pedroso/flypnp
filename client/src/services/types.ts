@@ -30,6 +30,7 @@ export interface Place {
   rating: number
   reviews: number
   price: number
+  archivedAt?: string
 }
 
 export interface GuestCount {
@@ -73,6 +74,7 @@ export interface Payment {
   _id: string
   user: string
   place: Place
+  booking?: string
   amount: number
   currency: string
   status: 'pending' | 'confirmed' | 'cancelled' | 'failed'

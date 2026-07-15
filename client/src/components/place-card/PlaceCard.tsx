@@ -4,6 +4,7 @@ import { Heart, Star } from "lucide-react";
 import CreateWishListBox from "../wishlist/create/CreateWishListBox";
 import WebpImage from "./WebpImage";
 import type { Place } from "../../services";
+import { getTravelParams, useTravelSearch } from "../search/SearchContext";
 
 interface PlaceCardProps {
   place: Place;
@@ -11,9 +12,12 @@ interface PlaceCardProps {
 
 const PlaceCard = ({ place }: PlaceCardProps) => {
   const [showCreateWishList, setShowCreateWishList] = useState(false);
+  const { destination, checkIn, checkOut, guests } = useTravelSearch();
 
   const { title, address, photos, rating, price, category, _id } = place;
   const mainPhotoUrl = photos?.[0]?.main ?? "";
+  const travelParams = getTravelParams({ destination, checkIn, checkOut, guests });
+  const placeUrl = `/place/${category}/${_id}?${travelParams.toString()}`;
 
   const handleClickCreateWishList = () => {
     setShowCreateWishList(!showCreateWishList);
@@ -37,7 +41,7 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
       <div>
         {mainPhotoUrl && (
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-slate-200">
-            <Link to={`/place/${category}/${_id}`} className="block size-full" aria-label={`View ${title}`}>
+            <Link to={placeUrl} className="block size-full" aria-label={`View ${title}`}>
               <WebpImage
                 src={mainPhotoUrl}
                 alt={title}

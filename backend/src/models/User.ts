@@ -9,6 +9,7 @@ interface IUser {
     password: string;
     avatar: string;
     isAdmin: boolean;
+    stripeCustomerId?: string;
     isValidatedPassword(enteredPassword: string): Promise<boolean>;
     getSignedJwtToken(): string;
  }
@@ -19,6 +20,7 @@ const userSchema = new Schema<IUser>({
     password: { type: String, required: true, minlength: 6 },
     avatar: { type: String, default: "https://res.cloudinary.com/ddgf7ijdc/image/upload/v1706787809/yami_lil00v.jpg" },
     isAdmin: { type: Boolean, default: false },
+    stripeCustomerId: { type: String, index: true, sparse: true },
 }, {
     timestamps: true,
 });

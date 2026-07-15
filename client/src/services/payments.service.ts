@@ -5,8 +5,16 @@ export const paymentsService = {
   async list() {
     return (await http.get<ApiResponse<Payment[]> & { count: number }>('/payments')).data.data
   },
-  async create(input: { placeId: string; currency?: string }) {
-    return (await http.post<ApiResponse<Payment> & { clientSecret: string }>('/create-payment', input)).data
+  async create(input: { bookingId: string; currency?: string }) {
+    return (await http.post<ApiResponse<Payment> & {
+      clientSecret: string
+      successUrl: string
+      cancelUrl: string
+      alreadyPaid: boolean
+    }>('/create-payment', input)).data
+  },
+  async confirm(id: string) {
+    return (await http.post<ApiResponse<Payment>>(`/payment/${id}/confirm`)).data.data
   },
   async get(id: string) {
     return (await http.get<ApiResponse<Payment>>(`/payment/${id}`)).data.data

@@ -15,7 +15,7 @@ const cookieToken = (user: HydratedDocument<IUser>, res: Response) => {
   };
 
   const safeUser = user.toObject();
-  const { password: _password, ...userWithoutPassword } = safeUser;
+  const { password: _password, stripeCustomerId: _stripeCustomerId, ...userWithoutPassword } = safeUser;
 
   res.status(200).cookie("token", token, options).json({
     success: true,

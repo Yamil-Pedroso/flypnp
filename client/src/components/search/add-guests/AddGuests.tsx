@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ComponentType } from "react";
 import { FaBaby, FaMinus, FaPlus, FaUser } from "react-icons/fa";
 import { MdChildCare, MdPets } from "react-icons/md";
 import { Users } from "lucide-react";
+import { useTravelSearch } from "../SearchContext";
 
 type GuestType = "adults" | "children" | "infants" | "pets";
 
@@ -22,12 +23,7 @@ const guestOptions: GuestOption[] = [
 
 const AddGuests = () => {
   const [open, setOpen] = useState(false);
-  const [guests, setGuests] = useState<Record<GuestType, number>>({
-    adults: 0,
-    children: 0,
-    infants: 0,
-    pets: 0,
-  });
+  const { guests, setGuests } = useTravelSearch();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

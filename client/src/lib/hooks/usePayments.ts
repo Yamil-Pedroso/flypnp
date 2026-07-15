@@ -8,7 +8,7 @@ export interface PaymentsContextValue {
   loading: boolean
   error: string | null
   refresh: () => Promise<void>
-  createPayment: (input: { placeId: string; currency?: string }) => Promise<{ success: boolean; clientSecret?: string; message?: string }>
+  createPayment: (input: { bookingId: string; currency?: string }) => Promise<{ success: boolean; clientSecret?: string; message?: string }>
   getSinglePayment: (id: string) => Promise<Payment>
   paymentDetailsWithPlace: (id: string) => Promise<Place>
   cancelPayment: (id: string) => Promise<void>

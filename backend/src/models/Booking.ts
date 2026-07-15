@@ -15,6 +15,7 @@ interface IBooking {
     extraInfo: string;
     name: string;
     price: number;
+    archivedAt?: Date;
 }
 
 const bookingSchema = new Schema<IBooking>({
@@ -36,6 +37,7 @@ const bookingSchema = new Schema<IBooking>({
     extraInfo: { type: String },
     name: { type: String, required: true },
     price: { type: Number, required: true },
+    archivedAt: { type: Date },
 }, {
     timestamps: true,
 });
