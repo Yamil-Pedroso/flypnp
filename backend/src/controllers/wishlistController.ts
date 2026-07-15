@@ -1,73 +1,35 @@
-import { Request, Response, NextFunction } from 'express';
-import { WishList } from '../models/WishList';
+import type { Request, Response } from "express";
+import { Place } from "../models/Place";
+import { WishList } from "../models/WishList";
+import CustomError from "../utils/customError";
 
-interface AuthenticatedRequest extends Request {
-    user?: any;
-}
+export const addPlaceToWishlist = async (req: Request, res: Response) => {
+  const place = await Place.findById(req.body.placeId);
+  if (!place) throw new CustomError("Place not found", 404);
 
-// Add a new place to the wishlist
-export const addPlaceToWishlist = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-        const userData = req.user;
-        const { placeId, title, picture } = req.body;
+  const wishlist = await WishList.findOneAndUpdate(
+    { owner: req.user!._id, place: place._id },
+    {
+      owner: req.user!._id,
+      place: place._id,
+      title: place.title,
+      picture: place.photos[0]?.main ?? "",
+    },
+    { new: true, upsert: true, runValidators: true }
+  );
+  res.status(201).json({ success: true, data: wishlist });
+};
 
-        if (!req.user) {
-            return res.status(401).json({ message: "User not authenticated" });
-        }
+export const getUserWishlist = async (req: Request, res: Response) => {
+  const wishlist = await WishList.find({ owner: req.user!._id });
+  res.status(200).json({ success: true, data: wishlist });
+};
 
-        const wishlist = await WishList.create({
-            owner: userData.id,
-            place: placeId,
-            picture,
-            title,
-        });
-
-        res.status(201).json({ success: true, data: wishlist });
-    } catch (error: any) {
-        console.error(error);
-        res.status(500).json({
-            message: 'Internal server error',
-            error: error.message,
-        });
-    }
-}
-
-// Return to the user all the places that he has added to his wishlist
-export const getUserWishlist = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-        const userData = req.user;
-        const { id } = userData;
-        const wishlist = await WishList.find({ owner: id });
-
-        res.status(200).json({ success: true, data: wishlist });
-    } catch (error: any) {
-        res.status(500).json({
-            message: 'Internal server error',
-            error: error.message,
-          })
-    }
-}
-
-// Remove a place from the wishlist
-export const removePlaceFromWishlist = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-        const { placeId } = req.params;
-        const userId = req.user.id;
-
-        const deletedWishList = await WishList.findOneAndDelete({
-            owner: userId,
-            place: placeId,
-        });
-
-        if (deletedWishList) {
-            res.status(200).json({ success: true, message: "Place removed from wishlist successfully", data: deletedWishList });
-        } else {
-            res.status(404).json({ success: false, message: "Wishlist item not found" });
-        }
-    } catch (error: any) {
-        res.status(500).json({
-            message: 'Internal server error',
-            error: error.message,
-        });
-    }
+export const removePlaceFromWishlist = async (req: Request, res: Response) => {
+  const deleted = await WishList.findOneAndDelete({
+    owner: req.user!._id,
+    place: req.params.placeId,
+  });
+  if (!deleted) throw new CustomError("Wishlist item not found", 404);
+  res.status(200).json({ success: true, data: deleted });
 };

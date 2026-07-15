@@ -1,12 +1,10 @@
 import Stripe from 'stripe';
+import { requireEnv } from './env';
 
-const apiKey = process.env.STRIPE_SECRET_KEY as string;
-const customerId = process.env.STRIPE_CUSTOMER_ID as string;
-
-
-const stripe = new Stripe(apiKey, {
-  apiVersion: '2023-10-16',
-});
+const apiKey = requireEnv('STRIPE_SECRET_KEY');
 
 
-export { stripe , customerId };
+const stripe = new Stripe(apiKey);
+
+
+export { stripe };

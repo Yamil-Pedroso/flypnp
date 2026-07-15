@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useWishlist } from "../../../hooks";
+import { useWishlist } from "../../lib/hooks";
 import { AiFillDelete } from "react-icons/ai";
 import { IoCloseSharp } from "react-icons/io5";
 import images from "../../assets/images/index";
@@ -59,7 +59,7 @@ const WishList = () => {
             <div className="flex flex-wrap items-center gap-4 w-[80rem]">
               {wishlist.map((wish) => (
                 <div
-                  key={wish.id}
+                  key={wish._id}
                   className="flex flex-col relative"
                   onMouseEnter={() => overPicture(wish.place)}
                   onMouseLeave={() => leavePicture(wish.place)}

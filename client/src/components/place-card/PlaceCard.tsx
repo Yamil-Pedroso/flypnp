@@ -1,30 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { MdStar, MdStarBorder, MdStarHalf } from "react-icons/md";
-import { FaRegHeart } from "react-icons/fa";
+import { Heart, Star } from "lucide-react";
 import CreateWishListBox from "../wishlist/create/CreateWishListBox";
 import WebpImage from "./WebpImage";
-
-interface Photo {
-  main: string;
-  thumbnails: string[];
-}
+import type { Place } from "../../services";
 
 interface PlaceCardProps {
-  place: {
-    _id: string;
-    category: string;
-    placeId?: number;
-    title: string;
-    address: string;
-    photos: Photo[];
-    description?: string;
-    perks?: string[];
-    extraInfo?: string;
-    maxGuests?: number;
-    rating: number;
-    price: number;
-  };
+  place: Place;
 }
 
 const PlaceCard = ({ place }: PlaceCardProps) => {
@@ -38,10 +20,10 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-[320px] mx-auto">
+    <article className="group relative min-w-0">
       {/* Overlay Wishlist */}
       {showCreateWishList && (
-        <div className="fixed inset-0 bg-black/50 z-[999] animate-fadeInFromDown">
+        <div className="fixed inset-0 z-[999] bg-slate-950/55 backdrop-blur-sm">
           <CreateWishListBox
             closeCreateWishList={handleClickCreateWishList}
             className="wishlist-box"
@@ -52,64 +34,38 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
         </div>
       )}
 
-      {/* Card Wrapper */}
-      <div className="rounded-xl cursor-pointer transition-transform duration-300 hover:scale-105 relative shadow-md overflow-hidden flex flex-col h-[450px]">
-        {/* Image */}
+      <div>
         {mainPhotoUrl && (
-          <div className="relative h-[200px] w-full overflow-hidden">
-            <Link to={`/place/${category}/${_id}`}>
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-slate-200">
+            <Link to={`/place/${category}/${_id}`} className="block size-full" aria-label={`View ${title}`}>
               <WebpImage
                 src={mainPhotoUrl}
-                alt="place"
-                className="w-full h-full object-cover"
+                alt={title}
+                className="size-full object-cover transition duration-500 group-hover:scale-[1.04]"
               />
             </Link>
-            <div
-              className="absolute top-2 right-2 text-2xl text-[#ff8c91] hover:text-red-500 animate-heart cursor-pointer"
+            <button
+              type="button"
+              aria-label={`Save ${title} to wishlist`}
+              className="absolute right-3 top-3 flex size-10 items-center justify-center rounded-full bg-white/90 text-slate-800 shadow-sm backdrop-blur transition hover:scale-105 hover:text-rose-500"
               onClick={handleClickCreateWishList}
             >
-              <FaRegHeart />
-            </div>
+              <Heart className="size-5" />
+            </button>
           </div>
         )}
 
-        {/* Content */}
-        <div className="p-4 flex flex-col justify-between flex-grow">
-          <div>
-            <p className="font-semibold text-lg">{title}</p>
-            <p className="text-sm text-gray-600">{address}</p>
-            <p className="flex items-center gap-1 text-[#ff8c91]">
-              {renderRatingStars(rating)}
-              <span className="text-gray-800">{rating}</span>
-            </p>
+        <div className="px-1 pt-3">
+          <div className="flex items-start justify-between gap-3">
+            <h2 className="truncate font-semibold text-slate-950">{title}</h2>
+            <span className="flex shrink-0 items-center gap-1 text-sm text-slate-800"><Star className="size-4 fill-slate-900" />{rating.toFixed(1)}</span>
           </div>
-          <div className="text-sm mt-2">
-            <span className="font-bold">CHF{price} </span>per night
-          </div>
+          <p className="mt-0.5 truncate text-sm text-slate-500">{address}</p>
+          <p className="mt-2 text-sm text-slate-700"><span className="font-semibold text-slate-950">CHF {price}</span> night</p>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
-
-function renderRatingStars(rating: number) {
-  const fullStars = Math.floor(rating);
-  const halfStar = rating % 1 >= 0.5;
-  const stars = [];
-
-  for (let i = 0; i < fullStars; i++) {
-    stars.push(<MdStar key={`star-${i}`} />);
-  }
-
-  if (halfStar) {
-    stars.push(<MdStarHalf key="half" />);
-  }
-
-  while (stars.length < 5) {
-    stars.push(<MdStarBorder key={`border-${stars.length}`} />);
-  }
-
-  return <span className="flex text-[#ff8c91]">{stars}</span>;
-}
 
 export default PlaceCard;

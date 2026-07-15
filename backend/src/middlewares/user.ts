@@ -1,16 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { User, IUser } from "../models/User";
-
-// Extend the Request interface to add the user property
-interface AuthenticatedRequest extends Request {
-    user?: IUser | null;
-
-}
+import { User } from "../models/User";
+import { requireEnv } from "../config/env";
 
 // Check if user is logged in based on the token and set the req.user to the user
-export const isLoggedIn = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const token = req.cookies.token || req.header("Authorization")?.replace("Bearer ", "");
+export const isLoggedIn = async (req: Request, res: Response, next: NextFunction) => {
+    const token = req.header("Authorization")?.replace("Bearer ", "") || req.cookies.token;
 
     if (!token) {
         return res.status(401).json({
@@ -21,15 +16,22 @@ export const isLoggedIn = async (req: AuthenticatedRequest, res: Response, next:
 
     try {
         // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-        console.log("Decoded token:", decoded.id);
+        const decoded = jwt.verify(token, requireEnv("JWT_SECRET"));
+        if (typeof decoded === "string" || typeof decoded.id !== "string") {
+            throw new Error("Invalid token payload");
+        }
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "The user associated with this token no longer exists",
+            });
+        }
 
-        // Set the req.user to the user
-        req.user = await User.findById(decoded.id);
+        req.user = user;
 
         next();
     } catch (error) {
-        console.log("JWT verification error:", error);
         return res.status(401).json({
             success: false,
             message: "Login first to access this route",

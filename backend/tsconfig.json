@@ -2,11 +2,14 @@
   "compilerOptions": {
     "types": ["node"],
     "target": "es2020",
-    "module": "CommonJS",
+    "module": "Node16",
     "rootDir": "./src",
+    "outDir": "./dist",
+    "sourceMap": true,
     "strict": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "Node16",
+    "esModuleInterop": true
   },
   "include": [
     "src/**/*.ts"

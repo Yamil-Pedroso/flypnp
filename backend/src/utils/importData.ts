@@ -1,17 +1,11 @@
+import "../config/env";
 import mongoose from "mongoose";
 import connectDB from "../config/db";
-import colors from "colors";
-import dotenv from "dotenv";
-import path from "path";
 import { Place } from "../models/Place";
 
 import { trending } from "../data/trending";
 import { beachFront } from "../data/beachFront";
 import { iconicCities } from "../data/iconicCities";
-
-colors.enable();
-
-dotenv.config({ path: path.resolve(__dirname, "..", "config", "config.env") });
 
 const importData = async () => {
   try {
@@ -23,10 +17,11 @@ const importData = async () => {
 
     await Place.insertMany(datasets);
 
-    console.log("Data Imported...".green.inverse);
+    console.log("Data imported");
     process.exit();
-  } catch (error: any) {
-    console.error(`Error: ${error.message}`.red.inverse);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error(`Error: ${message}`);
     process.exit(1);
   }
 };

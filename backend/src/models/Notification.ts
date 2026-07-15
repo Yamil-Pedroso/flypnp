@@ -3,13 +3,13 @@ import { Schema, model, Types } from "mongoose";
 interface INotification {
     user: Types.ObjectId;
     message: string;
-    //read: boolean;
+    read: boolean;
 }
 
 const notificationSchema = new Schema<INotification>({
     user: { type: Schema.Types.ObjectId, required: true },
     message: { type: String, required: true },
-    //read: { type: Boolean, required: true, default: false },
+    read: { type: Boolean, default: false },
 }, {
     timestamps: true,
 });

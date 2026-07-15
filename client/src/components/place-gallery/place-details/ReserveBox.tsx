@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { usePlaces, useBooking, useAuth } from "../../../../hooks";
+import { usePlaces, useBooking, useAuth } from "../../../lib/hooks";
 import {
   FaChevronDown,
   FaChevronUp,
@@ -12,22 +12,19 @@ import MyCalendar from "../../common/calendar/Calendar";
 
 const ReserveBox = () => {
   const [clickArrow, setClickArrow] = useState(false);
+  const navigate = useNavigate();
   const [clickCheckIn, setClickCheckIn] = useState(false);
   const { places, loading } = usePlaces();
   const { id, category } = useParams();
-  const [checkInDate, setCheckInDate] = useState("2024-02-23");
-  const [checkOutDate, setCheckOutDate] = useState("2024-03-19");
-  const { user } = useAuth();
+  const [checkInDate] = useState("2026-08-23");
+  const [checkOutDate] = useState("2026-08-26");
+  const { user } = useAuth() as { user: { _id: string; id?: string; name: string } | null };
   const { addBooking } = useBooking();
   const [adult, setAdult] = useState(0);
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
   const [pets, setPets] = useState(0);
-  const [guests, setGuests] = useState(0);
-
-  useEffect(() => {
-    setGuests(adult + children);
-  }, [adult, children]);
+  const guests = adult + children;
 
   const place = places.find(
     (place) => place._id === id && place.category === category
@@ -35,7 +32,6 @@ const ReserveBox = () => {
   if (loading) return <div>Loading...</div>;
   if (!place) return <div>Image not found</div>;
 
-  const navigate = useNavigate();
   const mainPhoto = place.photos[0]?.main || "";
 
   const handleClickAdults = (count: number) => {
@@ -70,16 +66,16 @@ const ReserveBox = () => {
   };
 
   const handleReserveClick = async () => {
+    if (!user) {
+      navigate("/profile");
+      return;
+    }
     const booking = {
-      owner: user.id,
       place: place._id,
-      checkIn: new Date(checkInDate),
-      checkOut: new Date(checkOutDate),
+      checkIn: checkInDate,
+      checkOut: checkOutDate,
       numOfGuests: { adults: adult, children, infants, pets },
-      status: "pending",
       extraInfo: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      name: user.name,
-      price: place.price,
     };
 
     try {
@@ -99,7 +95,7 @@ const ReserveBox = () => {
   };
 
   return (
-    <div className="w-[23rem] h-[28rem] p-4 border border-gray-300 shadow-xl rounded-lg relative bg-white">
+    <div className="relative min-h-[28rem] w-full max-w-[23rem] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
       <div className="flex justify-between text-lg font-semibold mb-4">
         <span>{place.price} CHF</span>
         <span>/ night</span>
@@ -150,7 +146,7 @@ const ReserveBox = () => {
       </button>
 
       {clickArrow && (
-        <div className="absolute bg-white p-4 shadow-lg border rounded-lg top-[15rem] right-0 w-[27rem] z-50">
+        <div className="absolute right-0 top-[15rem] z-50 w-[min(27rem,calc(100vw-2rem))] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
           {[
             {
               label: "Adults",
@@ -204,7 +200,7 @@ const ReserveBox = () => {
       )}
 
       {clickCheckIn && (
-        <MyCalendar className="absolute top-[10rem] right-[-2rem] w-[55rem] h-[36rem] rounded-xl shadow-md overflow-hidden" />
+        <MyCalendar className="fixed inset-x-4 top-24 z-50 max-h-[calc(100vh-7rem)] overflow-auto rounded-2xl bg-white shadow-2xl lg:absolute lg:inset-x-auto lg:right-[-2rem] lg:top-[10rem] lg:h-[36rem] lg:w-[55rem]" />
       )}
     </div>
   );

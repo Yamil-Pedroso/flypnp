@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react'
-import { CreateWishListContainer } from './styles'
+import { useState, type ChangeEvent } from 'react'
 import { IoCloseSharp } from 'react-icons/io5'
 import { FaCircleExclamation } from 'react-icons/fa6'
-import { useWishlist } from '../../../../hooks'
+import { useWishlist } from '../../../lib/hooks'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -29,24 +27,18 @@ const CreateWishListBox = ({
   const handleCreateWishList = () => {
     if (wishListName.trim() && !errorCharLimit) {
       addWishlist(placeId, wishListName, picture)
-      console.log(wishListName)
       closeCreateWishList()
       notify()
       setWishListName('')
     }
   }
 
-  const handleWishListNameChange = (e: any) => {
+  const handleWishListNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value
     setWishListName(name)
 
     setErrorCharLimit(name.length > 50)
 
-    if (e.target.value.length > 0) {
-      console.log('name is valid')
-    } else {
-      console.log('name is invalid')
-    }
   }
 
   const handleClearInputName = () => {
@@ -55,33 +47,26 @@ const CreateWishListBox = ({
   }
 
   return (
-    <CreateWishListContainer className={className}>
-      <div className="header-wrapper">
-        <IoCloseSharp
-          onClick={closeCreateWishList}
-          size={24}
-          className="close-icon"
-        />
-        <h1>Create wishlist</h1>
+    <div className={`mx-auto mt-[15vh] flex w-[calc(100%-2rem)] max-w-xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl ${className ?? ''}`}>
+      <div className="flex items-center border-b border-slate-200 px-5 py-4">
+        <button type="button" onClick={closeCreateWishList} aria-label="Close wishlist dialog" className="flex size-9 items-center justify-center rounded-full transition hover:bg-slate-100"><IoCloseSharp size={24} /></button>
+        <h1 className="ml-3 text-xl font-semibold text-slate-950">Create wishlist</h1>
       </div>
 
-      <div className="input-wrapper">
+      <div className="px-5 py-6">
         <input
           type="text"
           placeholder="Name your place"
           value={wishListName}
           onChange={handleWishListNameChange}
-          className={errorCharLimit ? 'error' : ''}
-          style={{ borderColor: errorCharLimit ? 'red' : 'inherit' }}
+          aria-invalid={errorCharLimit}
+          className={`w-full rounded-xl border px-4 py-3 text-base text-slate-700 outline-none transition placeholder:text-slate-400 focus:ring-2 ${errorCharLimit ? 'border-rose-500 focus:ring-rose-200' : 'border-slate-300 focus:border-slate-700 focus:ring-slate-200'}`}
         />
-        <div
-          className="limit-chars"
-          style={{ color: errorCharLimit ? 'red' : 'inherit' }}
-        >
+        <div className={`mt-2 flex items-center text-sm ${errorCharLimit ? 'text-rose-600' : 'text-slate-500'}`}>
           <span>{wishListName.length}</span>/50
-          <p>characters</p>
+          <p className="ml-1">characters</p>
           {errorCharLimit && (
-            <div className="error-text-wrapper" style={{ color: 'red' }}>
+            <div className="ml-4 flex items-center gap-1.5">
               <FaCircleExclamation />
               <p>Over character limit.</p>
             </div>
@@ -89,8 +74,8 @@ const CreateWishListBox = ({
         </div>
       </div>
 
-      <div className="btn-wrapper">
-        <button onClick={handleClearInputName} className="clear-btn">
+      <div className="flex justify-between border-t border-slate-200 px-5 py-4">
+        <button type="button" onClick={handleClearInputName} className="rounded-xl border border-slate-300 px-5 py-2.5 font-medium text-slate-700 transition hover:bg-slate-50">
           Clear
         </button>
         <button
@@ -99,17 +84,13 @@ const CreateWishListBox = ({
               ? handleCreateWishList
               : undefined
           }
-          className={
-            wishListName.length > 0 && !errorCharLimit
-              ? 'create-btn'
-              : 'disabled'
-          }
+          className="rounded-xl bg-rose-500 px-5 py-2.5 font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-slate-300"
           disabled={!(wishListName.length > 0 && !errorCharLimit)}
         >
           Create
         </button>
       </div>
-    </CreateWishListContainer>
+    </div>
   )
 }
 

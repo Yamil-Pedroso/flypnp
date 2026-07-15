@@ -1,9 +1,9 @@
 interface SetInLocalStorage {
-    (key: string, value: string): void;
+    (key: string, value: unknown): void;
 }
 
 export const setItemsInLocalStorage: SetInLocalStorage = (key, value) => {
-    if(!key || !value) {
+    if(!key || value === undefined || value === null) {
         throw new Error("Cannot set localStorage key/value without valid key/value");
     }
 

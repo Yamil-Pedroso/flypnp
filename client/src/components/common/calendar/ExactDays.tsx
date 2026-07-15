@@ -16,34 +16,26 @@ const ExactDays = () => {
   }
 
   return (
-    <div className="exact-days-container">
-      <div
+    <div className="mt-5 flex max-w-full flex-wrap items-center justify-center gap-2">
+      <button type="button"
         onClick={handleSelection(0)}
-        className={`exact-days-text ${selected === 0 ? 'black-border' : ''}`}
+        className={`rounded-full border px-4 py-2 text-sm transition ${selected === 0 ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 text-slate-600 hover:border-slate-400'}`}
       >
-        <p>Exact days</p>
-      </div>
-      <div className="exact-days-options-wrapper">
+        Exact days
+      </button>
+      <div className="flex flex-wrap justify-center gap-2">
         {daysOptions.map((option, index) => (
-          <div
+          <button type="button"
             key={index}
-            className={`exact-days-option ${
-              selected === index + 1 ? 'black-border' : ''
-            }`}
+            className={`rounded-full border px-4 py-2 text-sm transition ${selected === index + 1 ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 text-slate-600 hover:border-slate-400'}`}
             onClick={handleSelection(index + 1)}
           >
-            <div className="content">
-              <div className="icon">
-                <FaPlusMinus size={14} />
-              </div>
-              <div className="number">
-                <p>{index + 1}</p>
-              </div>
-              <div className="text">
-                <p>{option.text}</p>
-              </div>
+            <div className="flex items-center gap-1">
+              <FaPlusMinus size={12} />
+              <span>{index + 1}</span>
+              <span>{option.text}</span>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>

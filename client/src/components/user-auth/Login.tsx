@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { IoCloseSharp } from "react-icons/io5";
-import { useAuth } from "../../../hooks";
+import { useAuth } from "../../lib/hooks";
 
 interface LoginProps {
   closeUserForm: () => void;
@@ -14,16 +14,15 @@ const Login = ({ closeUserForm, changeToRegister }: LoginProps) => {
     email: false,
     password: false,
   });
-  const [redirect, setRedirect] = useState(false);
-  const auth = useAuth() as any;
+  const auth = useAuth();
 
-  const handleFormData = (e: any) => {
+  const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setFormErrors({ ...formErrors, [name]: false });
   };
 
-  const handleFormSubmit = async (e: any) => {
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
       setFormErrors({ email: !formData.email, password: !formData.password });
@@ -33,7 +32,6 @@ const Login = ({ closeUserForm, changeToRegister }: LoginProps) => {
     const response = await auth.login(formData);
     if (response.success) {
       console.log("User logged in");
-      setRedirect(true);
       closeUserForm();
     } else {
       console.log("Login failed: Invalid credentials");
@@ -41,7 +39,8 @@ const Login = ({ closeUserForm, changeToRegister }: LoginProps) => {
     }
   };
 
-  const handleGoogleLogin = async (credential: any) => {
+  const handleGoogleLogin = async (credential?: string) => {
+    if (!credential) return;
     const response = await auth.googleLogin(credential);
     if (response.success) {
       console.log("User logged in with Google");

@@ -1,13 +1,12 @@
 import CalendarHeaderOpt from './CalendarHeaderOpt'
 import ExactDays from './ExactDays'
-import { Container } from './styles'
 
 const CalendarComp = () => {
   return (
-    <Container>
+    <div className="relative flex flex-col items-center justify-center box-border">
       <CalendarHeaderOpt />
       <ExactDays />
-    </Container>
+    </div>
   )
 }
 

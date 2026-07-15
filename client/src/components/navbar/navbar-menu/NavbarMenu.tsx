@@ -1,44 +1,20 @@
-import { useState, useEffect } from "react";
-import Search from "../../search/Search";
+import { useState } from "react";
 
-interface NavbarMenuProps {
-  active: string;
-}
-
-interface NavMenuClickProps {
-  menuClick: boolean;
-}
-
-const NavbarMenu = ({ menuClick }: NavMenuClickProps) => {
-  const [active, setActive] = useState<NavbarMenuProps>({ active: "Stays" });
-  const [myMenuClick, setMyMenuClick] = useState<boolean>(false);
+const NavbarMenu = () => {
+  const [active, setActive] = useState("Stays");
 
   const handleClick = (name: string) => {
-    setActive({ active: name });
-    setMyMenuClick(name === "Experiences");
+    setActive(name);
   };
 
-  useEffect(() => {
-    setMyMenuClick(menuClick);
-  }, [menuClick]);
-
   return (
-    <div className="flex flex-col items-center">
-      <ul className="flex items-center space-x-6 text-lg font-medium text-gray-600">
-        {["Stays", "Experiences", "Online Experiences"].map((menu, index) => (
-          <li
-            key={index}
-            className={`${
-              active.active === menu ? "text-black" : ""
-            } cursor-pointer`}
-            onClick={() => handleClick(menu)}
-          >
+      <nav aria-label="Primary navigation" className="hidden items-center gap-1 md:flex">
+        {["Stays", "Experiences", "Services"].map((menu) => (
+          <button key={menu} type="button" onClick={() => handleClick(menu)} className={`rounded-full px-4 py-2 text-sm font-medium transition ${active === menu ? "bg-slate-100 text-slate-950" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"}`}>
             {menu}
-          </li>
+          </button>
         ))}
-      </ul>
-      <Search menuClick={myMenuClick} />
-    </div>
+      </nav>
   );
 };
 

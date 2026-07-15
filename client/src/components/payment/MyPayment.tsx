@@ -8,15 +8,9 @@ import {
 import { GrAmex } from "react-icons/gr";
 import TestStripePayment from "./TestStripePayment";
 
-interface MyPaymentProps {
-  myPrice: string;
-}
-
-const MyPayment = ({ myPrice }: MyPaymentProps) => {
+const MyPayment = () => {
   const location = useLocation();
   const useQuery = new URLSearchParams(location.search);
-  const user = useQuery.get("user");
-  const booking = useQuery.get("booking");
   const checkIn = useQuery.get("checkIn");
   const checkOut = useQuery.get("checkOut");
   const guests = useQuery.get("guests");

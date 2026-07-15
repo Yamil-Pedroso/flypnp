@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -11,7 +10,7 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 //import { usePayment } from '../../../hooks'
-import axiosInstance from "../../../src/utils/axios";
+import { paymentsService } from "../../services";
 
 interface CheckoutFormProps {
   onSuccessfulCheckout: () => void;
@@ -24,10 +23,10 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
   //const { clientSecret, createPayment } = usePayment() as any
   const stripe = useStripe();
   const elements = useElements();
-  const [error, setError] = useState("") as any;
+  const [error, setError] = useState("");
   const [isLoading, setLoading] = useState(false);
-  const [clientSecret, setClientSecret] = useState("") as any;
-  const [paymentStatus, setPaymentStatus] = useState("pending") as any;
+  const [clientSecret, setClientSecret] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState<"pending" | "confirmed">("pending");
   const location = useLocation();
   const navigate = useNavigate();
   const notify = () => toast("You have made the payment successfully!");
@@ -40,32 +39,17 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
   //  getClientSecret()
   //}, [])
 
-  interface Name {
-    name: string;
-  }
-
   const useQuery = new URLSearchParams(location.search);
-  const user = useQuery.get("user") as unknown as Name;
-  //const booking = useQuery.get('booking')
-  const price = useQuery.get("price");
   const place = useQuery.get("place");
 
   useEffect(() => {
     const createPaymentClientSecret = async () => {
       try {
-        const response = await axiosInstance.post("/create-payment", {
-          user: user,
-          name: user.name,
+        if (!place) return { success: false, message: "Missing place" };
+        const data = await paymentsService.create({
           placeId: place,
-          amount: price,
           currency: "chf",
-          status: "confirmed",
-          stripeId: "pi_3OqDGhBO47rgKbjy0Gwl6Gui",
-          paymentMethod: "pm_1OqDGgBO47rgKbjyySEck3dX",
-          paymentDate: "2023-03-15T00:00:00.000Z",
         });
-
-        const data = response.data;
 
         if (data.success && data.clientSecret) {
           setClientSecret(data.clientSecret);
@@ -77,14 +61,14 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
             message: "Failed to retrieve client secret",
           };
         }
-      } catch (error) {
+      } catch {
         console.error("Failed to retrieve client secret");
         return { success: false, message: "Failed to retrieve client secret" };
       }
     };
 
     createPaymentClientSecret();
-  }, [user.name, place, price, user]);
+  }, [place]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -93,17 +77,19 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
     }
     setLoading(true);
 
+    const card = elements.getElement(CardElement);
+    if (!card) return;
     const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
-        card: elements.getElement(CardElement),
+        card,
       },
-    } as any);
+    });
 
     setLoading(false);
 
     if (result.error) {
-      setError(result.error.message);
-    } else if (result.paymentIntent.status === "succeeded") {
+      setError(result.error.message ?? "Payment failed");
+    } else if (result.paymentIntent?.status === "succeeded") {
       setError("");
       notify();
       setPaymentStatus("confirmed");

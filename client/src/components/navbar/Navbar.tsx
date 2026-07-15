@@ -1,22 +1,22 @@
 import NavbarMenu from "./navbar-menu/NavbarMenu";
 import UserMenu from "./user-menu/UserMenu";
 import images from "../../assets/images";
+import Search from "../search/Search";
 
-interface NavbarProps {
-  menuClick: boolean;
-}
-
-const Navbar = ({ menuClick }: NavbarProps) => {
+const Navbar = () => {
   return (
-    <header className="bg-white shadow px-8 py-6 flex justify-between items-center">
-      <div className="flex items-center cursor-pointer text-xl font-semibold text-black">
-        <a href="/" className="flex items-center">
-          <img src={images.logo} alt="logo" className="w-20" />
-          <p className="ml-2 text-[#f94a52]">Flypnp</p>
-        </a>
+    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 shadow-sm backdrop-blur">
+      <div className="mx-auto max-w-7xl px-4 pt-3 sm:px-6 md:pt-4 lg:px-8">
+        <div className="grid grid-cols-[1fr_auto] items-center md:grid-cols-[1fr_auto_1fr]">
+          <a href="/" className="flex w-fit items-center gap-2" aria-label="Flypnp home">
+            <img src={images.logo} alt="" className="h-10 w-10 object-contain sm:h-11 sm:w-11" />
+            <span className="text-xl font-bold tracking-tight text-rose-500">Flypnp</span>
+          </a>
+          <NavbarMenu />
+          <div className="justify-self-end"><UserMenu /></div>
+        </div>
+        <Search />
       </div>
-      <NavbarMenu menuClick={menuClick} />
-      <UserMenu />
     </header>
   );
 };

@@ -3,7 +3,7 @@ import Register from '../components/user-auth/Register'
 const RegisterPage = () => {
   return (
     <>
-      <Register />
+      <Register closeUserForm={() => undefined} changeToLogin={() => undefined} />
     </>
   )
 }

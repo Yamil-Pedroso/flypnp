@@ -1,13 +1,10 @@
-import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import axiosInstance from "./utils/axios";
 import { UserProvider } from "./providers/UserProvider";
 import { PlacesProvider } from "./providers/PlacesProvider";
 import { NotificationsProvider } from "./providers/NotificationsProvider";
 import { WishlistProvider } from "./providers/WishlistProvider";
 import { BookingProvider } from "./providers/BookingProvider";
 import { PaymentProvider } from "./providers/PaymentProvider";
-import { getItemsFromLocalStorage } from "./utils";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import "./index.css";
 
@@ -34,20 +31,7 @@ import WishListPage from "./pages/WishListPage";
 //   </div>
 //}
 
-interface AppProps {
-  menuClick: boolean;
-}
-
-function App({ menuClick }: AppProps) {
-  useEffect(() => {
-    const token = getItemsFromLocalStorage("token");
-    if (token) {
-      axiosInstance.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${token}`;
-    }
-  }, []);
-
+function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <UserProvider>
@@ -60,7 +44,7 @@ function App({ menuClick }: AppProps) {
                     <Routes>
                       {/* Rutas con Navbar */}
                       <Route
-                        element={<WithNavbarLayout menuClick={menuClick} />}
+                        element={<WithNavbarLayout />}
                       >
                         <Route path="/" element={<HomePage />} />
                         <Route path="/profile" element={<ProfilePage />} />

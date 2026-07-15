@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, type MouseEvent as ReactMouseEvent } from "react";
+import { Link } from "react-router-dom";
 import { FaHouseUser } from "react-icons/fa6";
 import { RiMenuUnfoldLine } from "react-icons/ri";
 import { TbWorld } from "react-icons/tb";
 import { IoCloseSharp } from "react-icons/io5";
-import { useAuth } from "../../../../hooks";
-import { useNotifications } from "../../../../hooks";
+import { useAuth, useNotifications } from "../../../lib/hooks";
 import Login from "../../user-auth/Login";
 import Register from "../../user-auth/Register";
 
@@ -14,10 +13,9 @@ const UserMenu = () => {
   const [userLoginOpen, setUserLoginOpen] = useState(false);
   const [userRegisterOpen, setUserRegisterOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const auth = useAuth() as any;
-  const { user, logout } = auth;
-  const notis = useNotifications() as any;
-  const { notifications } = notis;
+  const { user, logout } = useAuth();
+  const { notifications } = useNotifications();
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const handleMenuIconClick = () => setMenuOpen(!menuOpen);
   const handleMenuLoginIconClick = () => {
@@ -30,9 +28,8 @@ const UserMenu = () => {
   };
   const handleUserMenuIconClick = () => setUserMenuOpen(!userMenuOpen);
 
-  const clickOutside = (e: MouseEvent) => {
-    const wrapper = document.querySelector(".user-menu-wrapper");
-    if (wrapper && !wrapper.contains(e.target as Node)) {
+  const clickOutside = (e: PointerEvent) => {
+    if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
       setUserMenuOpen(false);
     }
   };
@@ -42,27 +39,25 @@ const UserMenu = () => {
     return () => document.removeEventListener("click", clickOutside);
   }, []);
 
-  const hangleLogout = async (e: any) => {
+  const handleLogout = async (e: ReactMouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const response = await logout();
-    console.log(response.success ? "logout success" : "logout failed");
+    await logout();
+    setUserMenuOpen(false);
   };
 
   return (
-    <div className="flex items-center space-x-4 relative">
-      <TbWorld
-        onClick={handleMenuIconClick}
-        className="text-xl text-gray-600 cursor-pointer"
-      />
+    <div ref={menuRef} className="user-menu-wrapper relative flex items-center gap-2 sm:gap-3">
+      <button type="button" onClick={handleMenuIconClick} aria-label="Language and currency" className="hidden size-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 sm:flex">
+        <TbWorld className="text-xl" />
+      </button>
 
       {/* Translation Menu */}
       {menuOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center animate-fadeInFromDown">
-          <div className="relative w-[60rem] h-[40rem] bg-white rounded-lg p-6">
-            <IoCloseSharp
-              onClick={handleMenuIconClick}
-              className="absolute top-4 right-4 text-2xl cursor-pointer"
-            />
+          <div className="relative mx-4 min-h-72 w-full max-w-4xl rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
+            <button type="button" onClick={handleMenuIconClick} aria-label="Close language settings" className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full hover:bg-slate-100">
+              <IoCloseSharp className="text-2xl" />
+            </button>
             <h2 className="text-xl font-semibold text-gray-800">
               Translation & Region & Currency
             </h2>
@@ -71,18 +66,16 @@ const UserMenu = () => {
       )}
 
       <div className="relative">
-        <div
+        <button
+          type="button"
+          aria-label="Open user menu"
+          aria-expanded={userMenuOpen}
           onClick={handleUserMenuIconClick}
-          className="flex items-center gap-2 w-28 h-12 rounded-full shadow cursor-pointer px-3"
+          className="relative flex h-11 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 shadow-sm transition hover:shadow-md sm:h-12"
         >
           <RiMenuUnfoldLine className="text-xl" />
           {user ? (
             <div className="relative w-10 h-10 rounded-full overflow-hidden">
-              {notifications.length > 0 && (
-                <span className="absolute -top-1 right-1 w-5 h-5 bg-green-600 text-white text-xs rounded-full flex items-center justify-center">
-                  {notifications.length}
-                </span>
-              )}
               <img
                 src={user.avatar}
                 alt="user-avatar"
@@ -92,7 +85,10 @@ const UserMenu = () => {
           ) : (
             <FaHouseUser className="text-xl text-gray-600" />
           )}
-        </div>
+          {user && notifications.length > 0 && (
+            <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-emerald-600 text-xs text-white">{notifications.length}</span>
+          )}
+        </button>
 
         {userMenuOpen && (
           <div className="absolute right-0 top-14 w-72 bg-white rounded-lg shadow-md z-50">
@@ -100,36 +96,36 @@ const UserMenu = () => {
               {user ? (
                 <>
                   <li>
-                    <a
-                      href="/notifications"
+                    <Link
+                      to="/notifications"
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
                       Notis
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/profile"
+                    <Link
+                      to="/profile"
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
                       Profile
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/trips"
+                    <Link
+                      to="/trips"
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
                       Trips
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/wishlist"
+                    <Link
+                      to="/wishlist"
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
                       Wishlists
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <hr className="my-2 border-t border-gray-200" />
@@ -172,7 +168,7 @@ const UserMenu = () => {
                   <li>
                     <a
                       href="#"
-                      onClick={hangleLogout}
+                      onClick={handleLogout}
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
                       Logout

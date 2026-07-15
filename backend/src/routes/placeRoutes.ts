@@ -1,6 +1,6 @@
-import express from 'express';
 import { Router } from 'express';
 import { isLoggedIn } from '../middlewares/user';
+import asyncHandler from '../utils/asyncHandler';
 
 const router = Router();
 
@@ -14,14 +14,14 @@ import {
     deletePlace,
 } from '../controllers/placeController';
 
-router.post('/add-places', isLoggedIn, addPlace);
-router.get('/user-places', isLoggedIn, getUserPlaces);
-router.put('/update-place/:id', isLoggedIn, updatePlace);
-router.delete('/delete-place/:id', isLoggedIn, deletePlace);
+router.post('/add-places', isLoggedIn, asyncHandler(addPlace));
+router.get('/user-places', isLoggedIn, asyncHandler(getUserPlaces));
+router.put('/update-place/:id', isLoggedIn, asyncHandler(updatePlace));
+router.delete('/delete-place/:id', isLoggedIn, asyncHandler(deletePlace));
 
 // Public routes, not protected by the isLoggedIn middleware
-router.get('/all-places', getAllPlaces);
-router.get('/single-place/:id', getSinglePlace);
-router.get('/search/:key', searchPlaces);
+router.get('/all-places', asyncHandler(getAllPlaces));
+router.get('/single-place/:id', asyncHandler(getSinglePlace));
+router.get('/search/:key', asyncHandler(searchPlaces));
 
 export default router;

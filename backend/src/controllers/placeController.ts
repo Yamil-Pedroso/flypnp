@@ -1,213 +1,105 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response } from "express";
+import { isValidObjectId } from "mongoose";
 import { Place } from "../models/Place";
+import CustomError from "../utils/customError";
 
-const place = Place.findById("placeId");
-console.log(place);
+const categories = new Set(["trending", "beachFront", "iconicCities"]);
 
-interface AuthenticatedRequest extends Request {
-  user?: any;
-}
+const parsePlaceInput = (body: Record<string, unknown>, partial = false) => {
+  const value = {
+    title: body.title === undefined ? undefined : String(body.title).trim(),
+    address: body.address === undefined ? undefined : String(body.address).trim(),
+    photos: body.photos ?? body.addedPhotos,
+    category: body.category === undefined ? undefined : String(body.category),
+    description: body.description === undefined ? undefined : String(body.description).trim(),
+    perks: body.perks,
+    extraInfo: body.extraInfo === undefined ? undefined : String(body.extraInfo).trim(),
+    maxGuests: body.maxGuests === undefined ? undefined : Number(body.maxGuests),
+    price: body.price === undefined ? undefined : Number(body.price),
+  };
 
-// Add a new place to the database
-export const addPlace = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const userData = req.user;
-    const {
-      title,
-      address,
-      photos,
-      category,
-      description,
-      perks,
-      extraInfo,
-      maxGuests,
-      rating,
-      reviews,
-      price,
-    } = req.body;
-
-    const place = await Place.create({
-      owner: userData.id,
-      title,
-      address,
-      photos,
-      category,
-      description,
-      perks,
-      extraInfo,
-      maxGuests,
-      rating,
-      reviews,
-      price,
-    });
-
-    res.status(201).json({ success: true, data: place });
-  } catch (error: any) {
-    console.error(error);
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-};
-
-// Return to the user all the places that he has added
-export const getUserPlaces = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const userData = req.user;
-    const { id } = userData;
-    const places = await Place.find({ owner: id });
-
-    res.status(200).json({ success: true, data: places });
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-};
-
-// Update a place
-export const updatePlace = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const userData = req.user;
-    const userId = userData.id;
-    const {
-      id,
-      title,
-      address,
-      addedPhotos,
-      description,
-      perks,
-      extraInfo,
-      maxGuests,
-      rating,
-      reviews,
-      price,
-    } = req.body;
-
-    const place = (await Place.findById(id)) as any;
-    if (userId === place?.owner.toString()) {
-      place.set({
-        title,
-        address,
-        photos: addedPhotos,
-        description,
-        perks,
-        extraInfo,
-        maxGuests,
-        rating,
-        reviews,
-        price,
-      });
-      await place.save();
-      res
-        .status(200)
-        .json({ success: "Place updated successfully", data: place });
+  if (!partial) {
+    const required = [value.title, value.address, value.description, value.extraInfo];
+    if (required.some((field) => !field) || !Array.isArray(value.photos)) {
+      throw new CustomError("Missing required place fields", 400);
     }
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
   }
+
+  if (value.category !== undefined && !categories.has(value.category)) {
+    throw new CustomError("Invalid place category", 400);
+  }
+  if (value.maxGuests !== undefined && (!Number.isInteger(value.maxGuests) || value.maxGuests < 1)) {
+    throw new CustomError("maxGuests must be a positive integer", 400);
+  }
+  if (value.price !== undefined && (!Number.isFinite(value.price) || value.price <= 0)) {
+    throw new CustomError("price must be greater than zero", 400);
+  }
+  if (value.perks !== undefined && !Array.isArray(value.perks)) {
+    throw new CustomError("perks must be an array", 400);
+  }
+  if (value.photos !== undefined && !Array.isArray(value.photos)) {
+    throw new CustomError("photos must be an array", 400);
+  }
+
+  return Object.fromEntries(Object.entries(value).filter(([, item]) => item !== undefined));
 };
 
-// Return all the places in the database
-export const getAllPlaces = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const places = await Place.find();
-    res.status(200).json({ success: true, data: places });
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+export const addPlace = async (req: Request, res: Response) => {
+  const place = await Place.create({
+    ...parsePlaceInput(req.body),
+    owner: req.user!._id,
+    rating: 0,
+    reviews: 0,
+  });
+  res.status(201).json({ success: true, data: place });
 };
 
-// Return a single place by its id
-export const getSinglePlace = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const place = await Place.findById(id);
-
-    if (!place) {
-      res.status(404).json({ success: false, message: "Place not found" });
-    }
-
-    res.status(200).json({ success: true, data: place });
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
+export const getUserPlaces = async (req: Request, res: Response) => {
+  const places = await Place.find({ owner: req.user!._id });
+  res.status(200).json({ success: true, data: places });
 };
 
-// Search places in the database
-export const searchPlaces = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const searchWord = req.query.key;
-
-    if (searchWord === "") return res.status(200).json(await Place.find());
-
-    const searchMatch = await Place.find({
-      address: { $regex: searchWord, $options: "i" },
-    });
-
-    res.status(200).json({ success: true, data: searchMatch });
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
+export const updatePlace = async (req: Request, res: Response) => {
+  const place = await Place.findById(req.params.id);
+  if (!place) throw new CustomError("Place not found", 404);
+  if (place.owner?.toString() !== req.user!.id && !req.user!.isAdmin) {
+    throw new CustomError("You cannot update this place", 403);
   }
+
+  place.set(parsePlaceInput(req.body, true));
+  await place.save();
+  res.status(200).json({ success: true, data: place });
 };
 
-// Delete a place by its id
-export const deletePlace = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const userData = req.user;
-    const { id } = req.params;
+export const getAllPlaces = async (_req: Request, res: Response) => {
+  const places = await Place.find();
+  res.status(200).json({ success: true, data: places });
+};
 
-    const place = await Place.findById(id);
+export const getSinglePlace = async (req: Request, res: Response) => {
+  if (!isValidObjectId(req.params.id)) throw new CustomError("Invalid place id", 400);
+  const place = await Place.findById(req.params.id);
+  if (!place) throw new CustomError("Place not found", 404);
+  res.status(200).json({ success: true, data: place });
+};
 
-    if (!place) {
-      res.status(404).json({ success: false, message: "Place not found" });
-    }
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
+export const searchPlaces = async (req: Request, res: Response) => {
+  const searchWord = String(req.params.key ?? "").trim();
+  const places = searchWord
+    ? await Place.find({ address: { $regex: escapeRegex(searchWord), $options: "i" } })
+    : await Place.find();
+  res.status(200).json({ success: true, data: places });
+};
+
+export const deletePlace = async (req: Request, res: Response) => {
+  const place = await Place.findById(req.params.id);
+  if (!place) throw new CustomError("Place not found", 404);
+  if (place.owner?.toString() !== req.user!.id && !req.user!.isAdmin) {
+    throw new CustomError("You cannot delete this place", 403);
   }
+
+  await place.deleteOne();
+  res.status(200).json({ success: true, message: "Place deleted successfully" });
 };

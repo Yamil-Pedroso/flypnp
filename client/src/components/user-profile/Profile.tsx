@@ -16,7 +16,7 @@ import { GrAchievement } from "react-icons/gr";
 import { GiAchievement } from "react-icons/gi";
 import { RiAwardFill } from "react-icons/ri";
 import { CgWebsite } from "react-icons/cg";
-import { useAuth, useWishlist } from "../../../hooks";
+import { useAuth, useWishlist } from "../../lib/hooks";
 import { LogOut } from "lucide-react";
 
 const Profile = () => {
@@ -25,7 +25,7 @@ const Profile = () => {
   const { wishlist } = useWishlist();
   const [userAvatar, setUserAvatar] = useState(user?.avatar);
   const [userUpdateProfileOpen, setUserUpdateProfileOpen] = useState(false);
-  const [redirect, setRedirect] = useState(null);
+  const [redirect] = useState(null);
   const [time, setTime] = useState(new Date());
   const navigate = useNavigate();
 

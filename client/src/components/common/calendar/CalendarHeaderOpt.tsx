@@ -13,28 +13,14 @@ const CalendarHeaderOpt = () => {
   }
 
   return (
-    <div className="calendar-opt-container">
-      <ul>
-        <div className="date">
-          <li onClick={() => handleClickOptionList('date')}>Dates</li>
-          <span
-            className={optionList === 'date' ? 'horizontal-line' : ''}
-          ></span>
-        </div>
-        <div className="months">
-          <li onClick={() => handleClickOptionList('months')}>Months</li>
-          <span
-            className={optionList === 'months' ? 'horizontal-line' : ''}
-          ></span>
-        </div>
-
-        <div className="flexible">
-          <li onClick={() => handleClickOptionList('flexible')}>Flexible</li>
-          <span
-            className={optionList === 'flexible' ? 'horizontal-line' : ''}
-          ></span>
-        </div>
-      </ul>
+    <div className="relative">
+      <div className="mb-5 flex items-center justify-center gap-2">
+        {(['date', 'months', 'flexible'] as const).map((option) => (
+          <button key={option} type="button" onClick={() => handleClickOptionList(option)} className={`rounded-full px-4 py-2 text-sm font-medium capitalize transition ${optionList === option ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}>
+            {option === 'date' ? 'Dates' : option}
+          </button>
+        ))}
+      </div>
       {optionList === 'date' ? (
         <div className="my-calendar-wrapper">
           <MyCalendar />

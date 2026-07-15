@@ -1,14 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 
-interface AuthenticatedRequest extends Request {
-    user?: any;
-    }
-
-const isAdmin = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (req.user && req.user.isAdmin) {
     next();
   } else {
-    res.status(403).json({ message: 'Acceso denegado. Debes ser administrador para realizar esta acción.' });
+    res.status(403).json({ success: false, message: 'Admin access required' });
   }
 };
 

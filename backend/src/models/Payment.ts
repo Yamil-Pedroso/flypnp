@@ -11,7 +11,6 @@ interface IPayment {
     stripeId: string;
     paymentMethod: string;
     paymentDate: Date;
-    clientSecret?: string;
 }
 
 const paymentSchema = new Schema<IPayment>({
@@ -21,10 +20,9 @@ const paymentSchema = new Schema<IPayment>({
     place: { type: Schema.Types.ObjectId, ref: "Place", required: true },
     amount: { type: Number, required: true },
     currency: { type: String, required: true, default: "chf" },
-    clientSecret: { type: String },
     status: {
         type: String,
-        enum: ["pending", "confirmed", "cancelled"],
+        enum: ["pending", "confirmed", "cancelled", "failed"],
         default: "pending",
     },
     stripeId: { type: String },

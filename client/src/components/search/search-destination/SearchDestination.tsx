@@ -36,12 +36,10 @@ const searchDestinationData: SearchDestinationProps[] = [
 
 const SearchDestination = () => {
   const [bgWhiteActive, setBgWhiteActive] = useState(false);
-  const [defaultSearchDest, setDefaultSearchDest] = useState<boolean>(true);
 
-  const handleBgWhiteActive = (e: any) => {
+  const handleBgWhiteActive = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     setBgWhiteActive(!bgWhiteActive);
-    setDefaultSearchDest(false);
     handleGrowSearchIcon();
   };
 
@@ -70,7 +68,7 @@ const SearchDestination = () => {
     };
   }, []);
 
-  const handleInnerClick = (e: any) => {
+  const handleInnerClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
   };
 

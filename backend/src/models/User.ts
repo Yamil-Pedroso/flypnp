@@ -1,8 +1,9 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import jwt, { type SignOptions } from "jsonwebtoken";
+import { requireEnv } from "../config/env";
 
-interface IUser extends Document {
+interface IUser {
     name: string;
     email: string;
     password: string;
@@ -23,9 +24,9 @@ const userSchema = new Schema<IUser>({
 });
 
 // Hash the password before saving the user to the database
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
     if (!this.isModified("password")) {
-        next();
+        return;
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -34,8 +35,8 @@ userSchema.pre("save", async function (next) {
 
 // Sign JWT and return
 userSchema.methods.getSignedJwtToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET!, {
-        expiresIn: process.env.JWT_EXPIRE,
+    return jwt.sign({ id: this._id }, requireEnv("JWT_SECRET"), {
+        expiresIn: (process.env.JWT_EXPIRE ?? "7d") as SignOptions["expiresIn"],
     });
 };
 

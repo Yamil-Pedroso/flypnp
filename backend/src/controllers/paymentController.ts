@@ -1,146 +1,128 @@
-import { Request, Response, NextFunction } from 'express';
-import { Payment, IPayment } from '../models/Payment';
-import { stripe, customerId } from '../config/stripe';
+import type { Request, Response } from "express";
+import type Stripe from "stripe";
+import { Payment } from "../models/Payment";
+import { Place } from "../models/Place";
+import { stripe } from "../config/stripe";
+import { requireEnv } from "../config/env";
+import CustomError from "../utils/customError";
 
-interface AuthenticatedRequest extends Request {
-    user?: any;
-}
-
-// Create a payment
-export const createPayment = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-        const userData = req.user;
-        const { placeId, amount, currency, status, stripeId, paymentMethod, paymentDate } = req.body;
-
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount,
-            currency: currency || 'chf',
-            customer: customerId,
-            payment_method: paymentMethod,
-            confirmation_method: 'automatic',
-            confirm: false,
-            //return_url: 'https://yampe-webdeveloper.netlify.app/',
-        }) as any;
-
-        const payment: IPayment = {
-            user: userData.id,
-            name: userData.name,
-            place: placeId,
-            amount,
-            currency,
-            status,
-            stripeId: paymentIntent.id,
-            paymentMethod,
-            paymentDate,
-        };
-
-        await Payment.create(payment);
-
-        res.status(201).json({ success: true, data: payment, clientSecret: paymentIntent.client_secret });
-    } catch (error: any) {
-        console.error('Error to create payment:', error);
-        res.status(500).json({
-            message: 'Internal server error',
-            error: error.message,
-        });
-    }
-}
-
-// Get Place data
-// En tu controller de Payment, modifica o crea un endpoint que siga este principio
-export const getPaymentDetailsWithPlace = async (req: AuthenticatedRequest, res: Response) => {
-    try {
-        const paymentId = req.params.id;
-        const payment = await Payment.findById(paymentId).populate({
-            path: 'booking',
-            populate: {
-                path: 'place'
-            }
-        }) as any;
-
-        if (!payment) {
-            return res.status(404).json({ message: 'Payment not found' });
-        }
-
-        const place = payment.booking.place;
-
-        res.status(200).json({ success: true, data: place  });
-
-    } catch (error: any) {
-        console.error('Error fetching payment details with place:', error);
-        res.status(500).json({ message: 'Internal server error', error: error.message });
-    }
+const assertPaymentOwner = (userId: string, req: Request) => {
+  if (userId !== req.user!.id && !req.user!.isAdmin) {
+    throw new CustomError("You cannot access this payment", 403);
+  }
 };
 
+export const createPayment = async (req: Request, res: Response) => {
+  const place = await Place.findById(req.body.placeId);
+  if (!place) throw new CustomError("Place not found", 404);
 
-// Get all payments
-export const getPayments = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const paymentQuantity = await Payment.countDocuments();
+  const currency = String(req.body.currency ?? "chf").toLowerCase();
+  if (!/^[a-z]{3}$/.test(currency)) throw new CustomError("Invalid currency", 400);
 
-    try {
-        const payments = await Payment.find().populate('clientSecret');
+  const amount = Math.round(place.price * 100);
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount,
+    currency,
+    automatic_payment_methods: { enabled: true },
+    metadata: {
+      userId: req.user!.id,
+      placeId: place.id,
+    },
+  });
 
-        res.status(200).json({ success: true, qt: paymentQuantity, data: payments });
-    } catch (error: any) {
-        console.error('Error to get payments:', error);
-        res.status(500).json({
-            message: 'Internal server error',
-            error: error.message,
-        });
+  const payment = await Payment.create({
+    user: req.user!._id,
+    name: req.user!.name,
+    place: place._id,
+    amount,
+    currency,
+    status: "pending",
+    stripeId: paymentIntent.id,
+    paymentMethod: "",
+    paymentDate: new Date(),
+  });
+
+  res.status(201).json({
+    success: true,
+    data: payment,
+    clientSecret: paymentIntent.client_secret,
+  });
+};
+
+export const handleStripeWebhook = async (req: Request, res: Response) => {
+  const signature = req.headers["stripe-signature"];
+  if (typeof signature !== "string") {
+    throw new CustomError("Missing Stripe signature", 400);
+  }
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      requireEnv("STRIPE_WEBHOOK_SECRET")
+    );
+  } catch {
+    throw new CustomError("Invalid Stripe signature", 400);
+  }
+
+  if (event.type.startsWith("payment_intent.")) {
+    const intent = event.data.object as Stripe.PaymentIntent;
+    const statuses: Record<string, "confirmed" | "cancelled" | "failed"> = {
+      "payment_intent.succeeded": "confirmed",
+      "payment_intent.canceled": "cancelled",
+      "payment_intent.payment_failed": "failed",
+    };
+    const status = statuses[event.type];
+    if (status) {
+      await Payment.findOneAndUpdate(
+        { stripeId: intent.id },
+        { status, paymentMethod: String(intent.payment_method ?? "") }
+      );
     }
-}
+  }
 
-// Get a payment
-export const getSinglePayment = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-        const paymentId = req.params.id;
-        const payment = await Payment.findById(paymentId);
+  res.status(200).json({ received: true });
+};
 
-        res.status(200).json({ success: true, data: payment });
-    } catch (error: any) {
-        console.error('Error to get payment:', error);
-        res.status(500).json({
-            message: 'Internal server error',
-            error: error.message,
-        });
-    }
-}
+export const getPaymentDetailsWithPlace = async (req: Request, res: Response) => {
+  const payment = await Payment.findById(req.params.id).populate("place");
+  if (!payment) throw new CustomError("Payment not found", 404);
+  assertPaymentOwner(payment.user.toString(), req);
+  res.status(200).json({ success: true, data: payment.place });
+};
 
-// Update a payment
-export const updatePayment = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-        const paymentId = req.params.id;
-        const updatedPaymentData = req.body;
+export const getPayments = async (req: Request, res: Response) => {
+  const query = req.user!.isAdmin ? {} : { user: req.user!._id };
+  const payments = await Payment.find(query).populate("place");
+  res.status(200).json({ success: true, count: payments.length, data: payments });
+};
 
-        const updatedPayment = await Payment.findByIdAndUpdate(paymentId, updatedPaymentData, {
-            new: true,
-            runValidators: true,
+export const getSinglePayment = async (req: Request, res: Response) => {
+  const payment = await Payment.findById(req.params.id).populate("place");
+  if (!payment) throw new CustomError("Payment not found", 404);
+  assertPaymentOwner(payment.user.toString(), req);
+  res.status(200).json({ success: true, data: payment });
+};
 
-        });
+export const updatePayment = async (req: Request, res: Response) => {
+  const payment = await Payment.findById(req.params.id);
+  if (!payment) throw new CustomError("Payment not found", 404);
+  assertPaymentOwner(payment.user.toString(), req);
 
-        res.status(200).json({ success: true, data: updatedPayment });
-    } catch (error: any) {
-        console.error('Error to update payment:', error);
-        res.status(500).json({
-            message: 'Internal server error',
-            error: error.message,
-        });
-    }
-}
+  if (req.body.status !== "cancelled") {
+    throw new CustomError("Only payment cancellation is allowed from this endpoint", 400);
+  }
+  if (payment.status === "pending") {
+    await stripe.paymentIntents.cancel(payment.stripeId);
+    payment.status = "cancelled";
+    await payment.save();
+  }
+  res.status(200).json({ success: true, data: payment });
+};
 
-// Delete a payment
-export const deletePayment = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-        const paymentId = req.params.id;
-
-        await Payment.findByIdAndDelete(paymentId);
-
-        res.status(200).json({ success: true, message: 'Payment deleted successfully' });
-    } catch (error: any) {
-        console.error('Error to delete payment:', error);
-        res.status(500).json({
-            message: 'Internal server error',
-            error: error.message,
-        });
-    }
-}
+export const deletePayment = async (req: Request, res: Response) => {
+  const payment = await Payment.findByIdAndDelete(req.params.id);
+  if (!payment) throw new CustomError("Payment not found", 404);
+  res.status(200).json({ success: true });
+};

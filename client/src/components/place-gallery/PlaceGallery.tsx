@@ -1,8 +1,6 @@
-import { useState, useRef, useEffect } from "react";
-import Trending from "./trending/Trending";
-import Beachfront from "./beachfront/BeachFront";
-import IconicCities from "./iconic-cities/IconicCities";
-import { ToastContainer } from "react-toastify";
+import { useState, type ComponentType } from "react";
+import { usePlaces } from "../../lib/hooks";
+import PlaceCard from "../place-card/PlaceCard";
 import { FaTreeCity, FaUmbrellaBeach } from "react-icons/fa6";
 import {
   GiFamilyHouse,
@@ -20,129 +18,69 @@ import { AiFillPicture } from "react-icons/ai";
 import { MdFoodBank, MdCastle, MdOutlineSurfing } from "react-icons/md";
 import { PiWarehouseFill } from "react-icons/pi";
 
-type ComponentType = {
-  icon: JSX.Element;
-  component: JSX.Element;
-};
+type Category = { key: string; label: string; icon: ComponentType<{ size?: number }> };
+
+const categories: Category[] = [
+  { key: "all", label: "Explore", icon: AiFillPicture },
+  { key: "trending", label: "Trending", icon: FaFireAlt },
+  { key: "beachFront", label: "Beachfront", icon: FaUmbrellaBeach },
+  { key: "iconicCities", label: "Iconic cities", icon: FaTreeCity },
+  { key: "tinyHomes", label: "Tiny homes", icon: FaLaptopHouse },
+  { key: "mansions", label: "Mansions", icon: GiFamilyHouse },
+  { key: "huts", label: "Cabins", icon: FaShuttleVan },
+  { key: "ski", label: "Skiing", icon: FaSkiing },
+  { key: "design", label: "Design", icon: PiWarehouseFill },
+  { key: "tropical", label: "Tropical", icon: GiTropicalFish },
+  { key: "historicalHomes", label: "Castles", icon: MdCastle },
+  { key: "surfing", label: "Surfing", icon: MdOutlineSurfing },
+  { key: "caves", label: "Caves", icon: GiCaveEntrance },
+  { key: "camping", label: "Camping", icon: GiCampingTent },
+  { key: "luxe", label: "Luxe", icon: MdFoodBank },
+];
 
 const PlaceGallery = () => {
-  const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 });
-  const [activeComponent, setActiveComponent] =
-    useState<keyof typeof components>("trending");
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  const components: Record<string, ComponentType> = {
-    trending: { icon: <FaFireAlt size={32} />, component: <Trending /> },
-    beachfront: {
-      icon: <FaUmbrellaBeach size={32} />,
-      component: <Beachfront />,
-    },
-    iconicCities: {
-      icon: <FaTreeCity size={32} />,
-      component: <IconicCities />,
-    },
-    tinyHomes: {
-      icon: <FaLaptopHouse size={32} />,
-      component: <IconicCities />,
-    },
-    mansions: {
-      icon: <GiFamilyHouse size={32} />,
-      component: <IconicCities />,
-    },
-    huts: { icon: <FaShuttleVan size={32} />, component: <IconicCities /> },
-    ski: { icon: <FaSkiing size={32} />, component: <IconicCities /> },
-    amazingViews: {
-      icon: <AiFillPicture size={32} />,
-      component: <IconicCities />,
-    },
-    luxe: { icon: <MdFoodBank size={32} />, component: <IconicCities /> },
-    design: {
-      icon: <PiWarehouseFill size={32} />,
-      component: <IconicCities />,
-    },
-    tropical: {
-      icon: <GiTropicalFish size={32} />,
-      component: <IconicCities />,
-    },
-    historicalHomes: {
-      icon: <MdCastle size={32} />,
-      component: <IconicCities />,
-    },
-    surfing: {
-      icon: <MdOutlineSurfing size={32} />,
-      component: <IconicCities />,
-    },
-    caves: { icon: <GiCaveEntrance size={32} />, component: <IconicCities /> },
-    camping: { icon: <GiCampingTent size={32} />, component: <IconicCities /> },
-  };
-
-  const handleClick = (
-    component: keyof typeof components,
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    setActiveComponent(component);
-    const buttonRect = e.currentTarget.getBoundingClientRect();
-    const containerRect = menuRef.current?.getBoundingClientRect();
-    if (containerRect) {
-      setUnderlineStyle({
-        left: buttonRect.left - containerRect.left,
-        width: buttonRect.width,
-      });
-    }
-  };
-
-  useEffect(() => {
-    const initialButton = document.querySelector(
-      `button[data-key="${activeComponent}"]`
-    );
-    if (initialButton && menuRef.current) {
-      const buttonRect = initialButton.getBoundingClientRect();
-      const containerRect = menuRef.current.getBoundingClientRect();
-      setUnderlineStyle({
-        left: buttonRect.left - containerRect.left,
-        width: buttonRect.width,
-      });
-    }
-  }, [activeComponent]);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const { places, loading, error, refresh } = usePlaces();
+  const visiblePlaces = activeCategory === "all" ? places : places.filter((place) => place.category === activeCategory);
 
   return (
-    <div className="mt-[-2rem] border-t border-gray-300">
-      <div className="place-gallery-wrapper">
-        <div
-          ref={menuRef}
-          className="flex justify-center gap-4 mt-8 px-4 overflow-x-auto relative flex-wrap"
-        >
-          {Object.keys(components).map((key) => (
+    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="scrollbar-none -mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0">
+          {categories.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
-              data-key={key}
-              className={`flex flex-col items-center px-4 py-2 transition-all duration-300 bg-white rounded-md shadow-md hover:shadow-lg border border-transparent ${
-                activeComponent === key
-                  ? "text-[#f94a51] font-semibold border-gray-400"
-                  : "text-gray-500"
-              }`}
-              onClick={(e) => handleClick(key as keyof typeof components, e)}
+              type="button"
+              aria-pressed={activeCategory === key}
+              className={`flex shrink-0 snap-start items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition ${activeCategory === key ? "border-slate-900 bg-slate-900 text-white shadow-sm" : "border-slate-200 bg-white text-slate-600 hover:border-slate-400 hover:text-slate-950"}`}
+              onClick={() => setActiveCategory(key)}
             >
-              <div className="flex items-center justify-center">
-                {components[key as keyof typeof components].icon}
-              </div>
-              <p className="mt-1 text-sm capitalize">
-                {key.replace(/([A-Z])/g, " $1")}
-              </p>
+              <Icon size={17} />
+              <span>{label}</span>
             </button>
           ))}
-          <div
-            className="absolute bottom-0 h-[2px] bg-gray-800 transition-all duration-300"
-            style={{ left: underlineStyle.left, width: underlineStyle.width }}
-          ></div>
         </div>
 
-        <div className="mt-6">
-          {activeComponent && components[activeComponent].component}
-        </div>
-      </div>
-      <ToastContainer />
-    </div>
+        {loading ? (
+          <div className="grid grid-cols-1 gap-x-5 gap-y-8 pt-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-label="Loading stays">
+            {Array.from({ length: 8 }).map((_, index) => <div key={index} className="h-80 animate-pulse rounded-3xl bg-slate-200" />)}
+          </div>
+        ) : error ? (
+          <div className="mt-5 rounded-3xl border border-rose-100 bg-rose-50 px-6 py-12 text-center" role="alert">
+            <h2 className="text-xl font-semibold text-slate-900">We couldn’t load the stays</h2>
+            <p className="mt-2 text-slate-600">Check that the backend is running and try again.</p>
+            <button type="button" onClick={() => void refresh()} className="mt-5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700">Try again</button>
+          </div>
+        ) : visiblePlaces.length ? (
+          <div className="grid grid-cols-1 gap-x-5 gap-y-9 pt-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {visiblePlaces.map((place) => <PlaceCard key={place._id} place={place} />)}
+          </div>
+        ) : (
+          <div className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+            <h2 className="text-xl font-semibold text-slate-900">No stays found here yet</h2>
+            <p className="mt-2 text-slate-500">Try another category or clear your destination search.</p>
+          </div>
+        )}
+    </section>
   );
 };
 

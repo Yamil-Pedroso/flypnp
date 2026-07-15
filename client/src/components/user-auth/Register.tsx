@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { IoCloseSharp } from "react-icons/io5";
-import { useAuth } from "../../../hooks";
+import { useAuth } from "../../lib/hooks";
 
 interface RegisterProps {
   closeUserForm: () => void;
@@ -9,11 +9,16 @@ interface RegisterProps {
 }
 
 const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    email: string;
+    password: string;
+    avatar: File | null;
+  }>({
     name: "",
     email: "",
     password: "",
-    avatar: "",
+    avatar: null,
   });
 
   const [formErrors, setFormErrors] = useState({
@@ -23,8 +28,7 @@ const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
     avatar: false,
   });
 
-  const [redirect, setRedirect] = useState(false);
-  const auth = useAuth() as any;
+  const auth = useAuth();
 
   const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.type !== "file") {
@@ -36,7 +40,7 @@ const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormData({ ...formData, avatar: e.target.files[0] as any });
+      setFormData({ ...formData, avatar: e.target.files[0] });
     }
   };
 
@@ -67,10 +71,11 @@ const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
     }
   };
 
-  const handleGoogleLogin = async (credential: any) => {
+  const handleGoogleLogin = async (credential?: string) => {
+    if (!credential) return;
     const response = await auth.googleLogin(credential);
     if (response.success) {
-      setRedirect(true);
+      closeUserForm();
     } else {
       console.log(response.message);
     }
@@ -144,7 +149,7 @@ const Register = ({ closeUserForm, changeToLogin }: RegisterProps) => {
         <div className="flex justify-center">
           <GoogleLogin
             onSuccess={(credentialResponse) =>
-              handleGoogleLogin(credentialResponse)
+              handleGoogleLogin(credentialResponse.credential)
             }
             onError={() => console.log("Google login failed")}
             width="350"

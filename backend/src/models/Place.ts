@@ -34,8 +34,8 @@ const placeSchema = new Schema<IPlace>({
     perks: { type: [String], required: true },
     extraInfo: { type: String, required: true },
     maxGuests: { type: Number, required: true },
-    rating: { type: Number, required: true },
-    reviews: { type: Number, required: true },
+    rating: { type: Number, min: 0, max: 5, default: 0 },
+    reviews: { type: Number, min: 0, default: 0 },
     price: { type: Number, required: true },
 }, {
     timestamps: true,

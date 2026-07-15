@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "../../../hooks/index";
+import { useAuth } from "../../lib/hooks";
 import { IoCloseSharp } from "react-icons/io5";
 
 interface UpdateProfileProps {
@@ -15,10 +15,10 @@ const UpdateProfile = ({ closeUserForm }: UpdateProfileProps) => {
     name: false,
     password: false,
   });
-  const auth = useAuth() as any;
+  const auth = useAuth();
   const { user, updateUser } = auth;
 
-  const handleFormData = (e: any) => {
+  const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -31,8 +31,9 @@ const UpdateProfile = ({ closeUserForm }: UpdateProfileProps) => {
     }));
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!user) return;
     const submitData = new FormData();
     if (formData.name) submitData.append("name", formData.name);
     if (formData.password) submitData.append("password", formData.password);
@@ -40,7 +41,7 @@ const UpdateProfile = ({ closeUserForm }: UpdateProfileProps) => {
     const response = await updateUser(formData, user._id);
     if (response.success) {
       console.log("User updated");
-      user.setUser(response.user);
+      closeUserForm();
     } else {
       console.log("Update failed");
     }

@@ -1,233 +1,121 @@
-import { useState, useEffect } from "react";
-import {
-  FaPlusCircle,
-  FaMinusCircle,
-  FaSearch,
-  FaUser,
-  FaBaby,
-} from "react-icons/fa";
-import { MdPets, MdChildCare } from "react-icons/md";
+import { useEffect, useRef, useState, type ComponentType } from "react";
+import { FaBaby, FaMinus, FaPlus, FaUser } from "react-icons/fa";
+import { MdChildCare, MdPets } from "react-icons/md";
+import { Users } from "lucide-react";
+
+type GuestType = "adults" | "children" | "infants" | "pets";
+
+type GuestOption = {
+  type: GuestType;
+  label: string;
+  description: string;
+  icon: ComponentType<{ className?: string }>;
+  max: number;
+};
+
+const guestOptions: GuestOption[] = [
+  { type: "adults", label: "Adults", description: "Age 13 or above", icon: FaUser, max: 16 },
+  { type: "children", label: "Children", description: "Ages 2–12", icon: MdChildCare, max: 15 },
+  { type: "infants", label: "Infants", description: "Under 2", icon: FaBaby, max: 5 },
+  { type: "pets", label: "Pets", description: "Bringing a furry friend?", icon: MdPets, max: 5 },
+];
 
 const AddGuests = () => {
-  const [bgWhiteActive, setBgWhiteActive] = useState(false);
-  const [adult, setAdult] = useState(0);
-  const [children, setChildren] = useState(0);
-  const [infants, setInfants] = useState(0);
-  const [pets, setPets] = useState(0);
-  const [clickMainContainer, setClickMainContainer] = useState(false);
-
-  const handleClickAdults = (count: number) => {
-    if ((children > 0 || infants > 0 || pets > 0) && count < 1) return;
-    if (count >= 0 && count <= 16) setAdult(count);
-  };
-
-  const handleClickChildren = (count: number) => {
-    if (count < 0) return;
-    if (adult === 0 && children === 0) {
-      setAdult(1);
-      setChildren(1);
-    } else if (count <= 15) {
-      setChildren(count);
-    }
-  };
-
-  const handleClickInfants = (count: number) => {
-    if (count < 0) return;
-    if (adult === 0 && infants === 0) {
-      setAdult(1);
-      setInfants(1);
-    } else if (count <= 5) {
-      setInfants(count);
-    }
-  };
-
-  const handleClickPets = (count: number) => {
-    if (count < 0) return;
-    if (adult === 0 && pets === 0) {
-      setAdult(1);
-      setPets(1);
-    } else if (count <= 5) {
-      setPets(count);
-    }
-  };
-
-  const handleBgWhiteActive = (e: any) => {
-    e.stopPropagation();
-    setBgWhiteActive(!bgWhiteActive);
-    handleGrowSearchIcon();
-  };
-
-  const clickOutside = (e: any) => {
-    const wrapper = document.querySelector(".add-guests-wrapper");
-    const headerGuests = document.querySelector(
-      ".header-guests, .header-guests-two"
-    ) as HTMLElement;
-    if (
-      wrapper &&
-      !wrapper.contains(e.target) &&
-      !headerGuests.contains(e.target)
-    ) {
-      setBgWhiteActive(false);
-    }
-    const searchIconWrapper = document.querySelector(".search-guests-wrapper");
-    if (searchIconWrapper) {
-      searchIconWrapper.classList.remove("search-wrapper-ready");
-    }
-  };
-
-  const handleGrowSearchIcon = () => {
-    const searchIconWrapper = document.querySelector(".search-guests-wrapper");
-    if (searchIconWrapper) {
-      searchIconWrapper.classList.add("search-wrapper-ready");
-    }
-  };
+  const [open, setOpen] = useState(false);
+  const [guests, setGuests] = useState<Record<GuestType, number>>({
+    adults: 0,
+    children: 0,
+    infants: 0,
+    pets: 0,
+  });
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    document.addEventListener("click", clickOutside);
-    return () => {
-      document.removeEventListener("click", clickOutside);
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
     };
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    return () => document.removeEventListener("pointerdown", closeOnOutsideClick);
   }, []);
 
-  const handleDropdownClick = (e: any) => e.stopPropagation();
+  const updateGuest = (type: GuestType, change: -1 | 1) => {
+    setGuests((current) => {
+      const option = guestOptions.find((item) => item.type === type);
+      if (!option) return current;
+
+      const nextValue = current[type] + change;
+      if (nextValue < 0 || nextValue > option.max) return current;
+
+      if (type === "adults" && nextValue === 0 && (current.children || current.infants || current.pets)) {
+        return current;
+      }
+
+      const next = { ...current, [type]: nextValue };
+      if (type !== "adults" && nextValue > 0 && current.adults === 0) next.adults = 1;
+      return next;
+    });
+  };
+
+  const primaryGuests = guests.adults + guests.children;
+  const totalGuests = primaryGuests + guests.infants;
+  const summary = primaryGuests
+    ? `${primaryGuests} guest${primaryGuests === 1 ? "" : "s"}${guests.infants ? `, ${guests.infants} infant${guests.infants === 1 ? "" : "s"}` : ""}${guests.pets ? `, ${guests.pets} pet${guests.pets === 1 ? "" : "s"}` : ""}`
+    : "Add guests";
 
   return (
-    <div
-      className="relative flex items-center bg-white text-gray-900 w-[22rem] h-full rounded-full"
-      onClick={handleBgWhiteActive}
-    >
-      <div
-        className="add-guests-wrapper flex justify-between items-center w-full h-full relative hover:bg-gray-300 rounded-full cursor-pointer"
-        onClick={handleDropdownClick}
+    <div ref={wrapperRef} className="relative block h-full md:border-l md:border-slate-100">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        aria-label="Open guest selector"
+        onClick={() => setOpen((current) => !current)}
+        className={`flex size-11 items-center justify-center gap-2 rounded-xl text-left transition md:h-full md:w-full md:justify-start md:rounded-full md:px-4 ${open ? "bg-slate-900 text-white shadow-lg" : "hover:bg-slate-50"}`}
       >
-        <div
-          className={`flex flex-col justify-center h-full px-4 rounded-full ${
-            bgWhiteActive ? "bg-neutral-800 text-white shadow-md" : ""
-          }`}
-        >
-          <p className="text-sm">Who</p>
-          <p className="text-base text-gray-400">
-            {adult + children > 0
-              ? `${adult + children} guests${
-                  infants > 0 || pets > 0
-                    ? `, ${
-                        infants
-                          ? `${infants} infant${infants > 1 ? "s" : ""}`
-                          : ""
-                      }${infants && pets ? ", " : ""}${
-                        pets ? `${pets} pet${pets > 1 ? "s" : ""}` : ""
-                      }`
-                    : ""
-                }`
-              : "Add guests"}
-          </p>
-        </div>
+        <Users className={`size-4 shrink-0 ${open ? "text-emerald-300" : "text-slate-400"}`} aria-hidden="true" />
+        <span className="hidden min-w-0 md:block">
+          <span className="block text-xs font-semibold">Guests</span>
+          <span className={`block max-w-28 truncate text-xs ${open ? "text-slate-200" : "text-slate-500"}`}>{summary}</span>
+        </span>
+      </button>
 
-        <div
-          className={`absolute top-[5rem] right-0 z-50 bg-white rounded-2xl shadow-lg p-6 pt-4 w-[27rem] ${
-            bgWhiteActive ? "block" : "hidden"
-          }`}
-        >
-          {[
-            {
-              label: "Adults",
-              sub: "Age 13 or above",
-              count: adult,
-              setter: setAdult,
-              handler: handleClickAdults,
-              disableMinus:
-                adult === 0 && (children > 0 || infants > 0 || pets > 0),
-            },
-            {
-              label: "Children",
-              sub: "Age 2-12",
-              count: children,
-              setter: setChildren,
-              handler: handleClickChildren,
-              disableMinus: children === 0,
-            },
-            {
-              label: "Infants",
-              sub: "Under 2",
-              count: infants,
-              setter: setInfants,
-              handler: handleClickInfants,
-              disableMinus: infants === 0,
-            },
-            {
-              label: "Pets",
-              sub: "Bringing a service animal?",
-              count: pets,
-              setter: setPets,
-              handler: handleClickPets,
-              disableMinus: pets === 0,
-              isLink: true,
-            },
-          ].map(({ label, sub, count, handler, disableMinus, isLink }, i) => (
-            <div
-              key={i}
-              className="flex justify-between items-center border-b py-4"
-            >
-              <div>
-                <p className="text-lg font-medium">{label}</p>
-                {isLink ? (
-                  <a href="#" className="text-gray-400 text-sm">
-                    {sub}
-                  </a>
-                ) : (
-                  <span className="text-gray-400 text-sm">{sub}</span>
-                )}
-              </div>
-              <div className="flex items-center">
-                <FaMinusCircle
-                  onClick={() => handler(count - 1)}
-                  className={`text-2xl ${
-                    disableMinus
-                      ? "text-gray-300 cursor-not-allowed"
-                      : "text-gray-400 cursor-pointer"
-                  }`}
-                />
-                <span className="mx-4 text-gray-500 text-lg">{count}</span>
-                <FaPlusCircle
-                  onClick={() => handler(count + 1)}
-                  className="text-2xl text-gray-400 cursor-pointer"
-                />
-              </div>
+      {open && (
+        <div role="dialog" aria-label="Choose guests" className="absolute right-0 top-[calc(100%+1rem)] z-[70] w-[min(27rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border border-slate-200 bg-white text-slate-900 shadow-2xl">
+          <div className="flex items-center justify-between bg-slate-900 px-5 py-4 text-white">
+            <div><p className="font-semibold">Who’s coming?</p><p className="text-xs text-slate-300">Build your travel crew</p></div>
+            <div className="flex min-h-8 max-w-44 flex-wrap justify-end gap-1" aria-label={`${totalGuests} travelers selected`}>
+              {guestOptions.map(({ type, icon: Icon }) =>
+                Array.from({ length: Math.min(guests[type], 4) }, (_, index) => (
+                  <span key={`${type}-${index}`} className="flex size-7 animate-bounce items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300"><Icon className="size-3.5" /></span>
+                )),
+              )}
             </div>
-          ))}
-        </div>
-
-        {bgWhiteActive && adult > 0 && (
-          <div className="absolute top-[5.2rem] left-[17.6rem] bg-neutral-800 text-white p-4 rounded-lg z-50 flex flex-col animate-bounce">
-            {[
-              { count: adult, icon: FaUser },
-              { count: children, icon: MdChildCare },
-              { count: infants, icon: FaBaby },
-              { count: pets, icon: MdPets },
-            ].map(({ count, icon: Icon }, idx) =>
-              count > 0 ? (
-                <div key={idx} className="flex mb-1">
-                  {Array.from({ length: Math.min(count, 5) }, (_, i) => (
-                    <Icon key={i} size={24} className="mr-1" />
-                  ))}
-                  {count > 5 && <span className="ml-1 text-lg">+</span>}
-                </div>
-              ) : null
-            )}
           </div>
-        )}
-      </div>
 
-      <div
-        className={`search-guests-wrapper absolute right-0 mr-1 w-14 h-14 rounded-full bg-green-600 flex justify-center items-center transition-all duration-300 ${
-          clickMainContainer ? "w-[7rem] rounded-full bg-green-700" : ""
-        }`}
-      >
-        <FaSearch className="text-white text-xl" />
-        {clickMainContainer && (
-          <p className="text-white text-sm ml-2">Search</p>
-        )}
-      </div>
+          <div className="px-5">
+            {guestOptions.map(({ type, label, description, icon: Icon, max }) => {
+              const cannotRemoveAdult = type === "adults" && guests.adults === 1 && Boolean(guests.children || guests.infants || guests.pets);
+              const minusDisabled = guests[type] === 0 || cannotRemoveAdult;
+              const plusDisabled = guests[type] >= max;
+              return (
+                <div key={type} className="flex items-center justify-between border-b border-slate-100 py-4 last:border-0">
+                  <div className="flex items-center gap-3">
+                    <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-700"><Icon className="size-5" /></span>
+                    <div><p className="font-semibold">{label}</p><p className="text-sm text-slate-500">{description}</p></div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button type="button" aria-label={`Decrease ${label}`} disabled={minusDisabled} onClick={() => updateGuest(type, -1)} className="flex size-9 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-slate-900 hover:text-slate-900 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"><FaMinus className="size-3" /></button>
+                    <output aria-label={`${label} count`} className="w-5 text-center font-medium tabular-nums">{guests[type]}</output>
+                    <button type="button" aria-label={`Increase ${label}`} disabled={plusDisabled} onClick={() => updateGuest(type, 1)} className="flex size-9 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-emerald-600 hover:text-emerald-700 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"><FaPlus className="size-3" /></button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

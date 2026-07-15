@@ -1,10 +1,10 @@
 import Navbar from "../components/navbar/Navbar";
 import { Outlet } from "react-router-dom";
 
-const WithNavbarLayout = ({ menuClick }: { menuClick: boolean }) => {
+const WithNavbarLayout = () => {
   return (
     <>
-      <Navbar menuClick={menuClick} />
+      <Navbar />
       <Outlet />
     </>
   );
