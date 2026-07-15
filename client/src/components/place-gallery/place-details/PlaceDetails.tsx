@@ -8,15 +8,16 @@ import {
   Globe,
   Heart,
   House,
+  Link,
   MapPin,
   MessageCircle,
   Share2,
   Sparkles,
   Star,
+  Trash2,
   X,
 } from "lucide-react";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "sonner";
 import { usePlaces, useWishlist } from "../../../lib/hooks";
 import CreateWishListBox from "../../wishlist/create/CreateWishListBox";
 import ReserveBox from "./ReserveBox";
@@ -118,14 +119,14 @@ const PlaceDetails = () => {
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareUrl);
-    toast.success("Link copied to clipboard!");
+    toast.success("Link copied to clipboard!", { icon: <Link className="size-4" /> });
     setShareOpen(false);
   };
 
   const handleSave = () => {
     if (isSaved) {
       deleteWishlist(place._id);
-      toast("Removed from wishlist");
+      toast("Removed from wishlist", { icon: <Trash2 className="size-4" /> });
     } else {
       setShowCreateWishList(true);
     }

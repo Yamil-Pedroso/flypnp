@@ -25,7 +25,7 @@ const WishList = () => {
   const confirmDelete = async () => {
     if (!itemToDelete) return;
     await deleteWishlist(itemToDelete.place);
-    toast.success("Successfully deleted the place");
+    toast.success("Successfully deleted the place", { icon: <Trash2 className="size-4" /> });
     setItemToDelete(null);
   };
 

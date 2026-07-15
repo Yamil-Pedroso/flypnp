@@ -1,9 +1,9 @@
 import { useState, type ChangeEvent } from 'react'
 import { IoCloseSharp } from 'react-icons/io5'
 import { FaCircleExclamation } from 'react-icons/fa6'
+import { Heart } from 'lucide-react'
+import { toast } from 'sonner'
 import { useWishlist } from '../../../lib/hooks'
-import { toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 
 interface CreateWishListProps {
   closeCreateWishList: () => void
@@ -22,7 +22,7 @@ const CreateWishListBox = ({
   const [wishListName, setWishListName] = useState('')
   const [errorCharLimit, setErrorCharLimit] = useState(false)
   const { addWishlist } = useWishlist()
-  const notify = () => toast('Wishlist created successfully!')
+  const notify = () => toast('Wishlist created successfully!', { icon: <Heart className="size-4 fill-rose-500 text-rose-500" /> })
 
   const handleCreateWishList = () => {
     if (wishListName.trim() && !errorCharLimit) {

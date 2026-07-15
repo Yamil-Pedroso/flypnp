@@ -96,7 +96,7 @@ const Trips = () => {
       setDeleting(true);
       setDeleteError("");
       await deleteBooking(tripToDelete._id);
-      toast.success("Successfully deleted the place");
+      toast.success("Successfully deleted the place", { icon: <Trash2 className="size-4" /> });
       setTripToDelete(null);
     } catch (cause) {
       setDeleteError(getErrorMessage(cause, "We couldn't remove this trip. Please try again."));
