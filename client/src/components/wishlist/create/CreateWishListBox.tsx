@@ -47,22 +47,23 @@ const CreateWishListBox = ({
   }
 
   return (
-    <div className={`mx-auto mt-[15vh] flex w-[calc(100%-2rem)] max-w-xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl ${className ?? ''}`}>
-      <div className="flex items-center border-b border-slate-200 px-5 py-4">
-        <button type="button" onClick={closeCreateWishList} aria-label="Close wishlist dialog" className="flex size-9 items-center justify-center rounded-full transition hover:bg-slate-100"><IoCloseSharp size={24} /></button>
-        <h1 className="ml-3 text-xl font-semibold text-slate-950">Create wishlist</h1>
+    <div className={`mx-auto flex w-full max-w-xl flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white shadow-[0_32px_100px_-28px_rgba(0,0,0,0.72)] ${className ?? ''}`}>
+      <div className="relative flex min-h-24 items-center bg-slate-950 px-5 py-5 text-white sm:px-7">
+        <div className="pointer-events-none absolute -right-10 -top-16 size-40 rounded-full bg-rose-500/20 blur-3xl" />
+        <button type="button" onClick={closeCreateWishList} aria-label="Close wishlist dialog" className="relative z-10 grid size-10 shrink-0 place-items-center rounded-full bg-white/10 text-white transition hover:rotate-90 hover:bg-white hover:text-slate-950"><IoCloseSharp size={22} /></button>
+        <h1 className="relative z-10 ml-4 text-xl font-semibold tracking-tight sm:text-2xl">Create wishlist</h1>
       </div>
 
-      <div className="px-5 py-6">
+      <div className="bg-slate-50 px-5 py-7 sm:px-7 sm:py-8">
         <input
           type="text"
           placeholder="Name your place"
           value={wishListName}
           onChange={handleWishListNameChange}
           aria-invalid={errorCharLimit}
-          className={`w-full rounded-xl border px-4 py-3 text-base text-slate-700 outline-none transition placeholder:text-slate-400 focus:ring-2 ${errorCharLimit ? 'border-rose-500 focus:ring-rose-200' : 'border-slate-300 focus:border-slate-700 focus:ring-slate-200'}`}
+          className={`w-full rounded-2xl border bg-white px-5 py-4 text-base font-medium text-slate-950 shadow-sm outline-none transition placeholder:font-normal placeholder:text-slate-400 focus:ring-4 ${errorCharLimit ? 'border-rose-500 focus:ring-rose-100' : 'border-slate-200 focus:border-slate-950 focus:ring-slate-950/10'}`}
         />
-        <div className={`mt-2 flex items-center text-sm ${errorCharLimit ? 'text-rose-600' : 'text-slate-500'}`}>
+        <div className={`mt-3 flex min-h-5 items-center px-1 text-xs font-medium ${errorCharLimit ? 'text-rose-600' : 'text-slate-500'}`}>
           <span>{wishListName.length}</span>/50
           <p className="ml-1">characters</p>
           {errorCharLimit && (
@@ -74,8 +75,8 @@ const CreateWishListBox = ({
         </div>
       </div>
 
-      <div className="flex justify-between border-t border-slate-200 px-5 py-4">
-        <button type="button" onClick={handleClearInputName} className="rounded-xl border border-slate-300 px-5 py-2.5 font-medium text-slate-700 transition hover:bg-slate-50">
+      <div className="flex items-center justify-between border-t border-slate-100 bg-white px-5 py-5 sm:px-7">
+        <button type="button" onClick={handleClearInputName} className="rounded-full px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950">
           Clear
         </button>
         <button
@@ -84,7 +85,7 @@ const CreateWishListBox = ({
               ? handleCreateWishList
               : undefined
           }
-          className="rounded-xl bg-rose-500 px-5 py-2.5 font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+          className="rounded-full bg-rose-500 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-rose-500/20 transition hover:-translate-y-0.5 hover:bg-rose-600 hover:shadow-xl disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
           disabled={!(wishListName.length > 0 && !errorCharLimit)}
         >
           Create

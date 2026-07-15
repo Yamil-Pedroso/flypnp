@@ -27,7 +27,7 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
     <article className="group relative min-w-0">
       {/* Overlay Wishlist */}
       {showCreateWishList && (
-        <div className="fixed inset-0 z-[999] bg-slate-950/55 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[999] grid place-items-center overflow-y-auto bg-slate-950/65 p-4 backdrop-blur-md sm:p-6">
           <CreateWishListBox
             closeCreateWishList={handleClickCreateWishList}
             className="wishlist-box"

@@ -73,4 +73,15 @@ describe("Trips", () => {
     expect(screen.getByRole("heading", { name: "Lake memory" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Alpine hideaway" })).not.toBeInTheDocument();
   });
+
+  it("shows the original Flypnp drawing when there are no trips", () => {
+    const savedBookings = bookingState.bookings;
+    bookingState.bookings = [];
+
+    render(<MemoryRouter><Trips /></MemoryRouter>);
+
+    expect(screen.getByRole("img", { name: "Flypnp empty trips drawing" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "No trips booked… yet!" })).toBeInTheDocument();
+    bookingState.bookings = savedBookings;
+  });
 });

@@ -21,6 +21,7 @@ import SucceededPaymentPage from "./pages/SucceededPaymentPage";
 import TripsPage from "./pages/TripsPage";
 import WishListPage from "./pages/WishListPage";
 import { SearchProvider } from "./components/search/SearchContext";
+import WelcomeModal from "./components/welcome/WelcomeModal";
 
 //interface AppProps {
 //  children: React.ReactNode
@@ -36,6 +37,7 @@ function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <UserProvider>
+        <WelcomeModal />
         <PlacesProvider>
           <NotificationsProvider>
             <WishlistProvider>

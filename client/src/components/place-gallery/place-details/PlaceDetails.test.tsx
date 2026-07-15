@@ -24,6 +24,14 @@ vi.mock("../../../lib/hooks", () => ({
     error: null,
     refresh: vi.fn(),
   }),
+  useWishlist: () => ({
+    wishlist: [],
+    loading: false,
+    error: null,
+    refresh: vi.fn(),
+    addWishlist: vi.fn(),
+    deleteWishlist: vi.fn(),
+  }),
 }));
 
 vi.mock("./ReserveBox", () => ({

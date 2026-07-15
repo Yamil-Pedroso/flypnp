@@ -7,6 +7,7 @@ type AuthResult = { success: boolean; message?: string; user?: User }
 
 export interface AuthContextValue {
   user: User | null
+  authenticationEvent: { id: number; user: User } | null
   loading: boolean
   error: string | null
   setUser: (user: User | null) => void
@@ -29,6 +30,7 @@ const saveSession = (user: User, token: string) => {
 
 export const useAuthController = (): AuthContextValue => {
   const [user, setUser] = useState<User | null>(null)
+  const [authenticationEvent, setAuthenticationEvent] = useState<{ id: number; user: User } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -53,6 +55,7 @@ export const useAuthController = (): AuthContextValue => {
       const session = await request()
       setUser(session.user)
       saveSession(session.user, session.token)
+      setAuthenticationEvent({ id: Date.now(), user: session.user })
       return { success: true, user: session.user }
     } catch (cause) {
       const message = getErrorMessage(cause, 'Authentication failed')
@@ -63,6 +66,7 @@ export const useAuthController = (): AuthContextValue => {
 
   return {
     user,
+    authenticationEvent,
     loading,
     error,
     setUser,

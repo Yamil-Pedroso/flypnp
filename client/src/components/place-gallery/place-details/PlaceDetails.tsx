@@ -4,15 +4,21 @@ import {
   Award,
   Bath,
   BedDouble,
+  Copy,
+  Globe,
   Heart,
   House,
   MapPin,
+  MessageCircle,
   Share2,
   Sparkles,
   Star,
   X,
 } from "lucide-react";
-import { usePlaces } from "../../../lib/hooks";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { usePlaces, useWishlist } from "../../../lib/hooks";
+import CreateWishListBox from "../../wishlist/create/CreateWishListBox";
 import ReserveBox from "./ReserveBox";
 import ShowAllPhotos from "./ShowAllPhotos";
 
@@ -42,7 +48,10 @@ const stayHighlights = [
 const PlaceDetails = () => {
   const { id, category } = useParams<{ id: string; category: string }>();
   const { places, loading, error, refresh } = usePlaces();
+  const { wishlist, deleteWishlist } = useWishlist();
   const [reserveBoxVisible, setReserveBoxVisible] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [showCreateWishList, setShowCreateWishList] = useState(false);
 
   if (loading) {
     return (
@@ -88,6 +97,39 @@ const PlaceDetails = () => {
   const mainPhoto = place.photos[0]?.main || "";
   const thumbnails = place.photos[0]?.thumbnails || [];
   const photoCount = 1 + thumbnails.length;
+  const isSaved = wishlist.some((wish) => wish.place === place._id);
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const shareText = `Check out ${place.title} on Flypnp!`;
+
+  const handleShareWhatsApp = () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, "_blank");
+    setShareOpen(false);
+  };
+
+  const handleShareFacebook = () => {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, "_blank");
+    setShareOpen(false);
+  };
+
+  const handleShareTwitter = () => {
+    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, "_blank");
+    setShareOpen(false);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    toast.success("Link copied to clipboard!");
+    setShareOpen(false);
+  };
+
+  const handleSave = () => {
+    if (isSaved) {
+      deleteWishlist(place._id);
+      toast("Removed from wishlist");
+    } else {
+      setShowCreateWishList(true);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#fbfcfb] pb-28 lg:pb-16">
@@ -102,11 +144,34 @@ const PlaceDetails = () => {
             <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-4xl">{place.title}</h1>
           </div>
           <div className="flex shrink-0 gap-1 sm:gap-2">
-            <button type="button" aria-label="Share this place" className="group flex size-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-white hover:shadow-sm sm:size-auto sm:gap-2 sm:px-4 sm:py-2.5">
-              <Share2 className="size-5 transition group-hover:-translate-y-0.5" /><span className="hidden text-sm font-semibold sm:inline">Share</span>
-            </button>
-            <button type="button" aria-label="Save this place" className="group flex size-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-rose-50 hover:text-rose-600 sm:size-auto sm:gap-2 sm:px-4 sm:py-2.5">
-              <Heart className="size-5 transition group-hover:scale-110" /><span className="hidden text-sm font-semibold sm:inline">Save</span>
+            <div className="relative">
+              <button type="button" onClick={() => setShareOpen(!shareOpen)} aria-label="Share this place" className="group flex size-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-white hover:shadow-sm sm:size-auto sm:gap-2 sm:px-4 sm:py-2.5">
+                <Share2 className="size-5 transition group-hover:-translate-y-0.5" /><span className="hidden text-sm font-semibold sm:inline">Share</span>
+              </button>
+              {shareOpen && (
+                <>
+                  <div className="fixed inset-0 z-50" onClick={() => setShareOpen(false)} />
+                  <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                    <p className="px-4 pt-3.5 pb-1 text-xs font-bold uppercase tracking-[0.17em] text-slate-400">Share this place</p>
+                    <button type="button" onClick={handleShareWhatsApp} className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-700">
+                      <MessageCircle className="size-5 text-emerald-600" /> WhatsApp
+                    </button>
+                    <button type="button" onClick={handleShareFacebook} className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">
+                      <Globe className="size-5 text-blue-600" /> Facebook
+                    </button>
+                    <button type="button" onClick={handleShareTwitter} className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-950">
+                      <span className="grid size-5 place-items-center text-sm font-bold text-slate-900">X</span> X (Twitter)
+                    </button>
+                    <div className="border-t border-slate-100" />
+                    <button type="button" onClick={handleCopyLink} className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-950">
+                      <Copy className="size-5" /> Copy link
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+            <button type="button" onClick={handleSave} aria-label={isSaved ? "Remove from wishlist" : "Save this place"} className={`group flex size-10 items-center justify-center rounded-full transition sm:size-auto sm:gap-2 sm:px-4 sm:py-2.5 ${isSaved ? "text-rose-600 hover:bg-rose-50" : "text-slate-700 hover:bg-rose-50 hover:text-rose-600"}`}>
+              <Heart className={`size-5 transition group-hover:scale-110 ${isSaved ? "fill-rose-500" : ""}`} /><span className="hidden text-sm font-semibold sm:inline">{isSaved ? "Saved" : "Save"}</span>
             </button>
             <a href="#reservation" className="hidden items-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-slate-800 lg:flex">
               Reserve
@@ -198,6 +263,17 @@ const PlaceDetails = () => {
             <div className="mb-3 flex items-center justify-between px-1"><div className="h-1.5 w-10 rounded-full bg-slate-300 sm:hidden" /><p className="hidden text-sm font-semibold text-slate-950 sm:block">Complete your reservation</p><button type="button" aria-label="Close reservation" onClick={() => setReserveBoxVisible(false)} className="grid size-9 place-items-center rounded-full bg-white text-slate-700 shadow-sm ring-1 ring-slate-200"><X className="size-5" /></button></div>
             <ReserveBox />
           </div>
+        </div>
+      )}
+
+      {showCreateWishList && (
+        <div className="fixed inset-0 z-[999] grid place-items-center overflow-y-auto bg-slate-950/65 p-4 backdrop-blur-md sm:p-6">
+          <CreateWishListBox
+            closeCreateWishList={() => setShowCreateWishList(false)}
+            placeId={place._id}
+            title={place.title}
+            picture={mainPhoto}
+          />
         </div>
       )}
     </main>

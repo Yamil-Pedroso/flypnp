@@ -19,6 +19,7 @@ import {
 import { useBooking } from "../../lib/hooks";
 import { getBookingPaymentPath } from "../../lib/payment";
 import { getErrorMessage, type Booking } from "../../services";
+import emptyBoxDrawing from "../../assets/images/png/empty-box.png";
 
 type TripView = "upcoming" | "past";
 
@@ -139,9 +140,12 @@ const Trips = () => {
           ) : (
             <div className="relative mt-7 overflow-hidden rounded-[2rem] border border-slate-200 bg-white px-6 py-14 text-center shadow-sm sm:px-10 sm:py-20">
               <div className="absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-gradient-to-r from-transparent via-emerald-300 to-transparent" />
-              <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-emerald-50 text-emerald-700"><Compass className="size-9" /></div>
-              <Sparkles className="absolute left-[22%] top-16 size-5 text-amber-400" /><Sparkles className="absolute right-[24%] top-28 size-4 text-rose-400" />
-              <h3 className="mt-6 text-2xl font-semibold tracking-tight text-slate-950">{view === "upcoming" ? "No trips booked… yet!" : "Your travel memories will live here"}</h3>
+              <div className="relative mx-auto w-full max-w-sm">
+                <div className="absolute inset-x-10 bottom-4 h-24 rounded-full bg-emerald-100/70 blur-3xl" />
+                <img src={emptyBoxDrawing} alt="Flypnp empty trips drawing" className="relative mx-auto h-48 w-full object-contain sm:h-60" />
+              </div>
+              <Sparkles className="absolute left-[16%] top-20 size-5 text-amber-400 sm:left-[24%]" /><Sparkles className="absolute right-[17%] top-32 size-4 text-rose-400 sm:right-[25%]" />
+              <h3 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950">{view === "upcoming" ? "No trips booked… yet!" : "Your travel memories will live here"}</h3>
               <p className="mx-auto mt-3 max-w-lg leading-7 text-slate-500">{view === "upcoming" ? "The world is full of places worth waking up in. Start planning your next Flypnp adventure." : "After your first completed stay, you’ll find it here whenever you want to look back."}</p>
               {view === "upcoming" && <Link to="/" className="mt-7 inline-flex items-center gap-2 rounded-full bg-rose-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-500/20 transition hover:-translate-y-0.5 hover:bg-rose-600"><Compass className="size-4" />Start exploring</Link>}
             </div>
