@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getErrorMessage, paymentsService } from "../../services";
-import { useBooking } from "../../lib/hooks";
+import { useBooking, useExperiences } from "../../lib/hooks";
 
 const SucceededPayment = () => {
   const [searchParams] = useSearchParams();
   const { refresh } = useBooking();
+  const { refreshBookings: refreshExperienceBookings } = useExperiences();
   const [status, setStatus] = useState<"checking" | "confirmed" | "error">("checking");
   const [error, setError] = useState("");
   const paymentId = searchParams.get("payment");
@@ -22,7 +23,7 @@ const SucceededPayment = () => {
       }
       try {
         await paymentsService.confirm(paymentId);
-        await refresh();
+        await Promise.all([refresh(), refreshExperienceBookings()]);
         if (active) setStatus("confirmed");
       } catch (cause) {
         if (active) {
@@ -33,7 +34,7 @@ const SucceededPayment = () => {
     };
     void verify();
     return () => { active = false; };
-  }, [paymentId, refresh]);
+  }, [paymentId, refresh, refreshExperienceBookings]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-green-100 via-white to-blue-100 p-6 text-center">

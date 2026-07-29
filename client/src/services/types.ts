@@ -59,7 +59,9 @@ export type BookingInput = Omit<Booking, '_id' | 'owner' | 'name' | 'price' | 'p
 
 export interface WishlistItem {
   _id: string
-  place: string
+  place?: string
+  experience?: string
+  itemType?: 'place' | 'experience'
   title: string
   picture?: string
 }
@@ -73,12 +75,77 @@ export interface Notification {
 export interface Payment {
   _id: string
   user: string
-  place: Place
+  place?: Place
+  experience?: Experience
   booking?: string
+  experienceBooking?: string
   amount: number
   currency: string
   status: 'pending' | 'confirmed' | 'cancelled' | 'failed'
   stripeId: string
   paymentMethod: string
   paymentDate: string
+}
+
+export type ExperienceCategory =
+  | 'local-flavors'
+  | 'nature'
+  | 'creative'
+  | 'hidden-gems'
+  | 'night'
+  | 'family'
+  | 'wellness'
+  | 'culture'
+
+export interface Experience {
+  _id: string
+  slug: string
+  title: string
+  city: string
+  country: string
+  address: string
+  category: ExperienceCategory
+  kind: 'moment' | 'local-path'
+  summary: string
+  description: string
+  images: string[]
+  host: {
+    name: string
+    avatar: string
+    bio: string
+    yearsHosting: number
+  }
+  durationMinutes: number
+  languages: string[]
+  maxGuests: number
+  price: number
+  rating: number
+  reviews: number
+  meetingPoint: string
+  included: string[]
+  bring: string[]
+  highlights: string[]
+  availableDays: number[]
+  startTimes: string[]
+  featured: boolean
+}
+
+export interface ExperienceBooking {
+  _id: string
+  owner: string
+  experience: Experience
+  date: string
+  startTime: string
+  participants: number
+  status: 'pending' | 'confirmed' | 'cancelled'
+  name: string
+  price: number
+}
+
+export interface ExperienceFilters {
+  destination?: string
+  category?: ExperienceCategory | 'all'
+  date?: string
+  guests?: number
+  kind?: Experience['kind']
 }

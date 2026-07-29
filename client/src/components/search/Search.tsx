@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Search as SearchIcon } from "lucide-react";
 import { usePlaces } from "../../lib/hooks";
 import AddGuests from "./add-guests/AddGuests";
@@ -12,26 +12,35 @@ const Search = () => {
   const [validationError, setValidationError] = useState("");
   const { search } = usePlaces();
   const navigate = useNavigate();
+  const location = useLocation();
+  const experienceMode = location.pathname.startsWith("/experiences");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if ((checkIn && !checkOut) || (!checkIn && checkOut)) {
+    if (
+      !experienceMode &&
+      ((checkIn && !checkOut) || (!checkIn && checkOut))
+    ) {
       setValidationError("Choose both check-in and check-out dates.");
       return;
     }
-    if (checkIn && checkOut && checkOut <= checkIn) {
+    if (!experienceMode && checkIn && checkOut && checkOut <= checkIn) {
       setValidationError("Check-out must be after check-in.");
       return;
     }
     setValidationError("");
-    void search(destination);
-    navigate(`/?${getTravelParams({ destination, checkIn, checkOut, guests }).toString()}`);
+    if (experienceMode) {
+      navigate(`/experiences?${getTravelParams({ destination, checkIn, checkOut: "", guests }).toString()}`);
+    } else {
+      void search(destination);
+      navigate(`/?${getTravelParams({ destination, checkIn, checkOut, guests }).toString()}`);
+    }
   };
 
   return (
     <div className="mx-auto w-full max-w-5xl pb-4 pt-3 md:pt-4">
       <form
-        aria-label="Search stays"
+        aria-label={experienceMode ? "Search experiences" : "Search stays"}
         onSubmit={handleSubmit}
         className="relative grid grid-cols-[1fr_auto_auto] items-center gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_12px_35px_rgba(15,23,42,0.10)] md:grid-cols-[1.4fr_1fr_1fr_0.8fr_auto] md:rounded-full"
       >

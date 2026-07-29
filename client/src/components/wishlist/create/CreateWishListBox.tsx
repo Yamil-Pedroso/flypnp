@@ -11,6 +11,7 @@ interface CreateWishListProps {
   placeId: string
   title: string
   picture: string
+  itemType?: 'place' | 'experience'
 }
 
 const CreateWishListBox = ({
@@ -18,18 +19,23 @@ const CreateWishListBox = ({
   className,
   placeId,
   picture,
+  itemType = 'place',
 }: CreateWishListProps) => {
   const [wishListName, setWishListName] = useState('')
   const [errorCharLimit, setErrorCharLimit] = useState(false)
   const { addWishlist } = useWishlist()
   const notify = () => toast('Wishlist created successfully!', { icon: <Heart className="size-4 fill-rose-500 text-rose-500" /> })
 
-  const handleCreateWishList = () => {
+  const handleCreateWishList = async () => {
     if (wishListName.trim() && !errorCharLimit) {
-      addWishlist(placeId, wishListName, picture)
-      closeCreateWishList()
-      notify()
-      setWishListName('')
+      try {
+        await addWishlist(placeId, wishListName, picture, itemType)
+        closeCreateWishList()
+        notify()
+        setWishListName('')
+      } catch {
+        toast.error(`Could not save this ${itemType}. Please log in and try again.`)
+      }
     }
   }
 
@@ -82,7 +88,7 @@ const CreateWishListBox = ({
         <button
           onClick={
             wishListName.length > 0 && !errorCharLimit
-              ? handleCreateWishList
+              ? () => void handleCreateWishList()
               : undefined
           }
           className="rounded-full bg-rose-500 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-rose-500/20 transition hover:-translate-y-0.5 hover:bg-rose-600 hover:shadow-xl disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0"

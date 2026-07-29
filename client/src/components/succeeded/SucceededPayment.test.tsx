@@ -15,6 +15,7 @@ vi.mock("../../services", () => ({
 
 vi.mock("../../lib/hooks", () => ({
   useBooking: () => ({ refresh: successMocks.refresh }),
+  useExperiences: () => ({ refreshBookings: vi.fn().mockResolvedValue(undefined) }),
 }));
 
 describe("SucceededPayment", () => {

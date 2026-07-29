@@ -23,6 +23,9 @@ import TripsPage from "./pages/TripsPage";
 import WishListPage from "./pages/WishListPage";
 import { SearchProvider } from "./components/search/SearchContext";
 import WelcomeModal from "./components/welcome/WelcomeModal";
+import ExperienceProvider from "./providers/ExperienceProvider";
+import ExperiencesPage from "./pages/ExperiencesPage";
+import ExperienceDetailsPage from "./pages/ExperienceDetailsPage";
 
 //interface AppProps {
 //  children: React.ReactNode
@@ -41,6 +44,7 @@ function App() {
       <UserProvider>
         <WelcomeModal />
         <PlacesProvider>
+          <ExperienceProvider>
           <NotificationsProvider>
             <WishlistProvider>
               <BookingProvider>
@@ -53,6 +57,8 @@ function App() {
                         element={<WithNavbarLayout />}
                       >
                         <Route path="/" element={<HomePage />} />
+                        <Route path="/experiences" element={<ExperiencesPage />} />
+                        <Route path="/experiences/:slug" element={<ExperienceDetailsPage />} />
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route
                           path="/notifications"
@@ -84,6 +90,7 @@ function App() {
               </BookingProvider>
             </WishlistProvider>
           </NotificationsProvider>
+          </ExperienceProvider>
         </PlacesProvider>
       </UserProvider>
     </GoogleOAuthProvider>

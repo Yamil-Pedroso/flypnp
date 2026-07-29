@@ -7,6 +7,7 @@
     "start": "node dist/server/server.js",
     "dev": "tsx watch src/server/server.ts",
     "import-data": "tsx src/utils/importData.ts",
+    "seed-experiences": "tsx src/utils/seedExperiences.ts",
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

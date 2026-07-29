@@ -4,7 +4,9 @@ interface IPayment {
     user: Types.ObjectId;
     name: string;
     booking?: Types.ObjectId;
-    place: Types.ObjectId;
+    experienceBooking?: Types.ObjectId;
+    place?: Types.ObjectId;
+    experience?: Types.ObjectId;
     amount: number;
     currency: string;
     status: string;
@@ -17,7 +19,9 @@ const paymentSchema = new Schema<IPayment>({
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },
     booking: { type: Schema.Types.ObjectId, ref: "Booking" },
-    place: { type: Schema.Types.ObjectId, ref: "Place", required: true },
+    experienceBooking: { type: Schema.Types.ObjectId, ref: "ExperienceBooking" },
+    place: { type: Schema.Types.ObjectId, ref: "Place" },
+    experience: { type: Schema.Types.ObjectId, ref: "Experience" },
     amount: { type: Number, required: true },
     currency: { type: String, required: true, default: "chf" },
     status: {

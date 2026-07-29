@@ -7,8 +7,8 @@ export interface WishlistContextValue {
   loading: boolean
   error: string | null
   refresh: () => Promise<void>
-  addWishlist: (placeId: string, title?: string, picture?: string) => Promise<void>
-  deleteWishlist: (placeId: string) => Promise<void>
+  addWishlist: (itemId: string, title?: string, picture?: string, itemType?: 'place' | 'experience') => Promise<void>
+  deleteWishlist: (itemId: string, itemType?: 'place' | 'experience') => Promise<void>
 }
 
 export const WishlistContext = createContext<WishlistContextValue | null>(null)
@@ -27,13 +27,13 @@ export const useWishlistController = (): WishlistContextValue => {
   useEffect(() => { void refresh() }, [refresh])
   return {
     wishlist, loading, error, refresh,
-    async addWishlist(placeId) {
-      const item = await wishlistService.add(placeId)
-      setWishlist((current) => current.some((wish) => wish.place === placeId) ? current : [...current, item])
+    async addWishlist(itemId, _title, _picture, itemType = 'place') {
+      const item = await wishlistService.add(itemId, itemType)
+      setWishlist((current) => current.some((wish) => (itemType === 'experience' ? wish.experience : wish.place) === itemId) ? current : [...current, item])
     },
-    async deleteWishlist(placeId) {
-      await wishlistService.remove(placeId)
-      setWishlist((current) => current.filter((wish) => wish.place !== placeId))
+    async deleteWishlist(itemId, itemType = 'place') {
+      await wishlistService.remove(itemId, itemType)
+      setWishlist((current) => current.filter((wish) => (itemType === 'experience' ? wish.experience : wish.place) !== itemId))
     },
   }
 }

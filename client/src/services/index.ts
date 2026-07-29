@@ -1,6 +1,7 @@
 export * from './auth.service'
 export * from './bookings.service'
 export * from './errors'
+export * from './experiences.service'
 export * from './http'
 export * from './notifications.service'
 export * from './payments.service'

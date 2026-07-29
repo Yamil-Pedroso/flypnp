@@ -8,6 +8,7 @@ import booking from "./bookingRoutes";
 import notification from "./notificationRoutes";
 import wishlist from "./wishlistRoutes";
 import payment from "./paymentRoutes";
+import experience from "./experienceRoutes";
 import { isLoggedIn } from "../middlewares/user";
 import asyncHandler from "../utils/asyncHandler";
 import CustomError from "../utils/customError";
@@ -92,5 +93,6 @@ router.use('/', booking);
 router.use('/', notification);
 router.use('/', wishlist);
 router.use('/', payment);
+router.use('/', experience);
 
 export default router;

@@ -24,7 +24,11 @@ const WishList = () => {
 
   const confirmDelete = async () => {
     if (!itemToDelete) return;
-    await deleteWishlist(itemToDelete.place);
+    const itemType = itemToDelete.itemType ?? (itemToDelete.experience ? "experience" : "place");
+    const itemId = itemType === "experience" ? itemToDelete.experience : itemToDelete.place;
+    if (!itemId) return;
+    if (itemType === "experience") await deleteWishlist(itemId, itemType);
+    else await deleteWishlist(itemId);
     toast.success("Successfully deleted the place", { icon: <Trash2 className="size-4" /> });
     setItemToDelete(null);
   };
@@ -73,7 +77,7 @@ const WishList = () => {
                       {picture ? <img src={picture} alt={wish.title} className="size-full object-cover transition duration-500 group-hover:scale-105" /> : <div className="flex size-full items-center justify-center bg-rose-50 text-rose-400"><Images className="size-10" /></div>}
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent opacity-70" />
                       <button type="button" onClick={() => setItemToDelete(wish)} aria-label={`Remove ${wish.title} from wishlist`} className="absolute right-3 top-3 flex size-10 items-center justify-center rounded-full bg-white/90 text-slate-600 shadow-sm backdrop-blur transition hover:scale-105 hover:bg-rose-500 hover:text-white sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"><Trash2 className="size-4.5" /></button>
-                      <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 backdrop-blur">Saved stay</span>
+                      <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 backdrop-blur">{wish.itemType === "experience" ? "Saved experience" : "Saved stay"}</span>
                     </div>
                     <div className="px-1 pt-3"><h3 className="truncate text-lg font-semibold text-slate-950">{wish.title}</h3><p className="mt-1 flex items-center gap-1.5 text-sm text-slate-500"><Heart className="size-3.5 fill-rose-400 text-rose-400" />Ready when you are</p></div>
                   </motion.article>

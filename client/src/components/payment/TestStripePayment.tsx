@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getErrorMessage, paymentsService } from "../../services";
-import { useBooking } from "../../lib/hooks";
+import { useBooking, useExperiences } from "../../lib/hooks";
 
 interface CheckoutFormProps {
   onSuccessfulCheckout: () => void;
@@ -33,6 +33,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { refresh: refreshBookings } = useBooking();
+  const { refreshBookings: refreshExperienceBookings } = useExperiences();
   const [error, setError] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [isPreparing, setPreparing] = useState(true);
@@ -41,25 +42,30 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
   const [successUrl, setSuccessUrl] = useState("");
   const [paymentStatus, setPaymentStatus] = useState<"pending" | "confirmed">("pending");
   const bookingId = new URLSearchParams(location.search).get("booking");
+  const experienceBookingId = new URLSearchParams(location.search).get("experienceBooking");
 
   useEffect(() => {
     let active = true;
 
     const preparePayment = async () => {
-      if (!bookingId) {
+      if (!bookingId && !experienceBookingId) {
         if (active) {
-          setError("Missing accommodation details. Return to the stay and try again.");
+          setError("Missing booking details. Return to the listing and try again.");
           setPreparing(false);
         }
         return;
       }
 
       try {
-        const data = await paymentsService.create({ bookingId, currency: "chf" });
+        const data = await paymentsService.create({
+          bookingId: bookingId ?? undefined,
+          experienceBookingId: experienceBookingId ?? undefined,
+          currency: "chf",
+        });
         if (!data.success || !data.clientSecret) throw new Error("The secure payment session could not be created.");
         if (data.alreadyPaid) {
           await paymentsService.confirm(data.data._id);
-          await refreshBookings();
+          await Promise.all([refreshBookings(), refreshExperienceBookings()]);
           if (active) {
             const returnLocation = new URL(data.successUrl, window.location.origin);
             navigate(`${returnLocation.pathname}${returnLocation.search}`);
@@ -80,7 +86,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
 
     void preparePayment();
     return () => { active = false; };
-  }, [bookingId, navigate, refreshBookings]);
+  }, [bookingId, experienceBookingId, navigate, refreshBookings, refreshExperienceBookings]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -105,7 +111,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
       } else if (result.paymentIntent?.status === "succeeded") {
         if (!paymentId) throw new Error("Missing payment reference.");
         await paymentsService.confirm(paymentId);
-        await refreshBookings();
+        await Promise.all([refreshBookings(), refreshExperienceBookings()]);
         setPaymentStatus("confirmed");
         toast.success("Payment completed successfully.");
         onSuccessfulCheckout();

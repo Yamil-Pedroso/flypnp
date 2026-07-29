@@ -48,6 +48,7 @@ const bookingState = vi.hoisted(() => ({
 
 vi.mock("../../lib/hooks", () => ({
   useBooking: () => ({ bookings: bookingState.bookings, loading: false, error: null, refresh: vi.fn(), deleteBooking: bookingState.deleteBooking }),
+  useExperiences: () => ({ bookings: [], bookingsLoading: false, deleteBooking: vi.fn() }),
 }));
 
 describe("Trips", () => {

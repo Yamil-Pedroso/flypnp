@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import type Stripe from "stripe";
 import { Payment } from "../models/Payment";
 import { Booking } from "../models/Booking";
+import { ExperienceBooking } from "../models/ExperienceBooking";
 import { stripe } from "../config/stripe";
 import { requireEnv } from "../config/env";
 import CustomError from "../utils/customError";
@@ -23,21 +24,32 @@ const getPaymentReturnUrl = (kind: "success" | "cancel", paymentId?: string) => 
 };
 
 export const createPayment = async (req: Request, res: Response) => {
-  const booking = await Booking.findById(req.body.bookingId);
-  if (!booking) throw new CustomError("Booking not found", 404);
-  if (booking.owner.toString() !== req.user!.id && !req.user!.isAdmin) {
+  const bookingId = req.body.bookingId ? String(req.body.bookingId) : "";
+  const experienceBookingId = req.body.experienceBookingId ? String(req.body.experienceBookingId) : "";
+  if ((!bookingId && !experienceBookingId) || (bookingId && experienceBookingId)) {
+    throw new CustomError("Provide one booking to pay", 400);
+  }
+
+  const booking = bookingId ? await Booking.findById(bookingId) : null;
+  const experienceBooking = experienceBookingId
+    ? await ExperienceBooking.findById(experienceBookingId)
+    : null;
+  const payable = booking ?? experienceBooking;
+  if (!payable) throw new CustomError(bookingId ? "Booking not found" : "Experience booking not found", 404);
+  if (payable.owner.toString() !== req.user!.id && !req.user!.isAdmin) {
     throw new CustomError("You cannot pay for this booking", 403);
   }
-  if (booking.status !== "pending") {
-    throw new CustomError("Only pending bookings can be paid", 409);
-  }
+  if (payable.status !== "pending") throw new CustomError("Only pending bookings can be paid", 409);
 
   const currency = String(req.body.currency ?? "chf").toLowerCase();
   if (!/^[a-z]{3}$/.test(currency)) throw new CustomError("Invalid currency", 400);
 
-  const amount = Math.round(booking.price * 1.1 * 100);
+  const amount = Math.round(payable.price * 1.1 * 100);
+  const paymentLink = booking
+    ? { booking: booking._id }
+    : { experienceBooking: experienceBooking!._id };
   const existingPayment = await Payment.findOne({
-    booking: booking._id,
+    ...paymentLink,
     user: req.user!._id,
     status: { $in: ["pending", "failed"] },
   });
@@ -45,8 +57,8 @@ export const createPayment = async (req: Request, res: Response) => {
     const existingIntent = await stripe.paymentIntents.retrieve(existingPayment.stripeId);
     if (existingIntent.status === "canceled") {
       existingPayment.status = "cancelled";
-      booking.status = "cancelled";
-      await Promise.all([existingPayment.save(), booking.save()]);
+      payable.status = "cancelled";
+      await Promise.all([existingPayment.save(), payable.save()]);
       throw new CustomError("This payment was cancelled. Please create a new reservation", 409);
     }
     if (existingPayment.status === "failed") {
@@ -82,16 +94,30 @@ export const createPayment = async (req: Request, res: Response) => {
     automatic_payment_methods: { enabled: true },
     metadata: {
       userId: req.user!.id,
-      placeId: booking.place.toString(),
-      bookingId: booking.id,
+      ...(booking ? {
+        placeId: booking.place.toString(),
+        bookingId: booking.id,
+      } : {
+        experienceId: experienceBooking!.experience.toString(),
+        experienceBookingId: experienceBooking!.id,
+      }),
     },
-  }, { idempotencyKey: `flypnp-booking-${booking.id}` });
+  }, {
+    idempotencyKey: booking
+      ? `flypnp-booking-${booking.id}`
+      : `flypnp-experience-${experienceBooking!.id}`,
+  });
 
   const payment = await Payment.create({
     user: req.user!._id,
     name: req.user!.name,
-    place: booking.place,
-    booking: booking._id,
+    ...(booking ? {
+      place: booking.place,
+      booking: booking._id,
+    } : {
+      experience: experienceBooking!.experience,
+      experienceBooking: experienceBooking!._id,
+    }),
     amount,
     currency,
     status: "pending",
@@ -114,23 +140,29 @@ export const confirmPayment = async (req: Request, res: Response) => {
   const payment = await Payment.findById(req.params.id);
   if (!payment) throw new CustomError("Payment not found", 404);
   assertPaymentOwner(payment.user.toString(), req);
-  if (!payment.booking) throw new CustomError("This payment is not linked to a booking", 409);
+  if (!payment.booking && !payment.experienceBooking) {
+    throw new CustomError("This payment is not linked to a booking", 409);
+  }
 
   const intent = await stripe.paymentIntents.retrieve(payment.stripeId);
   if (intent.status !== "succeeded") {
     throw new CustomError("Stripe has not confirmed this payment", 409);
   }
 
-  const booking = await Booking.findById(payment.booking);
-  if (!booking) throw new CustomError("Booking not found", 404);
-  if (booking.owner.toString() !== req.user!.id && !req.user!.isAdmin) {
+  const booking = payment.booking ? await Booking.findById(payment.booking) : null;
+  const experienceBooking = payment.experienceBooking
+    ? await ExperienceBooking.findById(payment.experienceBooking)
+    : null;
+  const payable = booking ?? experienceBooking;
+  if (!payable) throw new CustomError("Booking not found", 404);
+  if (payable.owner.toString() !== req.user!.id && !req.user!.isAdmin) {
     throw new CustomError("You cannot confirm this booking", 403);
   }
 
   payment.status = "confirmed";
   payment.paymentMethod = String(intent.payment_method ?? "");
-  booking.status = "confirmed";
-  await Promise.all([payment.save(), booking.save()]);
+  payable.status = "confirmed";
+  await Promise.all([payment.save(), payable.save()]);
 
   res.status(200).json({ success: true, data: payment });
 };
@@ -169,6 +201,9 @@ export const handleStripeWebhook = async (req: Request, res: Response) => {
       if (payment?.booking && (status === "confirmed" || status === "cancelled")) {
         await Booking.findByIdAndUpdate(payment.booking, { status });
       }
+      if (payment?.experienceBooking && (status === "confirmed" || status === "cancelled")) {
+        await ExperienceBooking.findByIdAndUpdate(payment.experienceBooking, { status });
+      }
     }
   }
 
@@ -179,17 +214,18 @@ export const getPaymentDetailsWithPlace = async (req: Request, res: Response) =>
   const payment = await Payment.findById(req.params.id).populate("place");
   if (!payment) throw new CustomError("Payment not found", 404);
   assertPaymentOwner(payment.user.toString(), req);
+  if (!payment.place) throw new CustomError("This payment is not linked to a stay", 409);
   res.status(200).json({ success: true, data: payment.place });
 };
 
 export const getPayments = async (req: Request, res: Response) => {
   const query = req.user!.isAdmin ? {} : { user: req.user!._id };
-  const payments = await Payment.find(query).populate("place");
+  const payments = await Payment.find(query).populate("place").populate("experience");
   res.status(200).json({ success: true, count: payments.length, data: payments });
 };
 
 export const getSinglePayment = async (req: Request, res: Response) => {
-  const payment = await Payment.findById(req.params.id).populate("place");
+  const payment = await Payment.findById(req.params.id).populate("place").populate("experience");
   if (!payment) throw new CustomError("Payment not found", 404);
   assertPaymentOwner(payment.user.toString(), req);
   res.status(200).json({ success: true, data: payment });
@@ -208,6 +244,9 @@ export const updatePayment = async (req: Request, res: Response) => {
     payment.status = "cancelled";
     if (payment.booking) {
       await Booking.findByIdAndUpdate(payment.booking, { status: "cancelled" });
+    }
+    if (payment.experienceBooking) {
+      await ExperienceBooking.findByIdAndUpdate(payment.experienceBooking, { status: "cancelled" });
     }
     await payment.save();
   }
