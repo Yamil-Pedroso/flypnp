@@ -83,6 +83,29 @@ export const notifyUser = async (input: NotifyUserInput) => {
   }).catch(ignoreDuplicate);
 };
 
+export const queueTransactionalEmail = async (input: {
+  recipient: string;
+  recipientName: string;
+  subject: string;
+  title: string;
+  message: string;
+  actionPath: string;
+  dedupeKey: string;
+}) => {
+  if (!process.env.RESEND_API_KEY || !process.env.EMAIL_FROM) return;
+  const actionUrl = absoluteClientUrl(input.actionPath);
+  await EmailDelivery.create({
+    recipient: input.recipient,
+    subject: input.subject,
+    text: `${input.message}\n\n${actionUrl}`,
+    html: emailHtml(input.recipientName, input.title, input.message, actionUrl),
+    dedupeKey: input.dedupeKey,
+    status: "pending",
+    attempts: 0,
+    nextAttemptAt: new Date(),
+  }).catch(ignoreDuplicate);
+};
+
 const claimNextEmail = () => {
   const now = new Date();
   const staleLock = new Date(Date.now() - 10 * 60_000);

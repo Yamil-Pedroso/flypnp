@@ -5,7 +5,7 @@ import { CheckCircle2, CreditCard, LoaderCircle, LockKeyhole } from "lucide-reac
 import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getErrorMessage, paymentsService } from "../../services";
+import { getErrorMessage, giftCardsService, paymentsService } from "../../services";
 import { useBooking, useExperiences } from "../../lib/hooks";
 
 interface CheckoutFormProps {
@@ -42,6 +42,8 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
   const [paymentId, setPaymentId] = useState("");
   const [successUrl, setSuccessUrl] = useState("");
   const [paymentStatus, setPaymentStatus] = useState<"pending" | "confirmed">("pending");
+  const [giftCardAmount, setGiftCardAmount] = useState(0);
+  const [stripeAmount, setStripeAmount] = useState(0);
   const bookingId = new URLSearchParams(location.search).get("booking");
   const experienceBookingId = new URLSearchParams(location.search).get("experienceBooking");
   const serviceRequestId = new URLSearchParams(location.search).get("serviceRequest");
@@ -59,13 +61,19 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
       }
 
       try {
+        const wallet = await giftCardsService.summary().catch(() => null);
         const data = await paymentsService.create({
           bookingId: bookingId ?? undefined,
           experienceBookingId: experienceBookingId ?? undefined,
           serviceRequestId: serviceRequestId ?? undefined,
           currency: "chf",
+          useGiftBalance: Boolean(wallet?.balance),
         });
-        if (!data.success || !data.clientSecret) throw new Error("The secure payment session could not be created.");
+        if (!data.success) throw new Error("The secure payment session could not be created.");
+        if (active) {
+          setGiftCardAmount(data.giftCardAmount ?? 0);
+          setStripeAmount(data.stripeAmount ?? data.data.amount);
+        }
         if (data.alreadyPaid) {
           await paymentsService.confirm(data.data._id);
           await Promise.all([refreshBookings(), refreshExperienceBookings()]);
@@ -75,6 +83,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
           }
           return;
         }
+        if (!data.clientSecret) throw new Error("The secure payment session could not be created.");
         if (active) {
           setClientSecret(data.clientSecret);
           setPaymentId(data.data._id);
@@ -141,6 +150,16 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
           <CardElement options={cardOptions} />
         </div>
       </div>
+
+      {giftCardAmount > 0 && (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm">
+          <p className="flex items-center justify-between gap-4 font-semibold text-emerald-900">
+            <span>Gift card balance applied</span>
+            <span className="tabular-nums">−{(giftCardAmount / 100).toFixed(2)} CHF</span>
+          </p>
+          <p className="mt-1 text-xs text-emerald-700">Stripe will charge {(stripeAmount / 100).toFixed(2)} CHF.</p>
+        </div>
+      )}
 
       {isPreparing && <p className="flex items-center gap-2 text-xs font-medium text-slate-500"><LoaderCircle className="size-3.5 animate-spin" /> Preparing your secure payment…</p>}
       {error && <p role="alert" className="rounded-xl bg-rose-50 px-3.5 py-3 text-sm font-medium leading-5 text-rose-700 ring-1 ring-rose-100">{error}</p>}

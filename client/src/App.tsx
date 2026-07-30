@@ -30,6 +30,9 @@ import ServicesPage from "./pages/ServicesPage";
 import AdminServicesPage from "./pages/AdminServicesPage";
 import HostPage from "./pages/HostPage";
 import PlacesFormPage from "./pages/PlacesFormPage";
+import MessagesPage from "./pages/MessagesPage";
+import GiftCardsPage from "./pages/GiftCardsPage";
+import MessagesProvider from "./providers/MessagesProvider";
 
 //interface AppProps {
 //  children: React.ReactNode
@@ -46,6 +49,7 @@ function App() {
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <Toaster position="bottom-right" richColors />
       <UserProvider>
+        <MessagesProvider>
         <WelcomeModal />
         <PlacesProvider>
           <ExperienceProvider>
@@ -79,6 +83,8 @@ function App() {
                         />
                         <Route path="/bookings" element={<BookingPage />} />
                         <Route path="/trips" element={<TripsPage />} />
+                        <Route path="/messages" element={<MessagesPage />} />
+                        <Route path="/gift-cards" element={<GiftCardsPage />} />
                         <Route path="/wishlist" element={<WishListPage />} />
                         <Route path="/my-payment" element={<PaymentPage />} />
                       </Route>
@@ -101,6 +107,7 @@ function App() {
           </NotificationsProvider>
           </ExperienceProvider>
         </PlacesProvider>
+        </MessagesProvider>
       </UserProvider>
     </GoogleOAuthProvider>
   );

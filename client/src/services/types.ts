@@ -19,6 +19,7 @@ export interface Photo {
 
 export interface Place {
   _id: string
+  owner?: string
   title: string
   address: string
   photos: Photo[]
@@ -31,6 +32,65 @@ export interface Place {
   reviews: number
   price: number
   archivedAt?: string
+}
+
+export interface MessageParticipant {
+  _id: string
+  name: string
+  avatar: string
+}
+
+export interface ConversationMessage {
+  _id: string
+  conversation: string
+  sender: MessageParticipant
+  body: string
+  readBy: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface MessageCursor {
+  before: string
+  beforeId: string
+}
+
+export interface MessagePage {
+  messages: ConversationMessage[]
+  hasMore: boolean
+  nextCursor: MessageCursor | null
+}
+
+export interface MessageConversation {
+  _id: string
+  kind: 'hosting' | 'travelling'
+  otherParticipant: MessageParticipant
+  unreadCount: number
+  lastMessageText: string
+  lastMessageAt: string
+  lastMessageSender?: string
+  booking: {
+    _id: string
+    checkIn: string
+    checkOut: string
+    numOfGuests: GuestCount
+    status: Booking['status']
+    place: Pick<Place, '_id' | 'title' | 'address' | 'category' | 'photos'>
+  }
+  createdAt: string
+  updatedAt: string
+}
+
+export interface MessageRealtimeEvent {
+  type:
+    | 'conversation.updated'
+    | 'message.created'
+    | 'messages.read'
+    | 'typing.started'
+    | 'typing.stopped'
+  conversationId: string
+  message?: ConversationMessage
+  userId?: string
 }
 
 export type PlaceInput = Pick<
@@ -94,11 +154,43 @@ export interface Payment {
   experienceBooking?: string
   serviceRequest?: string | ServiceRequest
   amount: number
+  stripeAmount: number
+  giftCardAmount: number
   currency: string
   status: 'pending' | 'confirmed' | 'cancelled' | 'failed'
   stripeId: string
   paymentMethod: string
   paymentDate: string
+}
+
+export interface GiftCardPurchase {
+  _id: string
+  recipientName: string
+  recipientEmail: string
+  message?: string
+  amount: number
+  currency: 'chf'
+  status: 'pending' | 'active' | 'redeemed' | 'cancelled'
+  codeLast4: string
+  activatedAt?: string
+  redeemedAt?: string
+  createdAt: string
+}
+
+export interface WalletTransaction {
+  _id: string
+  type: 'gift_card_redemption' | 'booking_payment' | 'payment_refund'
+  amount: number
+  currency: 'chf'
+  description: string
+  createdAt: string
+}
+
+export interface GiftCardSummary {
+  balance: number
+  currency: 'chf'
+  transactions: WalletTransaction[]
+  purchases: GiftCardPurchase[]
 }
 
 export type ExperienceCategory =

@@ -7,6 +7,7 @@ import UserMenu from "./UserMenu";
 vi.mock("../../../lib/hooks", () => ({
   useAuth: () => ({ user: null, logout: vi.fn() }),
   useNotifications: () => ({ notifications: [] }),
+  useMessages: () => ({ unreadTotal: 0 }),
 }));
 
 vi.mock("../../user-auth/Login", () => ({ default: () => <div>Login</div> }));

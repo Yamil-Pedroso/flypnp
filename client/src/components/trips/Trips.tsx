@@ -20,6 +20,7 @@ import {
   Clock3,
   Phone,
   Mail,
+  MessageCircle,
 } from "lucide-react";
 import { useBooking, useExperiences } from "../../lib/hooks";
 import { getBookingPaymentPath, getExperiencePaymentPath, getServicePaymentPath } from "../../lib/payment";
@@ -75,11 +76,16 @@ const TripCard = ({ booking, past, onDelete }: { booking: Booking; past: boolean
         </div>
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
           <span className="flex items-center gap-2 text-sm text-slate-500"><Users className="size-4" />{getGuestCount(booking)} guest{getGuestCount(booking) === 1 ? "" : "s"}</span>
-          {booking.status === "pending" && !past ? (
-            <Link to={getBookingPaymentPath(booking)} className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-bold text-white shadow-md shadow-rose-500/20 transition hover:-translate-y-0.5 hover:bg-rose-600"><CreditCard className="size-4" />Complete payment</Link>
-          ) : (
-            <Link to={`/place/${booking.place.category}/${booking.place._id}`} className="flex items-center gap-1.5 text-sm font-semibold text-slate-900 transition group-hover:text-emerald-700">{past ? "View stay" : "Trip details"}<ArrowUpRight className="size-4" /></Link>
-          )}
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            {booking.place.owner && (
+              <Link to={`/messages?booking=${booking._id}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 transition hover:text-emerald-900"><MessageCircle className="size-4" />Message host</Link>
+            )}
+            {booking.status === "pending" && !past ? (
+              <Link to={getBookingPaymentPath(booking)} className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-bold text-white shadow-md shadow-rose-500/20 transition hover:-translate-y-0.5 hover:bg-rose-600"><CreditCard className="size-4" />Complete payment</Link>
+            ) : (
+              <Link to={`/place/${booking.place.category}/${booking.place._id}`} className="flex items-center gap-1.5 text-sm font-semibold text-slate-900 transition group-hover:text-emerald-700">{past ? "View stay" : "Trip details"}<ArrowUpRight className="size-4" /></Link>
+            )}
+          </div>
         </div>
       </div>
     </article>

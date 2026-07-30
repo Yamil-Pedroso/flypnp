@@ -6,7 +6,7 @@ import { FaHouseUser } from "react-icons/fa6";
 import { RiMenuUnfoldLine } from "react-icons/ri";
 import { TbWorld } from "react-icons/tb";
 import { Check, Languages, Sparkles, X } from "lucide-react";
-import { useAuth, useNotifications } from "../../../lib/hooks";
+import { useAuth, useMessages, useNotifications } from "../../../lib/hooks";
 import Login from "../../user-auth/Login";
 import Register from "../../user-auth/Register";
 
@@ -26,7 +26,9 @@ const UserMenu = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const { user, logout } = useAuth();
   const { notifications } = useNotifications();
+  const { unreadTotal: unreadMessages } = useMessages();
   const unreadNotifications = notifications.filter((notification) => !notification.read).length;
+  const unreadTotal = unreadNotifications + unreadMessages;
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleMenuIconClick = () => setMenuOpen(!menuOpen);
@@ -142,8 +144,8 @@ const UserMenu = () => {
           ) : (
             <FaHouseUser className="text-xl text-gray-600" />
           )}
-          {user && unreadNotifications > 0 && (
-            <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-emerald-600 text-xs text-white">{unreadNotifications}</span>
+          {user && unreadTotal > 0 && (
+            <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-emerald-600 text-xs text-white">{unreadTotal > 9 ? "9+" : unreadTotal}</span>
           )}
         </button>
 
@@ -214,23 +216,32 @@ const UserMenu = () => {
                     </Link>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/messages"
+                      onClick={() => setUserMenuOpen(false)}
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
-                      Messages
-                    </a>
+                      <span className="flex items-center justify-between gap-3">
+                        Messages
+                        {unreadMessages > 0 && (
+                          <span className="grid min-w-5 place-items-center rounded-full bg-rose-500 px-1.5 py-0.5 text-xs font-bold text-white">
+                            {unreadMessages}
+                          </span>
+                        )}
+                      </span>
+                    </Link>
                   </li>
                   <li>
                     <hr className="my-2 border-t border-gray-200" />
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/gift-cards"
+                      onClick={() => setUserMenuOpen(false)}
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
                       Gift cards
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a
@@ -272,12 +283,13 @@ const UserMenu = () => {
                     <hr className="my-2 border-t border-gray-200" />
                   </li>
                   <li>
-                    <a
-                      href="/register"
+                    <Link
+                      to="/gift-cards"
+                      onClick={() => setUserMenuOpen(false)}
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
                       Gift cards
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a

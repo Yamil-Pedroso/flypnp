@@ -1,4 +1,5 @@
-import { CalendarDays, Mail, UserRound, Users } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CalendarDays, MessageCircle, UserRound, Users } from "lucide-react";
 import type { HostBooking } from "../../services";
 
 const formatDate = (value: string) => new Intl.DateTimeFormat("en", {
@@ -34,7 +35,7 @@ const HostBookings = ({ bookings }: { bookings: HostBooking[] }) => (
                   <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-500">
                     <span className="inline-flex items-center gap-1.5"><CalendarDays className="size-3.5" />{formatDate(booking.checkIn)} – {formatDate(booking.checkOut)}</span>
                     <span className="inline-flex items-center gap-1.5"><Users className="size-3.5" />{guests} guest{guests === 1 ? "" : "s"}</span>
-                    {guest?.email && <a href={`mailto:${guest.email}`} className="inline-flex items-center gap-1.5 text-emerald-700"><Mail className="size-3.5" />Email guest</a>}
+                    <Link to={`/messages?booking=${booking._id}`} className="inline-flex items-center gap-1.5 font-semibold text-emerald-700 transition hover:text-emerald-900"><MessageCircle className="size-3.5" />Message guest</Link>
                   </div>
                 </div>
               </div>

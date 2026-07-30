@@ -1,4 +1,5 @@
 export * from './useAuth'
+export * from './useMessages'
 export * from './useBookings'
 export * from './useExperiences'
 export * from './useNotifications'

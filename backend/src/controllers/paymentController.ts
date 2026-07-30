@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import type Stripe from "stripe";
+import { Types } from "mongoose";
 import { Payment } from "../models/Payment";
 import { Booking } from "../models/Booking";
 import { ExperienceBooking } from "../models/ExperienceBooking";
@@ -9,6 +10,9 @@ import { requireEnv } from "../config/env";
 import { notifyUser } from "../services/notificationService";
 import CustomError from "../utils/customError";
 import { serviceRequestView } from "../utils/serviceRequestView";
+import { Wallet } from "../models/Wallet";
+import { WalletTransaction } from "../models/WalletTransaction";
+import { activateGiftCard, cancelGiftCard } from "../services/giftCardService";
 
 const serviceNames = {
   "airport-transfer": "Airport Transfer",
@@ -68,6 +72,85 @@ const paymentView = (payment: unknown, revealProviderContacts: boolean) => {
 const assertPaymentOwner = (userId: string, req: Request) => {
   if (userId !== req.user!.id && !req.user!.isAdmin) {
     throw new CustomError("You cannot access this payment", 403);
+  }
+};
+
+const isDuplicateKey = (cause: unknown) =>
+  (cause as Error & { code?: number }).code === 11000;
+
+const debitGiftBalance = async (userId: string, amount: number, paymentId: string) => {
+  if (amount <= 0) return 0;
+  const adjustmentKey = `payment-debit:${paymentId}`;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const wallet = await Wallet.findOne({ user: userId });
+    let giftAmount = Math.min(wallet?.balance ?? 0, amount);
+    const stripeRemainder = amount - giftAmount;
+    if (stripeRemainder > 0 && stripeRemainder < 50) {
+      giftAmount = Math.max(0, amount - 50);
+    }
+    if (giftAmount <= 0) return 0;
+    const debited = await Wallet.findOneAndUpdate(
+      { user: userId, balance: { $gte: giftAmount }, appliedKeys: { $ne: adjustmentKey } },
+      { $inc: { balance: -giftAmount }, $push: { appliedKeys: adjustmentKey } },
+      { new: true },
+    );
+    if (!debited) continue;
+    try {
+      await WalletTransaction.create({
+        user: userId,
+        type: "booking_payment",
+        amount: -giftAmount,
+        currency: "chf",
+        payment: paymentId,
+        description: "Gift card balance applied to booking",
+        idempotencyKey: adjustmentKey,
+      });
+      return giftAmount;
+    } catch (cause) {
+      if (isDuplicateKey(cause)) return giftAmount;
+      await Wallet.updateOne(
+        {
+          user: userId,
+          appliedKeys: adjustmentKey,
+          $nor: [{ appliedKeys: `${adjustmentKey}:rollback` }],
+        },
+        { $inc: { balance: giftAmount }, $push: { appliedKeys: `${adjustmentKey}:rollback` } },
+      );
+      throw cause;
+    }
+  }
+  return 0;
+};
+
+const refundGiftBalance = async (payment: {
+  id: string;
+  _id: Types.ObjectId;
+  user: Types.ObjectId;
+  giftCardAmount?: number;
+}) => {
+  const amount = payment.giftCardAmount ?? 0;
+  if (amount <= 0) return;
+  const adjustmentKey = `payment-refund:${payment.id}`;
+  await Wallet.updateOne(
+    { user: payment.user, appliedKeys: { $ne: adjustmentKey } },
+    {
+      $inc: { balance: amount },
+      $push: { appliedKeys: adjustmentKey },
+    },
+  );
+  try {
+    await WalletTransaction.create({
+      user: payment.user,
+      type: "payment_refund",
+      amount,
+      currency: "chf",
+      payment: payment._id,
+      description: "Gift card balance returned from cancelled payment",
+      idempotencyKey: adjustmentKey,
+    });
+  } catch (cause) {
+    if (isDuplicateKey(cause)) return;
+    throw cause;
   }
 };
 
@@ -151,6 +234,8 @@ export const createPayment = async (req: Request, res: Response) => {
       successUrl: getPaymentReturnUrl("success", existingPayment.id),
       cancelUrl: getPaymentReturnUrl("cancel"),
       alreadyPaid: existingIntent.status === "succeeded",
+      giftCardAmount: existingPayment.giftCardAmount ?? 0,
+      stripeAmount: existingPayment.stripeAmount ?? existingPayment.amount,
     });
   }
 
@@ -166,33 +251,9 @@ export const createPayment = async (req: Request, res: Response) => {
     await req.user!.save();
   }
 
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount,
-    currency,
-    customer: customerId,
-    automatic_payment_methods: { enabled: true },
-    metadata: {
-      userId: req.user!.id,
-      ...(booking ? {
-        placeId: booking.place.toString(),
-        bookingId: booking.id,
-      } : experienceBooking ? {
-        experienceId: experienceBooking!.experience.toString(),
-        experienceBookingId: experienceBooking!.id,
-      } : {
-        serviceRequestId: serviceRequest!.id,
-        serviceType: serviceRequest!.serviceType,
-      }),
-    },
-  }, {
-    idempotencyKey: booking
-      ? `flypnp-booking-${booking.id}`
-      : experienceBooking
-        ? `flypnp-experience-${experienceBooking.id}`
-        : `flypnp-service-${serviceRequest!.id}`,
-  });
-
-  const payment = await Payment.create({
+  const paymentId = new Types.ObjectId();
+  const paymentData = {
+    _id: paymentId,
     user: req.user!._id,
     name: req.user!.name,
     ...(booking ? {
@@ -205,21 +266,101 @@ export const createPayment = async (req: Request, res: Response) => {
       serviceRequest: serviceRequest!._id,
     }),
     amount,
+    stripeAmount: amount,
+    giftCardAmount: 0,
     currency,
     status: "pending",
-    stripeId: paymentIntent.id,
+    stripeId: "",
     paymentMethod: "",
     paymentDate: new Date(),
-  });
+  };
+  const useGiftBalance = req.body.useGiftBalance === true;
+  let giftCardAmount = 0;
+  try {
+    giftCardAmount = useGiftBalance
+      ? await debitGiftBalance(req.user!.id, amount, paymentId.toString())
+      : 0;
+    const stripeAmount = amount - giftCardAmount;
 
-  res.status(201).json({
-    success: true,
-    data: payment,
-    clientSecret: paymentIntent.client_secret,
-    successUrl: getPaymentReturnUrl("success", payment.id),
-    cancelUrl: getPaymentReturnUrl("cancel"),
-    alreadyPaid: false,
-  });
+    if (stripeAmount === 0) {
+      payable.status = "confirmed";
+      if (serviceRequest) serviceRequest.confirmedAt = new Date();
+      const payment = await Payment.create({
+        ...paymentData,
+        giftCardAmount,
+        stripeAmount,
+        status: "confirmed",
+        paymentMethod: "gift_card",
+      });
+      await payable.save();
+      if (serviceRequest) await sendServiceConfirmation(serviceRequest);
+      return res.status(201).json({
+        success: true,
+        data: payment,
+        clientSecret: "",
+        successUrl: getPaymentReturnUrl("success", payment.id),
+        cancelUrl: getPaymentReturnUrl("cancel"),
+        alreadyPaid: true,
+        giftCardAmount,
+        stripeAmount,
+      });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: stripeAmount,
+      currency,
+      customer: customerId,
+      automatic_payment_methods: { enabled: true },
+      metadata: {
+        kind: "booking",
+        userId: req.user!.id,
+        paymentId: paymentId.toString(),
+        ...(booking ? {
+          placeId: booking.place.toString(),
+          bookingId: booking.id,
+        } : experienceBooking ? {
+          experienceId: experienceBooking!.experience.toString(),
+          experienceBookingId: experienceBooking!.id,
+        } : {
+          serviceRequestId: serviceRequest!.id,
+          serviceType: serviceRequest!.serviceType,
+        }),
+      },
+    }, {
+      idempotencyKey: booking
+        ? `flypnp-booking-${booking.id}`
+        : experienceBooking
+          ? `flypnp-experience-${experienceBooking.id}`
+          : `flypnp-service-${serviceRequest!.id}`,
+    });
+    const payment = await Payment.create({
+      ...paymentData,
+      giftCardAmount,
+      stripeAmount,
+      stripeId: paymentIntent.id,
+    });
+
+    res.status(201).json({
+      success: true,
+      data: payment,
+      clientSecret: paymentIntent.client_secret,
+      successUrl: getPaymentReturnUrl("success", payment.id),
+      cancelUrl: getPaymentReturnUrl("cancel"),
+      alreadyPaid: false,
+      giftCardAmount,
+      stripeAmount,
+    });
+  } catch (cause) {
+    if (giftCardAmount > 0) {
+      await refundGiftBalance({
+        id: paymentId.toString(),
+        _id: paymentId,
+        user: req.user!._id,
+        giftCardAmount,
+      });
+    }
+    throw cause;
+  }
 };
 
 export const confirmPayment = async (req: Request, res: Response) => {
@@ -230,6 +371,9 @@ export const confirmPayment = async (req: Request, res: Response) => {
     throw new CustomError("This payment is not linked to a booking", 409);
   }
 
+  if (payment.status === "confirmed" && payment.paymentMethod === "gift_card") {
+    return res.status(200).json({ success: true, data: payment });
+  }
   const intent = await stripe.paymentIntents.retrieve(payment.stripeId);
   if (intent.status !== "succeeded") {
     throw new CustomError("Stripe has not confirmed this payment", 409);
@@ -280,6 +424,11 @@ export const handleStripeWebhook = async (req: Request, res: Response) => {
 
   if (event.type.startsWith("payment_intent.")) {
     const intent = event.data.object as Stripe.PaymentIntent;
+    if (intent.metadata?.kind === "gift_card") {
+      if (event.type === "payment_intent.succeeded") await activateGiftCard(intent);
+      if (event.type === "payment_intent.canceled") await cancelGiftCard(intent.id);
+      return res.status(200).json({ received: true });
+    }
     const statuses: Record<string, "confirmed" | "cancelled" | "failed"> = {
       "payment_intent.succeeded": "confirmed",
       "payment_intent.canceled": "cancelled",
@@ -292,6 +441,7 @@ export const handleStripeWebhook = async (req: Request, res: Response) => {
         { status, paymentMethod: String(intent.payment_method ?? "") },
         { new: true }
       );
+      if (payment && status === "cancelled") await refundGiftBalance(payment);
       if (payment?.booking && (status === "confirmed" || status === "cancelled")) {
         await Booking.findByIdAndUpdate(payment.booking, { status });
       }
@@ -348,8 +498,9 @@ export const updatePayment = async (req: Request, res: Response) => {
     throw new CustomError("Only payment cancellation is allowed from this endpoint", 400);
   }
   if (payment.status === "pending") {
-    await stripe.paymentIntents.cancel(payment.stripeId);
+    if (payment.stripeId) await stripe.paymentIntents.cancel(payment.stripeId);
     payment.status = "cancelled";
+    await refundGiftBalance(payment);
     if (payment.booking) {
       await Booking.findByIdAndUpdate(payment.booking, { status: "cancelled" });
     }

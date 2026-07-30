@@ -10,6 +10,8 @@ import wishlist from "./wishlistRoutes";
 import payment from "./paymentRoutes";
 import experience from "./experienceRoutes";
 import service from "./serviceRoutes";
+import message from "./messageRoutes";
+import giftCard from "./giftCardRoutes";
 import { isLoggedIn } from "../middlewares/user";
 import asyncHandler from "../utils/asyncHandler";
 import CustomError from "../utils/customError";
@@ -96,5 +98,7 @@ router.use('/', wishlist);
 router.use('/', payment);
 router.use('/', experience);
 router.use('/', service);
+router.use('/', message);
+router.use('/', giftCard);
 
 export default router;

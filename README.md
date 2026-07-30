@@ -193,7 +193,7 @@ For local webhook testing, forward Stripe events to the raw-body endpoint:
 stripe listen --forward-to localhost:8080/api/v1/stripe/webhook
 ```
 
-Copy the `whsec_...` value printed by Stripe CLI into `STRIPE_WEBHOOK_SECRET`, then restart the backend. The integration handles `payment_intent.succeeded`, `payment_intent.payment_failed`, and `payment_intent.canceled`.
+Copy the `whsec_...` value printed by Stripe CLI into `STRIPE_WEBHOOK_SECRET`, then restart the backend. The integration handles `payment_intent.succeeded`, `payment_intent.payment_failed`, and `payment_intent.canceled` for reservations and gift-card purchases. See [docs/gift-cards.md](docs/gift-cards.md) for the end-to-end staging flow.
 
 ### Testing Cards
 

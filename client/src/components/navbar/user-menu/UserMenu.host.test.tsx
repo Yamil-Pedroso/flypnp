@@ -10,6 +10,7 @@ vi.mock("../../../lib/hooks", () => ({
     logout: vi.fn(),
   }),
   useNotifications: () => ({ notifications: [] }),
+  useMessages: () => ({ unreadTotal: 0 }),
 }));
 
 vi.mock("../../user-auth/Login", () => ({ default: () => <div>Login</div> }));
@@ -23,6 +24,7 @@ describe("UserMenu host navigation", () => {
     await user.click(screen.getByRole("button", { name: "Open user menu" }));
 
     expect(screen.getByRole("link", { name: "List your home" })).toHaveAttribute("href", "/host");
+    expect(screen.getByRole("link", { name: "Messages" })).toHaveAttribute("href", "/messages");
     expect(screen.getAllByRole("link", { name: "Services" })).toHaveLength(1);
   });
 });

@@ -1,7 +1,13 @@
 import type { Request, Response } from "express";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { createIntent, retrieveIntent, constructEvent } = vi.hoisted(() => ({ createIntent: vi.fn(), retrieveIntent: vi.fn(), constructEvent: vi.fn() }));
+const { createIntent, retrieveIntent, constructEvent, activateGiftCard, cancelGiftCard } = vi.hoisted(() => ({
+  createIntent: vi.fn(),
+  retrieveIntent: vi.fn(),
+  constructEvent: vi.fn(),
+  activateGiftCard: vi.fn(),
+  cancelGiftCard: vi.fn(),
+}));
 vi.mock("../config/stripe", () => ({
   stripe: {
     paymentIntents: { create: createIntent, retrieve: retrieveIntent, cancel: vi.fn() },
@@ -20,6 +26,10 @@ vi.mock("../models/ServiceRequest", () => ({
 }));
 vi.mock("../services/notificationService", () => ({
   notifyUser: vi.fn(),
+}));
+vi.mock("../services/giftCardService", () => ({
+  activateGiftCard,
+  cancelGiftCard,
 }));
 
 import { Payment } from "../models/Payment";
@@ -227,6 +237,29 @@ describe("createPayment", () => {
 
     expect(constructEvent).toHaveBeenCalledWith(body, "signature", process.env.STRIPE_WEBHOOK_SECRET);
     expect(Booking.findByIdAndUpdate).toHaveBeenCalledWith("booking-1", { status: "confirmed" });
+    expect(response.status).toHaveBeenCalledWith(200);
+  });
+
+  it("routes gift card payments through the same signed Stripe webhook", async () => {
+    const intent = {
+      id: "pi_gift",
+      payment_method: "pm_card",
+      metadata: { kind: "gift_card" },
+    };
+    constructEvent.mockReturnValue({
+      type: "payment_intent.succeeded",
+      data: { object: intent },
+    });
+    const response = responseMock();
+    const request = {
+      body: Buffer.from("stripe-gift-event"),
+      headers: { "stripe-signature": "signature" },
+    } as unknown as Request;
+
+    await handleStripeWebhook(request, response);
+
+    expect(activateGiftCard).toHaveBeenCalledWith(intent);
+    expect(Payment.findOneAndUpdate).not.toHaveBeenCalled();
     expect(response.status).toHaveBeenCalledWith(200);
   });
 });

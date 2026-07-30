@@ -9,6 +9,8 @@ interface IPayment {
     place?: Types.ObjectId;
     experience?: Types.ObjectId;
     amount: number;
+    stripeAmount: number;
+    giftCardAmount: number;
     currency: string;
     status: string;
     stripeId: string;
@@ -25,13 +27,20 @@ const paymentSchema = new Schema<IPayment>({
     place: { type: Schema.Types.ObjectId, ref: "Place" },
     experience: { type: Schema.Types.ObjectId, ref: "Experience" },
     amount: { type: Number, required: true },
+    stripeAmount: {
+      type: Number,
+      min: 0,
+      required: true,
+      default: function (this: IPayment): number { return this.amount; },
+    },
+    giftCardAmount: { type: Number, min: 0, default: 0, required: true },
     currency: { type: String, required: true, default: "chf" },
     status: {
         type: String,
         enum: ["pending", "confirmed", "cancelled", "failed"],
         default: "pending",
     },
-    stripeId: { type: String },
+    stripeId: { type: String, default: "" },
     paymentMethod: { type: String },
     paymentDate: { type: Date, required: true },
 }, {
