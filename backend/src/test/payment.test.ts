@@ -15,9 +15,17 @@ vi.mock("../models/Payment", () => ({
 vi.mock("../models/Booking", () => ({
   Booking: { findById: vi.fn(), findByIdAndUpdate: vi.fn() },
 }));
+vi.mock("../models/ServiceRequest", () => ({
+  ServiceRequest: { findById: vi.fn(), findOneAndUpdate: vi.fn(), findByIdAndUpdate: vi.fn() },
+}));
+vi.mock("../services/notificationService", () => ({
+  notifyUser: vi.fn(),
+}));
 
 import { Payment } from "../models/Payment";
 import { Booking } from "../models/Booking";
+import { ServiceRequest } from "../models/ServiceRequest";
+import { notifyUser } from "../services/notificationService";
 import { confirmPayment, createPayment, handleStripeWebhook } from "../controllers/paymentController";
 
 const responseMock = () => {
@@ -57,6 +65,53 @@ describe("createPayment", () => {
     );
   });
 
+  it("creates a Stripe payment from the server-side service quote", async () => {
+    vi.mocked(ServiceRequest.findById).mockResolvedValue({
+      _id: "service-request-1",
+      id: "service-request-1",
+      owner: { toString: () => "user-1" },
+      serviceType: "airport-transfer",
+      quotePrice: 120,
+      status: "quoted",
+    } as never);
+    const request = {
+      user: { _id: "user-1", id: "user-1", name: "Ada", email: "ada@example.com", stripeCustomerId: "cus_test", isAdmin: false },
+      body: { serviceRequestId: "service-request-1", amount: 1, currency: "chf" },
+    } as unknown as Request;
+
+    await createPayment(request, responseMock());
+
+    expect(createIntent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        amount: 13200,
+        metadata: expect.objectContaining({ serviceRequestId: "service-request-1" }),
+      }),
+      { idempotencyKey: "flypnp-service-service-request-1" },
+    );
+    expect(Payment.create).toHaveBeenCalledWith(expect.objectContaining({
+      amount: 13200,
+      serviceRequest: "service-request-1",
+    }));
+  });
+
+  it("rejects a client attempt to pay a CHF quote in another currency", async () => {
+    vi.mocked(ServiceRequest.findById).mockResolvedValue({
+      _id: "service-request-1",
+      id: "service-request-1",
+      owner: { toString: () => "user-1" },
+      serviceType: "airport-transfer",
+      quotePrice: 120,
+      status: "quoted",
+    } as never);
+    const request = {
+      user: { _id: "user-1", id: "user-1", name: "Ada", email: "ada@example.com", stripeCustomerId: "cus_test", isAdmin: false },
+      body: { serviceRequestId: "service-request-1", currency: "jpy" },
+    } as unknown as Request;
+
+    await expect(createPayment(request, responseMock())).rejects.toThrow("Only CHF payments are supported");
+    expect(createIntent).not.toHaveBeenCalled();
+  });
+
   it("verifies Stripe before confirming the linked booking", async () => {
     const paymentSave = vi.fn();
     const bookingSave = vi.fn();
@@ -89,6 +144,44 @@ describe("createPayment", () => {
     expect(booking.status).toBe("confirmed");
     expect(paymentSave).toHaveBeenCalled();
     expect(bookingSave).toHaveBeenCalled();
+  });
+
+  it("confirms a paid service and notifies the traveler", async () => {
+    const paymentSave = vi.fn();
+    const serviceSave = vi.fn();
+    const payment = {
+      _id: "payment-1",
+      user: { toString: () => "user-1" },
+      serviceRequest: "service-request-1",
+      stripeId: "pi_service",
+      status: "pending",
+      paymentMethod: "",
+      save: paymentSave,
+    };
+    const serviceRequest = {
+      owner: { toString: () => "user-1" },
+      serviceType: "airport-transfer",
+      status: "quoted",
+      confirmedAt: undefined as Date | undefined,
+      save: serviceSave,
+    };
+    vi.mocked(Payment.findById).mockResolvedValue(payment as never);
+    vi.mocked(ServiceRequest.findById).mockResolvedValue(serviceRequest as never);
+    retrieveIntent.mockResolvedValue({ status: "succeeded", payment_method: "pm_card" });
+    const request = {
+      user: { _id: "user-1", id: "user-1", name: "Ada", isAdmin: false },
+      params: { id: "payment-1" },
+    } as unknown as Request;
+
+    await confirmPayment(request, responseMock());
+
+    expect(payment.status).toBe("confirmed");
+    expect(serviceRequest.status).toBe("confirmed");
+    expect(serviceRequest.confirmedAt).toBeInstanceOf(Date);
+    expect(notifyUser).toHaveBeenCalledWith(expect.objectContaining({
+      userId: "user-1",
+      type: "service_confirmed",
+    }));
   });
 
   it("reuses the payment intent when a guest returns to a pending booking", async () => {

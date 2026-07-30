@@ -12,7 +12,8 @@ interface CheckoutFormProps {
   onSuccessfulCheckout: () => void;
 }
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null;
 
 const cardOptions = {
   style: {
@@ -43,12 +44,13 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
   const [paymentStatus, setPaymentStatus] = useState<"pending" | "confirmed">("pending");
   const bookingId = new URLSearchParams(location.search).get("booking");
   const experienceBookingId = new URLSearchParams(location.search).get("experienceBooking");
+  const serviceRequestId = new URLSearchParams(location.search).get("serviceRequest");
 
   useEffect(() => {
     let active = true;
 
     const preparePayment = async () => {
-      if (!bookingId && !experienceBookingId) {
+      if (!bookingId && !experienceBookingId && !serviceRequestId) {
         if (active) {
           setError("Missing booking details. Return to the listing and try again.");
           setPreparing(false);
@@ -60,6 +62,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
         const data = await paymentsService.create({
           bookingId: bookingId ?? undefined,
           experienceBookingId: experienceBookingId ?? undefined,
+          serviceRequestId: serviceRequestId ?? undefined,
           currency: "chf",
         });
         if (!data.success || !data.clientSecret) throw new Error("The secure payment session could not be created.");
@@ -86,7 +89,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
 
     void preparePayment();
     return () => { active = false; };
-  }, [bookingId, experienceBookingId, navigate, refreshBookings, refreshExperienceBookings]);
+  }, [bookingId, experienceBookingId, navigate, refreshBookings, refreshExperienceBookings, serviceRequestId]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -152,10 +155,20 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
   );
 };
 
-const MyStripeForm = () => (
-  <Elements stripe={stripePromise}>
-    <CheckoutForm onSuccessfulCheckout={() => undefined} />
-  </Elements>
-);
+const MyStripeForm = () => {
+  if (!stripePublicKey) {
+    return (
+      <p role="alert" className="rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
+        Secure payments are temporarily unavailable. Please contact Flypnp support.
+      </p>
+    );
+  }
+
+  return (
+    <Elements stripe={stripePromise}>
+      <CheckoutForm onSuccessfulCheckout={() => undefined} />
+    </Elements>
+  );
+};
 
 export default MyStripeForm;

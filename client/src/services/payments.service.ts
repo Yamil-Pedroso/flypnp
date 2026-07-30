@@ -5,7 +5,7 @@ export const paymentsService = {
   async list() {
     return (await http.get<ApiResponse<Payment[]> & { count: number }>('/payments')).data.data
   },
-  async create(input: { bookingId?: string; experienceBookingId?: string; currency?: string }) {
+  async create(input: { bookingId?: string; experienceBookingId?: string; serviceRequestId?: string; currency?: string }) {
     return (await http.post<ApiResponse<Payment> & {
       clientSecret: string
       successUrl: string

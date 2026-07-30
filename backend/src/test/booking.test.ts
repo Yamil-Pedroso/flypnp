@@ -2,10 +2,10 @@ import type { Request, Response } from "express";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../models/Booking", () => ({
-  Booking: { exists: vi.fn(), create: vi.fn(), findById: vi.fn() },
+  Booking: { exists: vi.fn(), create: vi.fn(), findById: vi.fn(), find: vi.fn() },
 }));
 vi.mock("../models/Place", () => ({
-  Place: { findById: vi.fn() },
+  Place: { findById: vi.fn(), find: vi.fn() },
 }));
 vi.mock("../models/Payment", () => ({
   Payment: { findOne: vi.fn() },
@@ -18,7 +18,7 @@ vi.mock("../config/stripe", () => ({
 import { Booking } from "../models/Booking";
 import { Place } from "../models/Place";
 import { Payment } from "../models/Payment";
-import { createBookings, deleteBooking } from "../controllers/bookingController";
+import { createBookings, deleteBooking, getHostBookings } from "../controllers/bookingController";
 
 const responseMock = () => {
   const response = { status: vi.fn(), json: vi.fn() };
@@ -116,5 +116,27 @@ describe("createBookings", () => {
     expect(payment.status).toBe("cancelled");
     expect(booking.status).toBe("cancelled");
     expect(booking.archivedAt).toBeInstanceOf(Date);
+  });
+
+  it("returns bookings only for places owned by the host", async () => {
+    vi.mocked(Place.find).mockReturnValue({
+      select: vi.fn().mockResolvedValue([{ _id: "place-1" }, { _id: "place-2" }]),
+    } as never);
+    const sort = vi.fn().mockResolvedValue([{ _id: "booking-1", place: "place-1" }]);
+    const secondPopulate = vi.fn().mockReturnValue({ sort });
+    const firstPopulate = vi.fn().mockReturnValue({ populate: secondPopulate });
+    vi.mocked(Booking.find).mockReturnValue({ populate: firstPopulate } as never);
+    const response = responseMock();
+    const request = {
+      user: { _id: "host-1", id: "host-1", name: "Host", isAdmin: false },
+    } as unknown as Request;
+
+    await getHostBookings(request, response);
+
+    expect(Place.find).toHaveBeenCalledWith({ owner: "host-1" });
+    expect(Booking.find).toHaveBeenCalledWith({ place: { $in: ["place-1", "place-2"] } });
+    expect(firstPopulate).toHaveBeenCalledWith("place");
+    expect(secondPopulate).toHaveBeenCalledWith("owner", "name email avatar");
+    expect(response.status).toHaveBeenCalledWith(200);
   });
 });

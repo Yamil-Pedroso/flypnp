@@ -28,6 +28,7 @@ const Footer = () => {
             <div className="mt-4 flex flex-col items-start gap-3 text-sm">
               <Link to="/" className="transition hover:text-emerald-300">Stays</Link>
               <Link to="/experiences" className="transition hover:text-emerald-300">Experiences</Link>
+              <Link to="/services" className="transition hover:text-emerald-300">Services</Link>
               <Link to="/wishlist" className="transition hover:text-emerald-300">Wishlist</Link>
               <Link to="/trips" className="transition hover:text-emerald-300">Trips</Link>
             </div>

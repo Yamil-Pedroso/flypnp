@@ -13,6 +13,8 @@ import { errorHandler, notFound } from "../middlewares/error";
 import asyncHandler from "../utils/asyncHandler";
 import { handleStripeWebhook } from "../controllers/paymentController";
 import CustomError from "../utils/customError";
+import { validateProductionEnv } from "../config/env";
+import { startEmailDeliveryWorker } from "../services/notificationService";
 
 const PORT = Number(process.env.PORT) || 8080;
 
@@ -69,7 +71,9 @@ app.get("/{*splat}", (_req: Request, res: Response) => {
 app.use(errorHandler);
 
 const startServer = async () => {
+  validateProductionEnv();
   await connectDB();
+  startEmailDeliveryWorker();
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
   });

@@ -37,6 +37,8 @@ const MyPayment = () => {
   const rating = query.get("rating");
   const startTime = query.get("startTime");
   const isExperience = query.get("productType") === "experience";
+  const isService = query.get("productType") === "service";
+  const productLabel = isService ? "service" : isExperience ? "experience" : "trip";
   const serviceFee = price * 0.1;
   const total = price + serviceFee;
   const guestSummary = [
@@ -67,14 +69,14 @@ const MyPayment = () => {
           <section className="min-w-0 space-y-7">
             <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
               <div className="flex items-center justify-between gap-4">
-                <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Step 1</p><h2 className="mt-1 text-xl font-semibold text-slate-950">{isExperience ? "Your experience" : "Your trip"}</h2></div>
+                <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Step 1</p><h2 className="mt-1 text-xl font-semibold text-slate-950">Your {productLabel}</h2></div>
                 <span className="grid size-9 place-items-center rounded-full bg-emerald-50 text-emerald-700"><Check className="size-4" /></span>
               </div>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 <article className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
-                  <div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-emerald-700 shadow-sm"><CalendarDays className="size-5" /></span><div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{isExperience ? "Date & time" : "Dates"}</p><p className="mt-1 text-sm font-semibold text-slate-950">{formatDate(checkIn)}</p><p className="mt-0.5 text-xs text-slate-500">{isExperience ? `Starts at ${startTime ?? "selected time"}` : `to ${formatDate(checkOut)}`}</p></div></div>
-                  <button type="button" onClick={() => navigate(-1)} className="mt-4 text-xs font-bold text-rose-600 underline decoration-rose-200 underline-offset-4">Edit {isExperience ? "selection" : "dates"}</button>
+                  <div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-emerald-700 shadow-sm"><CalendarDays className="size-5" /></span><div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{isExperience || isService ? "Date & time" : "Dates"}</p><p className="mt-1 text-sm font-semibold text-slate-950">{formatDate(checkIn)}</p><p className="mt-0.5 text-xs text-slate-500">{isExperience || isService ? `Starts at ${startTime ?? "selected time"}` : `to ${formatDate(checkOut)}`}</p></div></div>
+                  <button type="button" onClick={() => navigate(-1)} className="mt-4 text-xs font-bold text-rose-600 underline decoration-rose-200 underline-offset-4">Edit {isExperience || isService ? "selection" : "dates"}</button>
                 </article>
                 <article className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
                   <div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-emerald-700 shadow-sm"><Users className="size-5" /></span><div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">Travelers</p><p className="mt-1 text-sm font-semibold text-slate-950">{guestSummary}</p>{pets > 0 && <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500"><PawPrint className="size-3" /> Pet-friendly trip</p>}</div></div>
@@ -105,12 +107,12 @@ const MyPayment = () => {
                 {rating && <span className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-slate-950 shadow-lg backdrop-blur"><Star className="size-3.5 fill-amber-400 text-amber-400" /> {rating}</span>}
               </div>
               <div className="p-5 sm:p-6">
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">{isExperience ? "Your experience" : "Your stay"}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Your {isService ? "service" : isExperience ? "experience" : "stay"}</p>
                 <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">{title}</h2>
                 <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">{description}</p>
 
                 <div className="mt-6 space-y-3 border-t border-slate-200 pt-5 text-sm">
-                  <div className="flex justify-between gap-4 text-slate-600"><span>{isExperience ? "Experience price" : "Stay price"}</span><span className="font-medium tabular-nums text-slate-900">{price.toFixed(2)} CHF</span></div>
+                  <div className="flex justify-between gap-4 text-slate-600"><span>{isService ? "Quoted price" : isExperience ? "Experience price" : "Stay price"}</span><span className="font-medium tabular-nums text-slate-900">{price.toFixed(2)} CHF</span></div>
                   <div className="flex justify-between gap-4 text-slate-600"><span className="underline decoration-slate-300 underline-offset-4">Service fee</span><span className="font-medium tabular-nums text-slate-900">{serviceFee.toFixed(2)} CHF</span></div>
                   <div className="flex justify-between gap-4 border-t border-slate-200 pt-4 text-base font-semibold text-slate-950"><span>Total</span><span className="tabular-nums">{total.toFixed(2)} CHF</span></div>
                 </div>

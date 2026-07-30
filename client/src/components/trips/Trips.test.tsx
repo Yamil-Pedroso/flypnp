@@ -51,12 +51,23 @@ vi.mock("../../lib/hooks", () => ({
   useExperiences: () => ({ bookings: [], bookingsLoading: false, deleteBooking: vi.fn() }),
 }));
 
+vi.mock("../../services", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../../services")>();
+  return {
+    ...original,
+    travelServicesService: {
+      listRequests: vi.fn().mockResolvedValue([]),
+      cancelRequest: vi.fn().mockResolvedValue(undefined),
+    },
+  };
+});
+
 describe("Trips", () => {
   it("separates upcoming trips from past memories", async () => {
     const user = userEvent.setup();
     render(<MemoryRouter><Trips /></MemoryRouter>);
 
-    expect(screen.getByRole("heading", { name: "Alpine hideaway" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Alpine hideaway" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Lake memory" })).not.toBeInTheDocument();
     expect(screen.getByText("3 guests")).toBeInTheDocument();
     const paymentLink = screen.getByRole("link", { name: "Complete payment" });
@@ -75,13 +86,13 @@ describe("Trips", () => {
     expect(screen.queryByRole("heading", { name: "Alpine hideaway" })).not.toBeInTheDocument();
   });
 
-  it("shows the original Flypnp drawing when there are no trips", () => {
+  it("shows the original Flypnp drawing when there are no trips", async () => {
     const savedBookings = bookingState.bookings;
     bookingState.bookings = [];
 
     render(<MemoryRouter><Trips /></MemoryRouter>);
 
-    expect(screen.getByRole("img", { name: "Flypnp empty trips drawing" })).toBeInTheDocument();
+    expect(await screen.findByRole("img", { name: "Flypnp empty trips drawing" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "No trips booked… yet!" })).toBeInTheDocument();
     bookingState.bookings = savedBookings;
   });

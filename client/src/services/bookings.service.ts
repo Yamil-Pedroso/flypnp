@@ -1,5 +1,5 @@
 import { http } from './http'
-import type { ApiResponse, Booking, BookingInput } from './types'
+import type { ApiResponse, Booking, BookingInput, HostBooking } from './types'
 
 export const bookingsService = {
   async list() {
@@ -16,5 +16,8 @@ export const bookingsService = {
   },
   async remove(id: string) {
     await http.delete(`/delete-booking/${id}`)
+  },
+  async listForHost() {
+    return (await http.get<ApiResponse<HostBooking[]> & { count: number }>('/host-bookings')).data.data
   },
 }

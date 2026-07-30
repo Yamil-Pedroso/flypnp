@@ -1,5 +1,5 @@
-const PlacesFormPage = () => {
-  return <div>PlacesFormPage</div>
-}
+import PlacesForm from "../components/places-form/PlacesForm";
 
-export default PlacesFormPage
+const PlacesFormPage = () => <PlacesForm />;
+
+export default PlacesFormPage;

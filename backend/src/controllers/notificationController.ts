@@ -1,7 +1,9 @@
 import type { Request, Response } from "express";
 import { isValidObjectId } from "mongoose";
 import { Notification } from "../models/Notification";
+import { EmailDelivery, type EmailDeliveryStatus } from "../models/EmailDelivery";
 import { User } from "../models/User";
+import { processEmailDeliveries } from "../services/notificationService";
 import CustomError from "../utils/customError";
 
 const canAccessUser = (req: Request, userId: string) =>
@@ -57,4 +59,32 @@ export const deleteNotification = async (req: Request, res: Response) => {
   }
   await notification.deleteOne();
   res.status(200).json({ success: true });
+};
+
+export const getEmailDeliveries = async (req: Request, res: Response) => {
+  const requestedStatus = String(req.query.status ?? "");
+  const allowedStatuses = new Set(["pending", "processing", "sent", "failed"]);
+  const query: { status?: EmailDeliveryStatus } = {};
+  if (allowedStatuses.has(requestedStatus)) query.status = requestedStatus as EmailDeliveryStatus;
+  const deliveries = await EmailDelivery.find(query)
+    .select("+recipient")
+    .sort({ createdAt: -1 })
+    .limit(200);
+  res.status(200).json({ success: true, count: deliveries.length, data: deliveries });
+};
+
+export const retryEmailDelivery = async (req: Request, res: Response) => {
+  const delivery = await EmailDelivery.findById(req.params.id);
+  if (!delivery) throw new CustomError("Email delivery not found", 404);
+  if (delivery.status === "sent") {
+    throw new CustomError("A sent email cannot be retried", 409);
+  }
+  delivery.status = "pending";
+  delivery.attempts = 0;
+  delivery.nextAttemptAt = new Date();
+  delivery.lockedAt = undefined;
+  delivery.lastError = undefined;
+  await delivery.save();
+  void processEmailDeliveries(1).catch(console.error);
+  res.status(200).json({ success: true, data: delivery });
 };

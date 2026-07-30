@@ -26,6 +26,7 @@ const UserMenu = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const { user, logout } = useAuth();
   const { notifications } = useNotifications();
+  const unreadNotifications = notifications.filter((notification) => !notification.read).length;
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleMenuIconClick = () => setMenuOpen(!menuOpen);
@@ -141,8 +142,8 @@ const UserMenu = () => {
           ) : (
             <FaHouseUser className="text-xl text-gray-600" />
           )}
-          {user && notifications.length > 0 && (
-            <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-emerald-600 text-xs text-white">{notifications.length}</span>
+          {user && unreadNotifications > 0 && (
+            <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-emerald-600 text-xs text-white">{unreadNotifications}</span>
           )}
         </button>
 
@@ -184,15 +185,33 @@ const UserMenu = () => {
                     </Link>
                   </li>
                   <li>
+                    <Link
+                      to="/services"
+                      className="block rounded px-4 py-2 hover:bg-[#f94a52] hover:text-white"
+                    >
+                      Services
+                    </Link>
+                  </li>
+                  {user.isAdmin && (
+                    <li>
+                      <Link
+                        to="/admin/services"
+                        className="block rounded bg-emerald-50 px-4 py-2 font-semibold text-emerald-800 hover:bg-emerald-600 hover:text-white"
+                      >
+                        Service operations
+                      </Link>
+                    </li>
+                  )}
+                  <li>
                     <hr className="my-2 border-t border-gray-200" />
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/host"
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
-                      Flypnp our home
-                    </a>
+                      List your home
+                    </Link>
                   </li>
                   <li>
                     <a

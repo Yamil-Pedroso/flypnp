@@ -4,7 +4,6 @@ import {
   Camera,
   ChefHat,
   Compass,
-  Footprints,
   Leaf,
   LoaderCircle,
   Map,
@@ -20,6 +19,7 @@ import {
 import { getTravelParams, useTravelSearch } from "../search/SearchContext";
 import { useExperiences } from "../../lib/hooks";
 import type { ExperienceCategory } from "../../services";
+import images from "../../assets/images";
 import ExperienceCard from "./ExperienceCard";
 import ExperienceWishlistButton from "./ExperienceWishlistButton";
 
@@ -106,8 +106,15 @@ const Experiences = () => {
         <div className="relative isolate overflow-hidden rounded-[2rem] bg-slate-950 px-6 py-10 text-white sm:px-10 sm:py-14 lg:px-14 lg:py-16">
           <div className="absolute -right-24 -top-32 size-[28rem] rounded-full bg-emerald-400/20 blur-3xl" />
           <div className="absolute -bottom-36 left-1/4 size-80 rounded-full bg-rose-500/15 blur-3xl" />
-          <div className="absolute right-[18%] top-12 hidden rotate-6 rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur lg:block">
-            <Footprints className="size-16 text-emerald-300/70" />
+          <div className="absolute right-[18%] top-12 hidden size-[6.5rem] rotate-6 place-items-center rounded-[2rem] border border-white/10 bg-white/5 backdrop-blur lg:grid">
+            <span
+              aria-hidden="true"
+              className="block size-24 bg-emerald-300/70"
+              style={{
+                WebkitMask: `url("${images.foot}") center / contain no-repeat`,
+                mask: `url("${images.foot}") center / contain no-repeat`,
+              }}
+            />
           </div>
           <div className="relative max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-emerald-300 ring-1 ring-white/10">

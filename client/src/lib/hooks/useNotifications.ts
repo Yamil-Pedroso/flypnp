@@ -24,7 +24,24 @@ export const useNotificationsController = (): NotificationsContextValue => {
     catch (cause) { setError(getErrorMessage(cause, 'Could not load notifications')) }
     finally { setLoading(false) }
   }, [user])
-  useEffect(() => { void refresh() }, [refresh])
+  useEffect(() => {
+    if (!user) {
+      void refresh()
+      return
+    }
+    void refresh()
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') void refresh()
+    }
+    const interval = window.setInterval(() => {
+      if (document.visibilityState === 'visible') void refresh()
+    }, 60_000)
+    document.addEventListener('visibilitychange', refreshWhenVisible)
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', refreshWhenVisible)
+    }
+  }, [refresh, user])
   return {
     notifications, loading, error, refresh,
     async markAsRead(id) {

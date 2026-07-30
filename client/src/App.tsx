@@ -26,6 +26,10 @@ import WelcomeModal from "./components/welcome/WelcomeModal";
 import ExperienceProvider from "./providers/ExperienceProvider";
 import ExperiencesPage from "./pages/ExperiencesPage";
 import ExperienceDetailsPage from "./pages/ExperienceDetailsPage";
+import ServicesPage from "./pages/ServicesPage";
+import AdminServicesPage from "./pages/AdminServicesPage";
+import HostPage from "./pages/HostPage";
+import PlacesFormPage from "./pages/PlacesFormPage";
 
 //interface AppProps {
 //  children: React.ReactNode
@@ -59,6 +63,11 @@ function App() {
                         <Route path="/" element={<HomePage />} />
                         <Route path="/experiences" element={<ExperiencesPage />} />
                         <Route path="/experiences/:slug" element={<ExperienceDetailsPage />} />
+                        <Route path="/services" element={<ServicesPage />} />
+                        <Route path="/admin/services" element={<AdminServicesPage />} />
+                        <Route path="/host" element={<HostPage />} />
+                        <Route path="/host/listings/new" element={<PlacesFormPage />} />
+                        <Route path="/host/listings/:id/edit" element={<PlacesFormPage />} />
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route
                           path="/notifications"

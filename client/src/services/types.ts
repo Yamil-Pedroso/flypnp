@@ -33,6 +33,11 @@ export interface Place {
   archivedAt?: string
 }
 
+export type PlaceInput = Pick<
+  Place,
+  'title' | 'address' | 'photos' | 'category' | 'description' | 'perks' | 'extraInfo' | 'maxGuests' | 'price'
+>
+
 export interface GuestCount {
   adults: number
   children: number
@@ -53,6 +58,10 @@ export interface Booking {
   price: number
 }
 
+export type HostBooking = Omit<Booking, 'owner'> & {
+  owner: string | Pick<User, '_id' | 'name' | 'email' | 'avatar'>
+}
+
 export type BookingInput = Omit<Booking, '_id' | 'owner' | 'name' | 'price' | 'place' | 'status'> & {
   place: string
 }
@@ -68,8 +77,12 @@ export interface WishlistItem {
 
 export interface Notification {
   _id: string
+  type?: 'general' | 'service_quote' | 'service_confirmed' | 'service_cancelled'
+  title?: string
   message: string
+  actionUrl?: string
   read: boolean
+  createdAt?: string
 }
 
 export interface Payment {
@@ -79,6 +92,7 @@ export interface Payment {
   experience?: Experience
   booking?: string
   experienceBooking?: string
+  serviceRequest?: string | ServiceRequest
   amount: number
   currency: string
   status: 'pending' | 'confirmed' | 'cancelled' | 'failed'
@@ -149,3 +163,37 @@ export interface ExperienceFilters {
   guests?: number
   kind?: Experience['kind']
 }
+
+export type TravelServiceType = 'airport-transfer' | 'pet-care' | 'local-guide'
+
+export interface ServiceRequest {
+  _id: string
+  owner: string | Pick<User, '_id' | 'name' | 'email' | 'avatar'>
+  serviceType: TravelServiceType
+  destination: string
+  date: string
+  time: string
+  participants: number
+  notes?: string
+  details: {
+    pickup?: string
+    dropoff?: string
+    flightNumber?: string
+    petType?: string
+    petCount?: number
+    language?: string
+    interests?: string
+  }
+  quotePrice?: number
+  provider?: {
+    name: string
+    email?: string
+    phone?: string
+  }
+  adminMessage?: string
+  quotedAt?: string
+  confirmedAt?: string
+  status: 'requested' | 'quoted' | 'confirmed' | 'cancelled'
+}
+
+export type ServiceRequestInput = Omit<ServiceRequest, '_id' | 'owner' | 'status'>

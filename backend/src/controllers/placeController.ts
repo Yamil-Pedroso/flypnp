@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { isValidObjectId } from "mongoose";
 import { Place } from "../models/Place";
+import { Booking } from "../models/Booking";
 import CustomError from "../utils/customError";
 
 const categories = new Set(["trending", "beachFront", "iconicCities"]);
@@ -98,6 +99,9 @@ export const deletePlace = async (req: Request, res: Response) => {
   if (!place) throw new CustomError("Place not found", 404);
   if (place.owner?.toString() !== req.user!.id && !req.user!.isAdmin) {
     throw new CustomError("You cannot delete this place", 403);
+  }
+  if (await Booking.exists({ place: place._id })) {
+    throw new CustomError("Listings with reservation history cannot be deleted", 409);
   }
 
   await place.deleteOne();

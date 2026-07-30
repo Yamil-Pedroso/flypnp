@@ -9,7 +9,9 @@ import {
     markNotificationAsRead,
     sendNotification,
     createNotification,
-    deleteNotification
+    deleteNotification,
+    getEmailDeliveries,
+    retryEmailDelivery,
 } from '../controllers/notificationController';
 import isAdmin from '../middlewares/admin';
 import { isLoggedIn } from '../middlewares/user';
@@ -22,5 +24,7 @@ router.get('/user-notifications', isLoggedIn, asyncHandler(getAllUserNotificatio
 router.get('/notification/:id', isLoggedIn, asyncHandler(getAllUserNotifications));
 router.put('/mark-as-read/:id', isLoggedIn, asyncHandler(markNotificationAsRead));
 router.delete('/delete-notification/:id', isLoggedIn, asyncHandler(deleteNotification));
+router.get('/admin/email-deliveries', isLoggedIn, isAdmin, asyncHandler(getEmailDeliveries));
+router.patch('/admin/email-deliveries/:id/retry', isLoggedIn, isAdmin, asyncHandler(retryEmailDelivery));
 
 export default router;

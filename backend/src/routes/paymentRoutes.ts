@@ -13,9 +13,15 @@ import {
 } from '../controllers/paymentController';
 import { isLoggedIn } from '../middlewares/user';
 import isAdmin from '../middlewares/admin';
+import { rateLimit } from '../middlewares/rateLimit';
 import asyncHandler from '../utils/asyncHandler';
 
-router.post('/create-payment', isLoggedIn, asyncHandler(createPayment));
+router.post(
+    '/create-payment',
+    isLoggedIn,
+    rateLimit({ scope: 'payment:create', windowMs: 60 * 60_000, max: 20 }),
+    asyncHandler(createPayment),
+);
 router.post('/payment/:id/confirm', isLoggedIn, asyncHandler(confirmPayment));
 router.get('/payments', isLoggedIn, asyncHandler(getPayments));
 router.get('/payment/:id', isLoggedIn, asyncHandler(getSinglePayment));

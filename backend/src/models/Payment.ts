@@ -5,6 +5,7 @@ interface IPayment {
     name: string;
     booking?: Types.ObjectId;
     experienceBooking?: Types.ObjectId;
+    serviceRequest?: Types.ObjectId;
     place?: Types.ObjectId;
     experience?: Types.ObjectId;
     amount: number;
@@ -20,6 +21,7 @@ const paymentSchema = new Schema<IPayment>({
     name: { type: String, required: true },
     booking: { type: Schema.Types.ObjectId, ref: "Booking" },
     experienceBooking: { type: Schema.Types.ObjectId, ref: "ExperienceBooking" },
+    serviceRequest: { type: Schema.Types.ObjectId, ref: "ServiceRequest" },
     place: { type: Schema.Types.ObjectId, ref: "Place" },
     experience: { type: Schema.Types.ObjectId, ref: "Experience" },
     amount: { type: Number, required: true },

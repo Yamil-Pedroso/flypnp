@@ -7,6 +7,7 @@ const router = Router();
 import {
     createBookings,
     getUserBookings,
+    getHostBookings,
     getBookingDetails,
     updateBooking,
     deleteBooking,
@@ -14,6 +15,7 @@ import {
 
 router.post('/create-booking', isLoggedIn, asyncHandler(createBookings));
 router.get('/user-bookings', isLoggedIn, asyncHandler(getUserBookings));
+router.get('/host-bookings', isLoggedIn, asyncHandler(getHostBookings));
 router.get('/booking-details/:id', isLoggedIn, asyncHandler(getBookingDetails));
 router.put('/update-booking/:id', isLoggedIn, asyncHandler(updateBooking));
 router.delete('/delete-booking/:id', isLoggedIn, asyncHandler(deleteBooking));
