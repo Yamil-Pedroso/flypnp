@@ -1,12 +1,47 @@
+import { createElement } from 'react'
 import { useNotifications } from '../lib/hooks'
 import { Link } from 'react-router-dom'
-import { Bell, Check, Clock3, Trash2 } from 'lucide-react'
+import {
+  Bell,
+  Check,
+  CheckCircle2,
+  Clock3,
+  Gift,
+  MessageSquareText,
+  Trash2,
+  XCircle,
+  type LucideIcon,
+} from 'lucide-react'
+import { toast } from 'sonner'
+import { getErrorMessage } from '../services'
+import type { Notification } from '../services'
+
+const notificationIcon = (notification: Notification): LucideIcon => {
+  switch (notification.type) {
+    case 'service_quote':
+      return MessageSquareText
+    case 'service_confirmed':
+      return CheckCircle2
+    case 'service_cancelled':
+      return XCircle
+    default:
+      break
+  }
+  const text = `${notification.title ?? ''} ${notification.message}`.toLowerCase()
+  if (text.includes('gift card') || text.includes('balance')) return Gift
+  return Bell
+}
 
 const NotificationsPage = () => {
   const { notifications, deleteNotification, markAsRead } = useNotifications()
 
   const handleDeleteNotification = async (id: string) => {
-    await deleteNotification(id)
+    try {
+      await deleteNotification(id)
+      toast.success('Notification deleted successfully.', { icon: <Trash2 className="size-4" /> })
+    } catch (cause) {
+      toast.error(getErrorMessage(cause, 'The notification could not be deleted.'))
+    }
   }
 
   return (
@@ -29,7 +64,10 @@ const NotificationsPage = () => {
                   <h2 className="font-semibold text-slate-950">{notification.title || 'Flypnp update'}</h2>
                   {!notification.read && <span className="size-2 rounded-full bg-emerald-500" aria-label="Unread" />}
                 </div>
-                <p className="mt-1 text-sm leading-6 text-slate-600">{notification.message}</p>
+                <p className="mt-1 flex items-start gap-2 text-sm leading-6 text-slate-600">
+                  {createElement(notificationIcon(notification), { className: 'mt-0.5 size-4 shrink-0 text-slate-400' })}
+                  <span>{notification.message}</span>
+                </p>
               </div>
             </div>
             {notification.createdAt && (
