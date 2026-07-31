@@ -244,12 +244,13 @@ const UserMenu = () => {
                     </Link>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/help"
+                      onClick={() => setUserMenuOpen(false)}
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
                       Help Center
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a

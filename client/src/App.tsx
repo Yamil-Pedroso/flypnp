@@ -32,6 +32,7 @@ import HostPage from "./pages/HostPage";
 import PlacesFormPage from "./pages/PlacesFormPage";
 import MessagesPage from "./pages/MessagesPage";
 import GiftCardsPage from "./pages/GiftCardsPage";
+import HelpCenterPage from "./pages/HelpCenterPage";
 import MessagesProvider from "./providers/MessagesProvider";
 
 //interface AppProps {
@@ -85,6 +86,7 @@ function App() {
                         <Route path="/trips" element={<TripsPage />} />
                         <Route path="/messages" element={<MessagesPage />} />
                         <Route path="/gift-cards" element={<GiftCardsPage />} />
+                        <Route path="/help" element={<HelpCenterPage />} />
                         <Route path="/wishlist" element={<WishListPage />} />
                         <Route path="/my-payment" element={<PaymentPage />} />
                       </Route>

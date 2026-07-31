@@ -1,4 +1,9 @@
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from "crypto";
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  randomBytes,
+} from "crypto";
 import type Stripe from "stripe";
 import { GiftCard } from "../models/GiftCard";
 import { User } from "../models/User";
@@ -8,8 +13,10 @@ import { notifyUser, queueTransactionalEmail } from "./notificationService";
 import CustomError from "../utils/customError";
 import { requireEnv } from "../config/env";
 
-const encryptionKey = () => createHash("sha256").update(requireEnv("JWT_SECRET")).digest();
-const normalizeCode = (value: string) => value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+const encryptionKey = () =>
+  createHash("sha256").update(requireEnv("JWT_SECRET")).digest();
+const normalizeCode = (value: string) =>
+  value.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
 export const hashGiftCardCode = (value: string) =>
   createHash("sha256").update(normalizeCode(value)).digest("hex");
@@ -22,27 +29,38 @@ export const createGiftCardCode = () => {
 export const encryptGiftCardCode = (code: string) => {
   const iv = randomBytes(12);
   const cipher = createCipheriv("aes-256-gcm", encryptionKey(), iv);
-  const encrypted = Buffer.concat([cipher.update(code, "utf8"), cipher.final()]);
-  return [iv, cipher.getAuthTag(), encrypted].map((part) => part.toString("base64url")).join(".");
+  const encrypted = Buffer.concat([
+    cipher.update(code, "utf8"),
+    cipher.final(),
+  ]);
+  return [iv, cipher.getAuthTag(), encrypted]
+    .map((part) => part.toString("base64url"))
+    .join(".");
 };
 
 export const decryptGiftCardCode = (value: string) => {
-  const [iv, tag, encrypted] = value.split(".").map((part) => Buffer.from(part, "base64url"));
+  const [iv, tag, encrypted] = value
+    .split(".")
+    .map((part) => Buffer.from(part, "base64url"));
   const decipher = createDecipheriv("aes-256-gcm", encryptionKey(), iv);
   decipher.setAuthTag(tag);
-  return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString("utf8");
+  return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString(
+    "utf8",
+  );
 };
 
 export const activateGiftCard = async (intent: Stripe.PaymentIntent) => {
   const card = await GiftCard.findOneAndUpdate(
     { stripePaymentIntentId: intent.id, status: "pending" },
     { status: "active", activatedAt: new Date() },
-    { new: true },
+    { returnDocument: "after" },
   ).select("+codeEncrypted");
   if (!card) return GiftCard.findOne({ stripePaymentIntentId: intent.id });
 
   const code = decryptGiftCardCode(card.codeEncrypted);
-  const recipient = await User.findOne({ email: card.recipientEmail }).select("_id");
+  const recipient = await User.findOne({ email: card.recipientEmail }).select(
+    "_id",
+  );
   const recipientId = recipient?._id.toString();
   const purchaserId = card.purchaser.toString();
   const message = `${card.recipientName}, your ${Math.round(card.amount / 100)} CHF gift card is ready. Code: ${code}`;
@@ -88,7 +106,7 @@ export const cancelGiftCard = (intentId: string) =>
   GiftCard.findOneAndUpdate(
     { stripePaymentIntentId: intentId, status: "pending" },
     { status: "cancelled" },
-    { new: true },
+    { returnDocument: "after" },
   );
 
 export const redeemGiftCard = async (userId: string, code: string) => {
@@ -96,9 +114,13 @@ export const redeemGiftCard = async (userId: string, code: string) => {
   const card = await GiftCard.findOneAndUpdate(
     { codeHash, status: "active", redeemedBy: { $exists: false } },
     { status: "redeemed", redeemedBy: userId, redeemedAt: new Date() },
-    { new: true },
+    { returnDocument: "after" },
   );
-  if (!card) throw new CustomError("This gift card is invalid or has already been redeemed", 409);
+  if (!card)
+    throw new CustomError(
+      "This gift card is invalid or has already been redeemed",
+      409,
+    );
 
   const adjustmentKey = `gift-card-redemption:${card.id}`;
   try {
@@ -109,7 +131,7 @@ export const redeemGiftCard = async (userId: string, code: string) => {
         $push: { appliedKeys: adjustmentKey },
         $setOnInsert: { currency: "chf" },
       },
-      { new: true, upsert: true },
+      { returnDocument: "after", upsert: true },
     );
     await WalletTransaction.create({
       user: userId,
