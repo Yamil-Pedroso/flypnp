@@ -14,6 +14,17 @@ import petFoot from "./png/pet_foot.png";
 import local from "./png/local.png";
 import foot from "./png/foot.png";
 
+// pets
+import pet1 from "./jpg/pet_1.jpg";
+import pet2 from "./jpg/pet_2.jpg";
+import pet3 from "./jpg/pet_3.jpg";
+
+// airports transfer
+import airportTransfer from "./airport_transfer/airport_transfer.png";
+
+// local guide
+import localGuide from "./local_guide/local_guide.jpg";
+
 interface Images {
   [key: string]: string;
 }
@@ -32,6 +43,11 @@ const images: Images = {
   petFoot,
   local,
   foot,
+  pet1,
+  pet2,
+  pet3,
+  airportTransfer,
+  localGuide,
 };
 
 export default images;

@@ -21,6 +21,7 @@ export const addPlaceToWishlist = async (req: Request, res: Response) => {
   const picture = itemType === "experience"
     ? ("images" in item ? item.images[0] ?? "" : "")
     : ("photos" in item ? item.photos[0]?.main ?? "" : "");
+  const category = itemType === "place" && "category" in item ? item.category : undefined;
 
   const wishlist = await WishList.findOneAndUpdate(
     { owner: req.user!._id, [itemKey]: item._id },
@@ -28,6 +29,7 @@ export const addPlaceToWishlist = async (req: Request, res: Response) => {
       owner: req.user!._id,
       [itemKey]: item._id,
       itemType,
+      ...(category ? { category } : {}),
       title: item.title,
       picture,
     },
@@ -37,8 +39,18 @@ export const addPlaceToWishlist = async (req: Request, res: Response) => {
 };
 
 export const getUserWishlist = async (req: Request, res: Response) => {
-  const wishlist = await WishList.find({ owner: req.user!._id });
-  res.status(200).json({ success: true, data: wishlist });
+  const wishlist = await WishList.find({ owner: req.user!._id }).lean();
+  const placesMissingCategory = wishlist
+    .filter((item) => item.itemType === "place" && item.place && !item.category)
+    .map((item) => item.place!);
+  const places = placesMissingCategory.length
+    ? await Place.find({ _id: { $in: placesMissingCategory } }).select("category").lean()
+    : [];
+  const categories = new Map(places.map((place) => [String(place._id), place.category]));
+  const data = wishlist.map((item) => item.category || !item.place
+    ? item
+    : { ...item, category: categories.get(String(item.place)) });
+  res.status(200).json({ success: true, data });
 };
 
 export const removePlaceFromWishlist = async (req: Request, res: Response) => {

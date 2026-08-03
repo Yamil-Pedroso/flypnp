@@ -46,6 +46,10 @@ const bookingState = vi.hoisted(() => ({
   ],
 }));
 
+const serviceState = vi.hoisted(() => ({
+  requests: [] as Array<Record<string, unknown>>,
+}));
+
 vi.mock("../../lib/hooks", () => ({
   useBooking: () => ({ bookings: bookingState.bookings, loading: false, error: null, refresh: vi.fn(), deleteBooking: bookingState.deleteBooking }),
   useExperiences: () => ({ bookings: [], bookingsLoading: false, deleteBooking: vi.fn() }),
@@ -56,7 +60,7 @@ vi.mock("../../services", async (importOriginal) => {
   return {
     ...original,
     travelServicesService: {
-      listRequests: vi.fn().mockResolvedValue([]),
+      listRequests: vi.fn().mockImplementation(() => Promise.resolve(serviceState.requests)),
       cancelRequest: vi.fn().mockResolvedValue(undefined),
     },
   };
@@ -94,6 +98,35 @@ describe("Trips", () => {
 
     expect(await screen.findByRole("img", { name: "Flypnp empty trips drawing" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "No trips booked… yet!" })).toBeInTheDocument();
+    bookingState.bookings = savedBookings;
+  });
+
+  it("uses service photos and cycles through the three pet photos in creation order", async () => {
+    const savedBookings = bookingState.bookings;
+    bookingState.bookings = [];
+    serviceState.requests = [
+      { _id: "pet-4", createdAt: "2026-04-04T10:00:00.000Z", serviceType: "pet-care", destination: "Basel", date: "2099-04-04", time: "10:00", participants: 1, details: { petType: "Dog", petCount: 1 }, status: "requested" },
+      { _id: "pet-2", createdAt: "2026-02-02T10:00:00.000Z", serviceType: "pet-care", destination: "Bern", date: "2099-02-02", time: "10:00", participants: 1, details: { petType: "Cat", petCount: 1 }, status: "requested" },
+      { _id: "pet-1", createdAt: "2026-01-01T10:00:00.000Z", serviceType: "pet-care", destination: "Zurich", date: "2099-01-01", time: "10:00", participants: 1, details: { petType: "Dog", petCount: 1 }, status: "requested" },
+      { _id: "pet-3", createdAt: "2026-03-03T10:00:00.000Z", serviceType: "pet-care", destination: "Geneva", date: "2099-03-03", time: "10:00", participants: 1, details: { petType: "Bird", petCount: 1 }, status: "requested" },
+      { _id: "airport-1", createdAt: "2026-05-05T10:00:00.000Z", serviceType: "airport-transfer", destination: "Lausanne", date: "2099-05-05", time: "10:00", participants: 2, details: { pickup: "Airport", dropoff: "Hotel" }, status: "requested" },
+      { _id: "guide-1", createdAt: "2026-06-06T10:00:00.000Z", serviceType: "local-guide", destination: "Lucerne", date: "2099-06-06", time: "10:00", participants: 2, details: { language: "English" }, status: "requested" },
+    ];
+
+    render(<MemoryRouter><Trips /></MemoryRouter>);
+
+    const pet1 = await screen.findByRole("img", { name: "Pet Care in Zurich" });
+    const pet2 = screen.getByRole("img", { name: "Pet Care in Bern" });
+    const pet3 = screen.getByRole("img", { name: "Pet Care in Geneva" });
+    const pet4 = screen.getByRole("img", { name: "Pet Care in Basel" });
+    expect(pet1).toHaveAttribute("src", expect.stringContaining("pet_1"));
+    expect(pet2).toHaveAttribute("src", expect.stringContaining("pet_2"));
+    expect(pet3).toHaveAttribute("src", expect.stringContaining("pet_3"));
+    expect(pet4).toHaveAttribute("src", expect.stringContaining("pet_1"));
+    expect(screen.getByRole("img", { name: "Airport Transfer in Lausanne" })).toHaveAttribute("src", expect.stringContaining("airport_transfer"));
+    expect(screen.getByRole("img", { name: "Local Guide in Lucerne" })).toHaveAttribute("src", expect.stringContaining("local_guide"));
+
+    serviceState.requests = [];
     bookingState.bookings = savedBookings;
   });
 });

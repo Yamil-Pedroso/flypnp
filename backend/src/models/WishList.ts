@@ -5,6 +5,7 @@ interface IWishList {
     place?: Types.ObjectId;
     experience?: Types.ObjectId;
     itemType: "place" | "experience";
+    category?: string;
     title: string;
     picture: string;
 }
@@ -14,6 +15,7 @@ const wishListSchema = new Schema<IWishList>({
     place: { type: Schema.Types.ObjectId, ref: "Place" },
     experience: { type: Schema.Types.ObjectId, ref: "Experience" },
     itemType: { type: String, enum: ["place", "experience"], default: "place", required: true },
+    category: { type: String },
     title: { type: String, required: true },
     picture: { type: String, required: true },
 }, {

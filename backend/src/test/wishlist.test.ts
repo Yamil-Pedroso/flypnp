@@ -12,6 +12,7 @@ vi.mock("../models/WishList", () => ({
 }));
 
 import { Experience } from "../models/Experience";
+import { Place } from "../models/Place";
 import { WishList } from "../models/WishList";
 import { addPlaceToWishlist } from "../controllers/wishlistController";
 
@@ -21,8 +22,14 @@ const responseMock = () => {
   return response as unknown as Response;
 };
 
-describe("wishlist experiences", () => {
+describe("wishlist items", () => {
   beforeEach(() => {
+    vi.mocked(Place.findById).mockResolvedValue({
+      _id: "place-1",
+      title: "Alpine hideaway",
+      category: "trending",
+      photos: [{ main: "/alpine.jpg" }],
+    } as never);
     vi.mocked(Experience.findById).mockResolvedValue({
       _id: "experience-1",
       title: "Zurich photo walk",
@@ -56,5 +63,25 @@ describe("wishlist experiences", () => {
       expect.objectContaining({ upsert: true }),
     );
     expect(response.status).toHaveBeenCalledWith(201);
+  });
+
+  it("stores the place category used by the reservation link", async () => {
+    const request = {
+      user: { _id: "user-1" },
+      body: { placeId: "place-1" },
+    } as unknown as Request;
+    const response = responseMock();
+
+    await addPlaceToWishlist(request, response);
+
+    expect(WishList.findOneAndUpdate).toHaveBeenCalledWith(
+      { owner: "user-1", place: "place-1" },
+      expect.objectContaining({
+        place: "place-1",
+        itemType: "place",
+        category: "trending",
+      }),
+      expect.objectContaining({ upsert: true }),
+    );
   });
 });

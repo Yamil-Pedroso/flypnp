@@ -11,7 +11,7 @@ const wishlistMocks = vi.hoisted(() => ({
 
 vi.mock("../../lib/hooks", () => ({
   useWishlist: () => ({
-    wishlist: [{ _id: "wish-1", place: "place-1", title: "Alpine hideaway", picture: "/uploads/alpine.jpg" }],
+    wishlist: [{ _id: "wish-1", place: "place-1", category: "trending", title: "Alpine hideaway", picture: "/uploads/alpine.jpg" }],
     loading: false,
     error: null,
     refresh: wishlistMocks.refresh,
@@ -25,6 +25,7 @@ describe("WishList", () => {
     render(<MemoryRouter><WishList /></MemoryRouter>);
 
     expect(screen.getByRole("heading", { name: "Alpine hideaway" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Reserve" })).toHaveAttribute("href", "/place/trending/place-1#reservation");
     await user.click(screen.getByRole("button", { name: "Remove Alpine hideaway from wishlist" }));
     expect(screen.getByRole("dialog", { name: "Remove saved place" })).toBeInTheDocument();
 

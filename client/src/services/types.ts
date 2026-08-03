@@ -146,6 +146,7 @@ export interface WishlistItem {
   place?: string
   experience?: string
   itemType?: 'place' | 'experience'
+  category?: string
   title: string
   picture?: string
 }
@@ -275,6 +276,7 @@ export type TravelServiceType = 'airport-transfer' | 'pet-care' | 'local-guide'
 
 export interface ServiceRequest {
   _id: string
+  createdAt?: string
   owner: string | Pick<User, '_id' | 'name' | 'email' | 'avatar'>
   serviceType: TravelServiceType
   destination: string

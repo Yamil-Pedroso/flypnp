@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -27,7 +27,7 @@ import { getBookingPaymentPath, getExperiencePaymentPath, getServicePaymentPath 
 import { isDateOnlyOnOrAfter, localDateKey } from "../../lib/date-only";
 import { getErrorMessage, travelServicesService, type Booking, type ExperienceBooking, type ServiceRequest } from "../../services";
 import emptyBoxDrawing from "../../assets/images/png/empty-box.png";
-import ServiceIcon from "../services/ServiceIcon";
+import images from "../../assets/images";
 
 type TripView = "upcoming" | "past";
 
@@ -36,6 +36,8 @@ const serviceNamesForTrip = {
   "pet-care": "Pet Care",
   "local-guide": "Local Guide",
 } as const;
+
+const petCareImages = [images.pet1, images.pet2, images.pet3];
 
 const formatDate = (date: string) => new Intl.DateTimeFormat("en", {
   day: "numeric",
@@ -127,7 +129,7 @@ const ExperienceTripCard = ({ booking, past, onDelete }: { booking: ExperienceBo
   );
 };
 
-const ServiceTripCard = ({ request, past, onDelete }: { request: ServiceRequest; past: boolean; onDelete: (request: ServiceRequest) => void }) => {
+const ServiceTripCard = ({ request, past, onDelete, petCareImage }: { request: ServiceRequest; past: boolean; onDelete: (request: ServiceRequest) => void; petCareImage?: string }) => {
   const service = {
     "airport-transfer": { name: "Airport Transfer", gradient: "from-sky-950 to-sky-700" },
     "pet-care": { name: "Pet Care", gradient: "from-amber-950 to-amber-700" },
@@ -139,12 +141,17 @@ const ServiceTripCard = ({ request, past, onDelete }: { request: ServiceRequest;
     confirmed: "bg-emerald-50 text-emerald-700",
     cancelled: "bg-rose-50 text-rose-700",
   }[request.status];
+  const serviceImage = request.serviceType === "pet-care"
+    ? petCareImage ?? images.pet1
+    : request.serviceType === "airport-transfer"
+      ? images.airportTransfer
+      : images.localGuide;
 
   return (
     <article className="group overflow-hidden rounded-[1.75rem] border border-sky-200/70 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
       <div className={`relative flex aspect-[16/10] items-center justify-center overflow-hidden bg-gradient-to-br ${service.gradient} ${past ? "saturate-[0.65]" : ""}`}>
-        <div className="absolute -right-10 -top-16 size-52 rounded-full bg-white/10 blur-2xl" />
-        <ServiceIcon serviceType={request.serviceType} className="size-20 text-white/20" />
+        <img src={serviceImage} alt={`${service.name} in ${request.destination}`} className="size-full object-cover transition duration-700 group-hover:scale-105" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
         <span className="absolute left-4 top-4 rounded-full bg-white/15 px-3 py-1.5 text-xs font-black uppercase tracking-wide text-white ring-1 ring-white/20 backdrop-blur">Service</span>
         <span className={`absolute left-4 top-14 rounded-full px-3 py-1.5 text-xs font-semibold capitalize shadow-sm ${statusStyles}`}>{request.status}</span>
         {request.status !== "confirmed" && <button type="button" aria-label={`Delete service ${service.name}`} onClick={() => onDelete(request)} className="absolute right-4 top-4 grid size-9 place-items-center rounded-full bg-white/90 text-slate-700 shadow-sm transition hover:scale-105 hover:bg-rose-500 hover:text-white"><Trash2 className="size-4" /></button>}
@@ -209,6 +216,19 @@ const Trips = () => {
   const upcomingServices = serviceRequests.filter((request) => isDateOnlyOnOrAfter(request.date, todayKey) && request.status !== "cancelled");
   const pastServices = serviceRequests.filter((request) => !isDateOnlyOnOrAfter(request.date, todayKey) || request.status === "cancelled");
   const visibleServices = view === "upcoming" ? upcomingServices : pastServices;
+  const petCareImageByRequest = useMemo(() => {
+    const requests = serviceRequests
+      .filter((request) => request.serviceType === "pet-care")
+      .map((request, listIndex) => ({ request, listIndex }))
+      .sort((a, b) => {
+        if (a.request.createdAt && b.request.createdAt) {
+          return new Date(a.request.createdAt).getTime() - new Date(b.request.createdAt).getTime();
+        }
+        return a.listIndex - b.listIndex;
+      });
+
+    return new Map(requests.map(({ request }, index) => [request._id, petCareImages[index % petCareImages.length]]));
+  }, [serviceRequests]);
   const upcomingCount = upcomingTrips.length + upcomingExperiences.length + upcomingServices.length;
   const pastCount = pastTrips.length + pastExperiences.length + pastServices.length;
 
@@ -295,7 +315,7 @@ const Trips = () => {
             <div className="mt-7 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {visibleTrips.map((booking) => <TripCard key={booking._id} booking={booking} past={view === "past"} onDelete={requestDelete} />)}
               {visibleExperiences.map((booking) => <ExperienceTripCard key={booking._id} booking={booking} past={view === "past"} onDelete={requestExperienceDelete} />)}
-              {visibleServices.map((request) => <ServiceTripCard key={request._id} request={request} past={view === "past"} onDelete={requestServiceDelete} />)}
+              {visibleServices.map((request) => <ServiceTripCard key={request._id} request={request} past={view === "past"} onDelete={requestServiceDelete} petCareImage={petCareImageByRequest.get(request._id)} />)}
             </div>
           ) : (
             <div className="relative mt-7 overflow-hidden rounded-[2rem] border border-slate-200 bg-white px-6 py-14 text-center shadow-sm sm:px-10 sm:py-20">

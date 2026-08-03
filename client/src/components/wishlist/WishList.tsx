@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import {
   ArrowUpRight,
+  CalendarCheck,
   Compass,
   Heart,
   Images,
@@ -71,15 +72,25 @@ const WishList = () => {
             <div className="mt-7 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {wishlist.map((wish, index) => {
                 const picture = resolvePicture(wish.picture);
+                const itemType = wish.itemType ?? (wish.experience ? "experience" : "place");
+                const reservationPath = itemType === "place" && wish.place && wish.category
+                  ? `/place/${wish.category}/${wish.place}#reservation`
+                  : null;
                 return (
                   <motion.article key={wish._id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.2) }} className="group min-w-0">
                     <div className="relative aspect-[4/3] overflow-hidden rounded-[1.75rem] bg-slate-200">
                       {picture ? <img src={picture} alt={wish.title} className="size-full object-cover transition duration-500 group-hover:scale-105" /> : <div className="flex size-full items-center justify-center bg-rose-50 text-rose-400"><Images className="size-10" /></div>}
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent opacity-70" />
                       <button type="button" onClick={() => setItemToDelete(wish)} aria-label={`Remove ${wish.title} from wishlist`} className="absolute right-3 top-3 flex size-10 items-center justify-center rounded-full bg-white/90 text-slate-600 shadow-sm backdrop-blur transition hover:scale-105 hover:bg-rose-500 hover:text-white sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"><Trash2 className="size-4.5" /></button>
-                      <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 backdrop-blur">{wish.itemType === "experience" ? "Saved experience" : "Saved stay"}</span>
+                      <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 backdrop-blur">{itemType === "experience" ? "Saved experience" : "Saved stay"}</span>
                     </div>
-                    <div className="px-1 pt-3"><h3 className="truncate text-lg font-semibold text-slate-950">{wish.title}</h3><p className="mt-1 flex items-center gap-1.5 text-sm text-slate-500"><Heart className="size-3.5 fill-rose-400 text-rose-400" />Ready when you are</p></div>
+                    <div className="px-1 pt-3">
+                      <h3 className="truncate text-lg font-semibold text-slate-950">{wish.title}</h3>
+                      <div className="mt-2 flex items-center justify-between gap-3">
+                        <p className="flex min-w-0 items-center gap-1.5 text-sm text-slate-500"><Heart className="size-3.5 shrink-0 fill-rose-400 text-rose-400" />Ready when you are</p>
+                        {reservationPath && <Link to={reservationPath} className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-rose-500 px-3.5 py-2 text-xs font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-rose-600"><CalendarCheck className="size-4" />Reserve</Link>}
+                      </div>
+                    </div>
                   </motion.article>
                 );
               })}
