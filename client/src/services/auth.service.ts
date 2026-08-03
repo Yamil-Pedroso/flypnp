@@ -19,6 +19,9 @@ export const authService = {
   async login(input: { email: string; password: string }) {
     return (await http.post<SessionResponse>('/login', input)).data
   },
+  async demoLogin() {
+    return (await http.post<SessionResponse>('/demo-login')).data
+  },
   async googleLogin(credential: string) {
     return (await http.post<SessionResponse>('/google-login', { credential })).data
   },

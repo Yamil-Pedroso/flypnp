@@ -8,6 +8,7 @@ vi.mock("../../../lib/hooks", () => ({
   useAuth: () => ({
     user: { _id: "host-1", name: "Host", email: "host@example.com", avatar: "/avatar.jpg", isAdmin: false },
     logout: vi.fn(),
+    demoLogin: vi.fn(),
   }),
   useNotifications: () => ({ notifications: [] }),
   useMessages: () => ({ unreadTotal: 0 }),

@@ -14,6 +14,7 @@ export interface AuthContextValue {
   getAllUsers: () => Promise<User[]>
   register: (input: RegisterInput) => Promise<AuthResult>
   login: (input: AuthInput) => Promise<AuthResult>
+  demoLogin: () => Promise<AuthResult>
   googleLogin: (credential: string) => Promise<AuthResult>
   logout: () => Promise<AuthResult>
   updateUser: (input: FormData | Record<string, string>, id: string) => Promise<AuthResult>
@@ -73,6 +74,7 @@ export const useAuthController = (): AuthContextValue => {
     getAllUsers: authService.listUsers,
     register: (input) => runSession(() => authService.register(input)),
     login: (input) => runSession(() => authService.login(input)),
+    demoLogin: () => runSession(() => authService.demoLogin()),
     googleLogin: (credential) => runSession(() => authService.googleLogin(credential)),
     async logout() {
       try {

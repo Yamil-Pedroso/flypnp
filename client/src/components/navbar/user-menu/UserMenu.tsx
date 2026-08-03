@@ -9,6 +9,7 @@ import { Check, Languages, Sparkles, X } from "lucide-react";
 import { useAuth, useMessages, useNotifications } from "../../../lib/hooks";
 import Login from "../../user-auth/Login";
 import Register from "../../user-auth/Register";
+import { toast } from "sonner";
 
 const languages = [
   { code: "de", name: "Deutsch", englishName: "German", mark: "DE" },
@@ -24,7 +25,8 @@ const UserMenu = () => {
   const [userRegisterOpen, setUserRegisterOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("en");
-  const { user, logout } = useAuth();
+  const [demoLoading, setDemoLoading] = useState(false);
+  const { user, logout, demoLogin } = useAuth();
   const { notifications } = useNotifications();
   const { unreadTotal: unreadMessages } = useMessages();
   const location = useLocation();
@@ -43,6 +45,19 @@ const UserMenu = () => {
     setUserLoginOpen(false);
   };
   const handleUserMenuIconClick = () => setUserMenuOpen(!userMenuOpen);
+
+  const handleDemoLogin = async () => {
+    if (demoLoading) return;
+    setDemoLoading(true);
+    const result = await demoLogin();
+    setDemoLoading(false);
+    if (result.success) {
+      setUserMenuOpen(false);
+      toast.success("Welcome to the Flypnp demo");
+    } else {
+      toast.error(result.message ?? "The demo account is not available right now");
+    }
+  };
 
   const clickOutside = (e: PointerEvent) => {
     if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -99,6 +114,12 @@ const UserMenu = () => {
 
   return (
     <div ref={menuRef} className="user-menu-wrapper relative flex items-center gap-2 sm:gap-3">
+      {!user && (
+        <button type="button" onClick={() => void handleDemoLogin()} disabled={demoLoading} className="hidden items-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-70 sm:inline-flex">
+          <Sparkles className="size-4 text-emerald-300" />
+          {demoLoading ? "Entering…" : "Try demo"}
+        </button>
+      )}
       <button type="button" onClick={handleMenuIconClick} aria-label="Language and currency" className="hidden size-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 sm:flex">
         <TbWorld className="text-xl" />
       </button>
@@ -284,6 +305,17 @@ const UserMenu = () => {
                 </>
               ) : (
                 <>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => void handleDemoLogin()}
+                      disabled={demoLoading}
+                      className="flex w-full items-center gap-2 rounded bg-slate-950 px-4 py-2 text-left font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-70 sm:hidden"
+                    >
+                      <Sparkles className="size-4 text-emerald-300" />
+                      {demoLoading ? "Entering demo…" : "Try demo"}
+                    </button>
+                  </li>
                   <li>
                     <button
                       type="button"

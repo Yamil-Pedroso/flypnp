@@ -15,6 +15,7 @@ const authValue = (user: AuthContextValue["user"]): AuthContextValue => ({
   getAllUsers: vi.fn(),
   register: vi.fn(),
   login: vi.fn(),
+  demoLogin: vi.fn(),
   googleLogin: vi.fn(),
   logout: vi.fn(),
   updateUser: vi.fn(),

@@ -41,4 +41,21 @@ describe('useAuthController', () => {
     expect(localStorage.getItem('token')).toBe('new-token')
     expect(JSON.parse(localStorage.getItem('user') ?? '{}')).toEqual(user)
   })
+
+  it('persists a demo session like any other authenticated user', async () => {
+    vi.spyOn(authService, 'demoLogin').mockResolvedValue({
+      success: true,
+      token: 'demo-token',
+      user: { ...user, _id: 'demo-1', name: 'Flypnp Demo', email: 'demo@example.com' },
+    })
+    const { result } = renderHook(() => useAuthController())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await expect(result.current.demoLogin()).resolves.toMatchObject({ success: true })
+    })
+
+    expect(localStorage.getItem('token')).toBe('demo-token')
+    expect(JSON.parse(localStorage.getItem('user') ?? '{}').email).toBe('demo@example.com')
+  })
 })

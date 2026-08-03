@@ -17,7 +17,7 @@ import foot from "./png/foot.png";
 // pets
 import pet1 from "./jpg/pet_1.jpg";
 import pet2 from "./jpg/pet_2.jpg";
-import pet3 from "./jpg/pet_3.jpg";
+const pet3 = "/demo-avatar.jpg";
 
 // airports transfer
 import airportTransfer from "./airport_transfer/airport_transfer.png";

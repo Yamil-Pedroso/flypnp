@@ -5,6 +5,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { User } from "../models/User";
 import cookieToken from "../utils/cookieToken";
 import CustomError from "../utils/customError";
+import { getOrRestoreDemoAccount } from "../services/demoAccountService";
 
 const DEFAULT_AVATAR =
   "https://res.cloudinary.com/ddgf7ijdc/image/upload/v1706787809/yami_lil00v.jpg";
@@ -62,6 +63,11 @@ export const loginUser = async (req: Request, res: Response) => {
     throw new CustomError("Invalid credentials", 401);
   }
 
+  cookieToken(user, res);
+};
+
+export const loginDemoUser = async (_req: Request, res: Response) => {
+  const user = await getOrRestoreDemoAccount();
   cookieToken(user, res);
 };
 

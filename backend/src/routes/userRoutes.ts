@@ -3,6 +3,7 @@ import multer from "multer";
 import { isLoggedIn } from "../middlewares/user";
 import isAdmin from "../middlewares/admin";
 import asyncHandler from "../utils/asyncHandler";
+import { rateLimit } from "../middlewares/rateLimit";
 
 const router = Router();
 
@@ -18,6 +19,7 @@ const upload = multer({
 import {
   registerUser,
   loginUser,
+  loginDemoUser,
   logoutUser,
   getUsers,
   deleteUser,
@@ -28,6 +30,11 @@ import {
 
 router.post("/register", upload.single("avatar"), asyncHandler(registerUser));
 router.post("/login", asyncHandler(loginUser));
+router.post(
+  "/demo-login",
+  rateLimit({ scope: "auth:demo", windowMs: 15 * 60_000, max: 30 }),
+  asyncHandler(loginDemoUser),
+);
 router.post("/google-login", asyncHandler(googleLogin));
 router.post("/upload-avatar", isLoggedIn, upload.single("avatar"), asyncHandler(uploadAvatar));
 router.get("/logout", asyncHandler(logoutUser));

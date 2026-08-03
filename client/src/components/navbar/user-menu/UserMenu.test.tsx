@@ -6,8 +6,10 @@ import UserMenu from "./UserMenu";
 
 afterEach(cleanup);
 
+const demoLoginMock = vi.hoisted(() => vi.fn());
+
 vi.mock("../../../lib/hooks", () => ({
-  useAuth: () => ({ user: null, logout: vi.fn() }),
+  useAuth: () => ({ user: null, logout: vi.fn(), demoLogin: demoLoginMock }),
   useNotifications: () => ({ notifications: [] }),
   useMessages: () => ({ unreadTotal: 0 }),
 }));
@@ -16,6 +18,16 @@ vi.mock("../../user-auth/Login", () => ({ default: () => <div>Login</div> }));
 vi.mock("../../user-auth/Register", () => ({ default: () => <div>Register</div> }));
 
 describe("UserMenu language modal", () => {
+  it("enters the shared demo account from the top navigation", async () => {
+    demoLoginMock.mockResolvedValueOnce({ success: true });
+    const user = userEvent.setup();
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
+
+    await user.click(screen.getByRole("button", { name: "Try demo" }));
+
+    await waitFor(() => expect(demoLoginMock).toHaveBeenCalledOnce());
+  });
+
   it("shows only public navigation to signed-out visitors", async () => {
     const user = userEvent.setup();
     render(<MemoryRouter><UserMenu /></MemoryRouter>);
