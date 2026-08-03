@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { Link, useLocation } from "react-router-dom";
 import { getErrorMessage, travelServicesService, type ServiceRequest, type ServiceRequestInput, type TravelServiceType } from "../../services";
 import { useAuth } from "../../lib/hooks";
+import { CONTACT_GMAIL_COMPOSE_URL } from "../../config/contact";
 import { getServicePaymentPath } from "../../lib/payment";
 import ServiceIcon from "./ServiceIcon";
 
@@ -367,7 +368,7 @@ const Services = () => {
       <section className="bg-emerald-950 px-4 py-14 text-white sm:px-6 sm:py-16">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
           <div><p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">A human is always nearby</p><h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl">One request. A local partner takes care of the details.</h2></div>
-          <a href="mailto:hello@flypnp.com" className="inline-flex w-fit items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-black text-emerald-950 transition hover:-translate-y-0.5">Need something else? Contact us <ArrowRight className="size-4" /></a>
+          <a href={CONTACT_GMAIL_COMPOSE_URL} target="_blank" rel="noreferrer" className="inline-flex w-fit items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-black text-emerald-950 transition hover:-translate-y-0.5">Need something else? Contact us <ArrowRight className="size-4" /></a>
         </div>
       </section>
     </main>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type MouseEvent as ReactMouseEvent } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaHouseUser } from "react-icons/fa6";
 import { RiMenuUnfoldLine } from "react-icons/ri";
@@ -27,6 +27,8 @@ const UserMenu = () => {
   const { user, logout } = useAuth();
   const { notifications } = useNotifications();
   const { unreadTotal: unreadMessages } = useMessages();
+  const location = useLocation();
+  const navigate = useNavigate();
   const unreadNotifications = notifications.filter((notification) => !notification.read).length;
   const unreadTotal = unreadNotifications + unreadMessages;
   const menuRef = useRef<HTMLDivElement>(null);
@@ -52,6 +54,24 @@ const UserMenu = () => {
     document.addEventListener("click", clickOutside);
     return () => document.removeEventListener("click", clickOutside);
   }, []);
+
+  useEffect(() => {
+    const routeState = location.state as { authRequired?: boolean; returnTo?: string } | null;
+    if (user || !routeState?.authRequired) return;
+    if (routeState.returnTo) sessionStorage.setItem("flypnp:returnTo", routeState.returnTo);
+    setUserMenuOpen(false);
+    setUserRegisterOpen(false);
+    setUserLoginOpen(true);
+    navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
+  }, [location.pathname, location.search, location.state, navigate, user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const returnTo = sessionStorage.getItem("flypnp:returnTo");
+    if (!returnTo) return;
+    sessionStorage.removeItem("flypnp:returnTo");
+    navigate(returnTo, { replace: true });
+  }, [navigate, user]);
 
   useEffect(() => {
     if (!menuOpen && !userLoginOpen && !userRegisterOpen) return;
@@ -264,21 +284,23 @@ const UserMenu = () => {
                 </>
               ) : (
                 <>
-                  <li onClick={handleMenuLoginIconClick}>
-                    <a
-                      href="#"
+                  <li>
+                    <button
+                      type="button"
+                      onClick={handleMenuLoginIconClick}
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
                       Login
-                    </a>
+                    </button>
                   </li>
-                  <li onClick={handleMenuRegisterIconClick}>
-                    <a
-                      href="#"
+                  <li>
+                    <button
+                      type="button"
+                      onClick={handleMenuRegisterIconClick}
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
                       Sign up
-                    </a>
+                    </button>
                   </li>
                   <li>
                     <hr className="my-2 border-t border-gray-200" />
@@ -293,20 +315,22 @@ const UserMenu = () => {
                     </Link>
                   </li>
                   <li>
-                    <a
-                      href="/register"
-                      className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
+                    <button
+                      type="button"
+                      onClick={handleMenuRegisterIconClick}
+                      className="block w-full px-4 py-2 text-left hover:bg-[#f94a52] hover:text-white rounded"
                     >
                       Flypnp your home
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a
-                      href="/register"
+                    <Link
+                      to="/help"
+                      onClick={() => setUserMenuOpen(false)}
                       className="block hover:bg-[#f94a52] hover:text-white px-4 py-2 rounded"
                     >
-                      Help center
-                    </a>
+                      Help Center
+                    </Link>
                   </li>
                 </>
               )}

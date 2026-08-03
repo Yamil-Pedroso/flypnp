@@ -3,10 +3,13 @@ import { Heart, Mail, MapPin } from "lucide-react";
 import { FaInstagram } from "react-icons/fa6";
 import images from "../../assets/images";
 import { motion, useReducedMotion } from "framer-motion";
+import { useAuth } from "../../lib/hooks";
+import { CONTACT_GMAIL_COMPOSE_URL } from "../../config/contact";
 
 const Footer = () => {
   const year = new Date().getFullYear();
   const reducedMotion = useReducedMotion();
+  const { user } = useAuth();
 
   return (
     <motion.footer
@@ -37,16 +40,18 @@ const Footer = () => {
               <Link to="/" className="transition hover:text-emerald-300">Stays</Link>
               <Link to="/experiences" className="transition hover:text-emerald-300">Experiences</Link>
               <Link to="/services" className="transition hover:text-emerald-300">Services</Link>
-              <Link to="/wishlist" className="transition hover:text-emerald-300">Wishlist</Link>
-              <Link to="/trips" className="transition hover:text-emerald-300">Trips</Link>
+              {user && <Link to="/wishlist" className="transition hover:text-emerald-300">Wishlist</Link>}
+              {user && <Link to="/trips" className="transition hover:text-emerald-300">Trips</Link>}
             </div>
           </nav>
 
           <div>
             <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-white">Flypnp</h2>
             <div className="mt-4 flex flex-col items-start gap-3 text-sm">
-              <Link to="/profile" className="transition hover:text-emerald-300">My profile</Link>
-              <a href="mailto:hello@flypnp.com" className="inline-flex items-center gap-2 transition hover:text-emerald-300"><Mail className="size-4" />Contact us</a>
+              {user && <Link to="/profile" className="transition hover:text-emerald-300">My profile</Link>}
+              <Link to="/gift-cards" className="transition hover:text-emerald-300">Gift cards</Link>
+              <Link to="/help" className="transition hover:text-emerald-300">Help Center</Link>
+              <a href={CONTACT_GMAIL_COMPOSE_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition hover:text-emerald-300"><Mail className="size-4" />Contact us</a>
               <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition hover:text-emerald-300"><FaInstagram className="size-4" />Instagram</a>
             </div>
           </div>

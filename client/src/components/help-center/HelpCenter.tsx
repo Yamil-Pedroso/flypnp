@@ -17,6 +17,7 @@ import {
   WalletCards,
 } from "lucide-react";
 import { categories } from "../../types/helpCenter.types";
+import { CONTACT_GMAIL_COMPOSE_URL } from "../../config/contact";
 
 const quickLinks = [
   { label: "Gift cards", href: "/gift-cards", icon: WalletCards },
@@ -29,22 +30,25 @@ const quickLinks = [
 
 const contactOptions = [
   {
-    title: "Message us",
+    title: "Email us",
     description: "Talk to us about any booking or account question.",
-    href: "/messages",
+    href: CONTACT_GMAIL_COMPOSE_URL,
     icon: MessageSquareText,
+    external: true,
   },
   {
     title: "Gift card help",
     description: "Buy, redeem or track a gift card code.",
     href: "/gift-cards",
     icon: Gift,
+    external: false,
   },
   {
     title: "Check notifications",
     description: "Find updates about your bookings and gift cards.",
     href: "/notifications",
     icon: Bell,
+    external: false,
   },
 ];
 
@@ -231,6 +235,8 @@ const HelpCenter = () => {
                   <Link
                     key={option.title}
                     to={option.href}
+                    target={option.external ? "_blank" : undefined}
+                    rel={option.external ? "noreferrer" : undefined}
                     className="group flex items-center gap-3 rounded-2xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md"
                   >
                     <span className="grid place-items-center rounded-xl transition size-10 shrink-0 bg-slate-50 text-slate-600 group-hover:bg-emerald-50 group-hover:text-emerald-700">

@@ -35,6 +35,7 @@ import MessagesPage from "./pages/MessagesPage";
 import GiftCardsPage from "./pages/GiftCardsPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import MessagesProvider from "./providers/MessagesProvider";
+import { RequireAdmin, RequireAuth } from "./components/auth/AccessRoutes";
 
 //interface AppProps {
 //  children: React.ReactNode
@@ -71,34 +72,39 @@ function App() {
                         <Route path="/experiences" element={<ExperiencesPage />} />
                         <Route path="/experiences/:slug" element={<ExperienceDetailsPage />} />
                         <Route path="/services" element={<ServicesPage />} />
-                        <Route path="/admin/services" element={<AdminServicesPage />} />
-                        <Route path="/host" element={<HostPage />} />
-                        <Route path="/host/listings/new" element={<PlacesFormPage />} />
-                        <Route path="/host/listings/:id/edit" element={<PlacesFormPage />} />
-                        <Route path="/profile" element={<ProfilePage />} />
-                        <Route
-                          path="/notifications"
-                          element={<NotificationsPage />}
-                        />
                         <Route
                           path="/place/:category/:id"
                           element={<PlaceDetailsPage />}
                         />
-                        <Route path="/bookings" element={<BookingPage />} />
-                        <Route path="/trips" element={<TripsPage />} />
-                        <Route path="/messages" element={<MessagesPage />} />
                         <Route path="/gift-cards" element={<GiftCardsPage />} />
                         <Route path="/help" element={<HelpCenterPage />} />
-                        <Route path="/wishlist" element={<WishListPage />} />
-                        <Route path="/my-payment" element={<PaymentPage />} />
+
+                        <Route element={<RequireAuth />}>
+                          <Route path="/host" element={<HostPage />} />
+                          <Route path="/host/listings/new" element={<PlacesFormPage />} />
+                          <Route path="/host/listings/:id/edit" element={<PlacesFormPage />} />
+                          <Route path="/profile" element={<ProfilePage />} />
+                          <Route path="/notifications" element={<NotificationsPage />} />
+                          <Route path="/bookings" element={<BookingPage />} />
+                          <Route path="/trips" element={<TripsPage />} />
+                          <Route path="/messages" element={<MessagesPage />} />
+                          <Route path="/wishlist" element={<WishListPage />} />
+                          <Route path="/my-payment" element={<PaymentPage />} />
+                        </Route>
+
+                        <Route element={<RequireAdmin />}>
+                          <Route path="/admin/services" element={<AdminServicesPage />} />
+                        </Route>
                       </Route>
 
                       {/* Rutas sin Navbar */}
-                      <Route element={<WithoutNavbarLayout />}>
-                        <Route
-                          path="/succeeded-payment"
-                          element={<SucceededPaymentPage />}
-                        />
+                      <Route element={<RequireAuth />}>
+                        <Route element={<WithoutNavbarLayout />}>
+                          <Route
+                            path="/succeeded-payment"
+                            element={<SucceededPaymentPage />}
+                          />
+                        </Route>
                       </Route>
 
                       <Route path="*" element={<NotFoundPage />} />

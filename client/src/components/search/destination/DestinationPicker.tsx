@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Check, Globe2, MapPin, Maximize2, Minimize2, Search, X } from "lucide-react";
+import { AnimatePresence, motion, useDragControls, useMotionValue } from "framer-motion";
+import { ArrowLeft, Check, Globe2, GripHorizontal, MapPin, Maximize2, Minimize2, Search, X } from "lucide-react";
 import * as portals from "react-reverse-portal";
 import { usePlaces } from "../../../lib/hooks";
 import { useTravelSearch } from "../SearchContext";
@@ -27,8 +27,12 @@ const DestinationPicker = () => {
   const [countryQuery, setCountryQuery] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const fieldRef = useRef<HTMLDivElement>(null);
+  const dragBoundsRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dragControls = useDragControls();
+  const modalX = useMotionValue(0);
+  const modalY = useMotionValue(0);
   const mapPortalNode = useMemo(() => portals.createHtmlPortalNode({
     attributes: {
       class: "block size-full min-h-0",
@@ -73,6 +77,13 @@ const DestinationPicker = () => {
 
   useEffect(() => setActiveIndex(0), [destination]);
 
+  useEffect(() => {
+    if (!open || isExpanded) {
+      modalX.set(0);
+      modalY.set(0);
+    }
+  }, [isExpanded, modalX, modalY, open]);
+
   const selectDestination = (value: string) => {
     setDestination(value);
     setIsExpanded(false);
@@ -113,7 +124,8 @@ const DestinationPicker = () => {
     <AnimatePresence>
       {open && (
         <motion.div
-          className={`fixed inset-0 z-[1200] flex justify-center bg-slate-950/40 ${isExpanded ? "items-stretch p-0" : "items-start p-3 pt-[max(5rem,10vh)] sm:p-6 sm:pt-[max(6rem,11vh)]"}`}
+          ref={dragBoundsRef}
+          className={`fixed inset-0 z-[1200] flex justify-center bg-slate-950/40 ${isExpanded ? "items-stretch p-0" : "items-start p-3 pt-[max(2rem,5vh)] sm:p-6 sm:pt-[max(2rem,5vh)]"}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -126,19 +138,33 @@ const DestinationPicker = () => {
             role="dialog"
             aria-modal="true"
             aria-label="Explore destinations"
-            initial={{ opacity: 0, y: 8, scale: 0.99 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 6, scale: 0.99 }}
+            drag={isExpanded ? false : true}
+            dragControls={dragControls}
+            dragConstraints={dragBoundsRef}
+            dragElastic={0.04}
+            dragListener={false}
+            dragMomentum={false}
+            style={{ x: modalX, y: modalY }}
+            initial={{ opacity: 0, scale: 0.99 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.99 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className={`flex w-full flex-col overflow-hidden bg-white text-slate-900 shadow-[0_30px_90px_rgba(15,23,42,0.34)] ${isExpanded ? "h-dvh max-h-none max-w-none rounded-none border-0" : "max-h-[82vh] max-w-6xl rounded-[1.75rem] border border-white/70"}`}
+            className={`flex w-full flex-col overflow-hidden bg-white text-slate-900 shadow-[0_30px_90px_rgba(15,23,42,0.34)] ${isExpanded ? "h-dvh max-h-none max-w-none rounded-none border-0" : `${selectedRegion ? "h-[90dvh]" : "max-h-[90dvh]"} max-w-6xl rounded-[1.75rem] border border-white/70`}`}
           >
-            <header className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-100 px-4 py-3 sm:px-6 sm:py-4">
+            <header
+              onPointerDown={(event) => {
+                if (isExpanded || (event.target as HTMLElement).closest("button")) return;
+                dragControls.start(event);
+              }}
+              className={`relative flex shrink-0 select-none items-center justify-between gap-4 border-b border-slate-100 px-4 py-3 sm:px-6 sm:py-4 ${isExpanded ? "cursor-default" : "cursor-grab active:cursor-grabbing"}`}
+            >
               <div className="flex min-w-0 items-center gap-3">
                 {selectedRegion ? (
                   <button type="button" onClick={() => { setSelectedRegion(null); setSelectedCountry(null); }} aria-label="Back to regions" className="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-slate-200"><ArrowLeft className="size-4.5" /></button>
                 ) : <span className="grid size-10 shrink-0 place-items-center rounded-full bg-emerald-50 text-emerald-700"><Globe2 className="size-5" /></span>}
                 <div className="min-w-0"><p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Where next?</p><h2 className="truncate text-lg font-bold sm:text-xl">{selectedRegion ? `Explore ${selectedRegion.name}` : "Choose a region"}</h2></div>
               </div>
+              {!isExpanded && <span aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1.5 hidden -translate-x-1/2 text-slate-300 md:block"><GripHorizontal className="size-5" /></span>}
               <div className="flex shrink-0 items-center gap-2">
                 {selectedRegion && (
                   <button type="button" onClick={() => setIsExpanded((expanded) => !expanded)} aria-label={isExpanded ? "Exit full screen map" : "Open map in full screen"} title={isExpanded ? "Exit full screen" : "Full screen"} className="grid size-10 place-items-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
@@ -172,7 +198,7 @@ const DestinationPicker = () => {
                 </div>
               </div>
             ) : (
-              <div className={`grid min-h-0 flex-1 overflow-y-auto ${isExpanded ? "grid-rows-[auto_minmax(22rem,1fr)] lg:grid-cols-[minmax(18rem,22rem)_1fr] lg:grid-rows-1 lg:overflow-hidden" : "max-h-[calc(82vh-5rem)] lg:h-[34rem] lg:grid-cols-[19rem_1fr] lg:overflow-hidden"}`}>
+              <div className={`grid min-h-0 flex-1 overflow-y-auto ${isExpanded ? "grid-rows-[auto_minmax(22rem,1fr)] lg:grid-cols-[minmax(18rem,22rem)_1fr] lg:grid-rows-1 lg:overflow-hidden" : "lg:h-[calc(90dvh-4.75rem)] lg:max-h-[44rem] lg:grid-cols-[19rem_1fr] lg:overflow-hidden"}`}>
                 <aside className="border-b border-slate-100 p-4 lg:overflow-y-auto lg:border-b-0 lg:border-r">
                   <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-100"><Search className="size-4 text-slate-400" /><input value={countryQuery} onChange={(event) => setCountryQuery(event.target.value)} placeholder={`Search in ${selectedRegion.name}`} aria-label={`Search country in ${selectedRegion.name}`} className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400" /></label>
                   <p className="px-1 pb-2 pt-4 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Select a country</p>

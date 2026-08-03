@@ -13,14 +13,15 @@ vi.mock("../../../lib/hooks", () => ({
 
 vi.mock("./DestinationMap", async () => {
   const { useEffect } = await import("react");
+  const MockDestinationMap = ({ expanded }: { expanded?: boolean }) => {
+    useEffect(() => {
+      mapLifecycle.mounted();
+      return () => mapLifecycle.unmounted();
+    }, []);
+    return <div data-testid="mock-destination-map" data-expanded={String(expanded)}>Map</div>;
+  };
   return {
-    default: ({ expanded }: { expanded?: boolean }) => {
-      useEffect(() => {
-        mapLifecycle.mounted();
-        return () => mapLifecycle.unmounted();
-      }, []);
-      return <div data-testid="mock-destination-map" data-expanded={String(expanded)}>Map</div>;
-    },
+    default: MockDestinationMap,
   };
 });
 
@@ -39,6 +40,7 @@ describe("DestinationPicker map explorer", () => {
     await user.click(screen.getByRole("button", { name: /Europe/ }));
     await screen.findByTestId("mock-destination-map");
 
+    expect(screen.getByRole("dialog", { name: "Explore destinations" })).toHaveClass("h-[90dvh]");
     expect(mapLifecycle.mounted).toHaveBeenCalledTimes(1);
     expect(mapLifecycle.unmounted).not.toHaveBeenCalled();
 
