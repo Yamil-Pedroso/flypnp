@@ -1,5 +1,5 @@
 import { http } from './http'
-import type { ApiResponse, Place, PlaceInput } from './types'
+import type { ApiResponse, GeocodingResult, Place, PlaceInput } from './types'
 
 export const placesService = {
   async list() {
@@ -13,6 +13,9 @@ export const placesService = {
   },
   async listOwned() {
     return (await http.get<ApiResponse<Place[]>>('/user-places')).data.data
+  },
+  async geocode(address: string) {
+    return (await http.post<ApiResponse<GeocodingResult>>('/geocode', { address })).data.data
   },
   async create(input: PlaceInput) {
     return (await http.post<ApiResponse<Place>>('/add-places', input)).data.data

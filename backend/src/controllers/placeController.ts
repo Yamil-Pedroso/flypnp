@@ -3,6 +3,7 @@ import { isValidObjectId } from "mongoose";
 import { Place } from "../models/Place";
 import { Booking } from "../models/Booking";
 import CustomError from "../utils/customError";
+import { geocodeAddress } from "../services/geocodingService";
 
 const categories = new Set(["trending", "beachFront", "iconicCities"]);
 
@@ -47,9 +48,38 @@ const parsePlaceInput = (body: Record<string, unknown>, partial = false) => {
 
 const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+const resolveAddress = async (address: string) => {
+  try {
+    const result = await geocodeAddress(address);
+    if (!result) throw new CustomError("We could not locate this address. Add a street, city and country.", 422);
+    return {
+      country: result.country,
+      countryCode: result.countryCode,
+      latitude: result.latitude,
+      longitude: result.longitude,
+      geocodedAddress: result.formattedAddress,
+      geocodedAt: new Date(),
+      location: { type: "Point" as const, coordinates: [result.longitude, result.latitude] },
+    };
+  } catch (error) {
+    if (error instanceof CustomError) throw error;
+    throw new CustomError("Address verification is temporarily unavailable. Please try again.", 503);
+  }
+};
+
+export const geocodePlaceAddress = async (req: Request, res: Response) => {
+  const address = String(req.body.address ?? "").trim();
+  if (address.length < 5) throw new CustomError("Enter a complete address", 400);
+  const coordinates = await resolveAddress(address);
+  res.status(200).json({ success: true, data: coordinates });
+};
+
 export const addPlace = async (req: Request, res: Response) => {
+  const input = parsePlaceInput(req.body);
+  const coordinates = await resolveAddress(String(input.address));
   const place = await Place.create({
-    ...parsePlaceInput(req.body),
+    ...input,
+    ...coordinates,
     owner: req.user!._id,
     rating: 0,
     reviews: 0,
@@ -69,7 +99,12 @@ export const updatePlace = async (req: Request, res: Response) => {
     throw new CustomError("You cannot update this place", 403);
   }
 
-  place.set(parsePlaceInput(req.body, true));
+  const input = parsePlaceInput(req.body, true);
+  const address = typeof input.address === "string" ? input.address : place.address;
+  const addressChanged = address !== place.address;
+  const missingCoordinates = !Number.isFinite(place.latitude) || !Number.isFinite(place.longitude);
+  const coordinates = addressChanged || missingCoordinates ? await resolveAddress(address) : {};
+  place.set({ ...input, ...coordinates });
   await place.save();
   res.status(200).json({ success: true, data: place });
 };

@@ -13,7 +13,15 @@ import {
     getSinglePlace,
     searchPlaces,
     deletePlace,
+    geocodePlaceAddress,
 } from '../controllers/placeController';
+
+router.post(
+  '/geocode',
+  isLoggedIn,
+  rateLimit({ scope: 'host-listing:geocode', windowMs: 24 * 60 * 60_000, max: 100 }),
+  asyncHandler(geocodePlaceAddress),
+);
 
 router.post(
   '/add-places',

@@ -1,9 +1,15 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, ImagePlus, LoaderCircle, Save, ShieldAlert, Trash2, Upload } from "lucide-react";
+import { AlertCircle, ArrowLeft, CheckCircle2, ImagePlus, LoaderCircle, LocateFixed, Save, ShieldAlert, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../../lib/hooks";
-import { getErrorMessage, placesService, type PlaceInput } from "../../services";
+import { getErrorMessage, placesService, type GeocodingResult, type PlaceInput } from "../../services";
+
+type AddressStatus =
+  | { state: "idle" }
+  | { state: "locating" }
+  | { state: "verified"; query: string; result: GeocodingResult }
+  | { state: "error"; message: string };
 
 const emptyForm: PlaceInput = {
   title: "",
@@ -29,6 +35,8 @@ const PlacesForm = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [addressStatus, setAddressStatus] = useState<AddressStatus>({ state: "idle" });
+  const addressRequestRef = useRef(0);
   const userId = user?._id;
 
   useEffect(() => {
@@ -49,6 +57,20 @@ const PlacesForm = () => {
           price: place.price,
         });
         setPerksText(place.perks.join(", "));
+        if (Number.isFinite(place.latitude) && Number.isFinite(place.longitude)) {
+          setAddressStatus({
+            state: "verified",
+            query: place.address,
+            result: {
+              latitude: place.latitude!,
+              longitude: place.longitude!,
+              country: place.country ?? "",
+              countryCode: place.countryCode ?? "",
+              geocodedAddress: place.geocodedAddress ?? place.address,
+              geocodedAt: place.geocodedAt ?? new Date().toISOString(),
+            },
+          });
+        }
       })
       .catch((cause) => { if (active) setError(getErrorMessage(cause, "Could not load this listing")); })
       .finally(() => { if (active) setLoading(false); });
@@ -57,6 +79,27 @@ const PlacesForm = () => {
 
   const setField = <K extends keyof PlaceInput>(key: K, value: PlaceInput[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
+  };
+
+  const setAddress = (address: string) => {
+    addressRequestRef.current += 1;
+    setField("address", address);
+    setAddressStatus({ state: "idle" });
+  };
+
+  const verifyAddress = async () => {
+    const address = form.address.trim();
+    if (address.length < 5 || addressStatus.state === "locating") return;
+    if (addressStatus.state === "verified" && addressStatus.query === address) return;
+    const requestId = addressRequestRef.current + 1;
+    addressRequestRef.current = requestId;
+    try {
+      setAddressStatus({ state: "locating" });
+      const result = await placesService.geocode(address);
+      if (addressRequestRef.current === requestId) setAddressStatus({ state: "verified", query: address, result });
+    } catch (cause) {
+      if (addressRequestRef.current === requestId) setAddressStatus({ state: "error", message: getErrorMessage(cause, "We could not locate this address") });
+    }
   };
 
   const addImages = (urls: string[]) => {
@@ -152,7 +195,15 @@ const PlacesForm = () => {
               <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{editing ? "Keep your listing fresh." : "Tell travelers about your home."}</h1>
               <div className="mt-7 grid gap-5 sm:grid-cols-2">
                 <label className="sm:col-span-2"><span className="text-sm font-semibold text-slate-800">Listing title</span><input required value={form.title} onChange={(event) => setField("title", event.target.value)} placeholder="Quiet alpine apartment" className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50" /></label>
-                <label className="sm:col-span-2"><span className="text-sm font-semibold text-slate-800">Address</span><input required value={form.address} onChange={(event) => setField("address", event.target.value)} placeholder="Street, city and country" className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50" /></label>
+                <div className="sm:col-span-2">
+                  <label><span className="text-sm font-semibold text-slate-800">Address</span><input required value={form.address} onChange={(event) => setAddress(event.target.value)} onBlur={() => void verifyAddress()} placeholder="Street, city and country" className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50" /></label>
+                  <div className="mt-2" aria-live="polite">
+                    {addressStatus.state === "idle" && <p className="flex items-center gap-1.5 text-xs text-slate-500"><LocateFixed className="size-3.5" />We’ll locate it automatically when you leave this field.</p>}
+                    {addressStatus.state === "locating" && <p className="flex items-center gap-1.5 text-xs font-semibold text-sky-700"><LoaderCircle className="size-3.5 animate-spin" />Locating this address…</p>}
+                    {addressStatus.state === "verified" && <div className="flex items-start justify-between gap-3 rounded-xl bg-emerald-50 px-3 py-2.5 text-emerald-800 ring-1 ring-emerald-100"><p className="min-w-0 text-xs"><span className="flex items-center gap-1.5 font-bold"><CheckCircle2 className="size-3.5" />Address located</span><span className="mt-1 block truncate">{addressStatus.result.geocodedAddress}</span><span className="mt-0.5 block font-mono text-[11px] text-emerald-700">{addressStatus.result.latitude.toFixed(5)}, {addressStatus.result.longitude.toFixed(5)}</span></p></div>}
+                    {addressStatus.state === "error" && <div className="flex items-center justify-between gap-3 rounded-xl bg-rose-50 px-3 py-2.5 text-xs text-rose-700 ring-1 ring-rose-100"><p className="flex min-w-0 items-center gap-1.5"><AlertCircle className="size-3.5 shrink-0" /><span>{addressStatus.message}</span></p><button type="button" onClick={() => void verifyAddress()} className="shrink-0 font-bold underline">Try again</button></div>}
+                  </div>
+                </div>
                 <label><span className="text-sm font-semibold text-slate-800">Category</span><select value={form.category} onChange={(event) => setField("category", event.target.value)} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500"><option value="trending">Trending</option><option value="beachFront">Beachfront</option><option value="iconicCities">Iconic city</option></select></label>
                 <label><span className="text-sm font-semibold text-slate-800">Nightly price (CHF)</span><input required type="number" min="1" step="0.01" value={form.price} onChange={(event) => setField("price", Number(event.target.value))} className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" /></label>
                 <label><span className="text-sm font-semibold text-slate-800">Maximum guests</span><input required type="number" min="1" value={form.maxGuests} onChange={(event) => setField("maxGuests", Number(event.target.value))} className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" /></label>
@@ -181,7 +232,7 @@ const PlacesForm = () => {
             </section>
 
             {error && <p role="alert" className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 ring-1 ring-rose-100">{error}</p>}
-            <button type="submit" disabled={saving || uploading} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-rose-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-rose-500/20 transition hover:bg-rose-600 disabled:opacity-50"><Save className="size-4" />{saving ? "Saving…" : editing ? "Save changes" : "Publish listing"}</button>
+            <button type="submit" disabled={saving || uploading || addressStatus.state === "locating"} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-rose-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-rose-500/20 transition hover:bg-rose-600 disabled:opacity-50"><Save className="size-4" />{saving ? "Saving…" : addressStatus.state === "locating" ? "Locating address…" : editing ? "Save changes" : "Publish listing"}</button>
           </form>
 
           <aside className="rounded-[1.75rem] bg-slate-950 p-6 text-white lg:sticky lg:top-28">

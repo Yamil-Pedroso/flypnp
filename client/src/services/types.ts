@@ -22,6 +22,12 @@ export interface Place {
   owner?: string
   title: string
   address: string
+  country?: string
+  countryCode?: string
+  latitude?: number
+  longitude?: number
+  geocodedAddress?: string
+  geocodedAt?: string
   photos: Photo[]
   category: string
   description: string
@@ -32,6 +38,15 @@ export interface Place {
   reviews: number
   price: number
   archivedAt?: string
+}
+
+export interface GeocodingResult {
+  latitude: number
+  longitude: number
+  country: string
+  countryCode: string
+  geocodedAddress: string
+  geocodedAt: string
 }
 
 export interface MessageParticipant {

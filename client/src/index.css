@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+.flypnp-price-marker {
+  appearance: none;
+  border: 1px solid rgb(255 255 255 / 0.82);
+  border-radius: 9999px;
+  background: white;
+  color: #0f172a;
+  cursor: pointer;
+  font: 700 12px/1 system-ui, sans-serif;
+  padding: 8px 11px;
+  box-shadow: 0 6px 20px rgb(15 23 42 / 0.24);
+  transition: transform 160ms ease, background-color 160ms ease, color 160ms ease;
+  white-space: nowrap;
+}
+
+.flypnp-price-marker:hover,
+.flypnp-price-marker.is-selected {
+  background: #0f172a;
+  color: white;
+  transform: translateY(-2px) scale(1.04);
+  z-index: 2;
+}
+
 @layer base {
   * { @apply border-slate-200; }
   html { @apply bg-white antialiased; }
@@ -12,4 +34,13 @@
 @layer utilities {
   .scrollbar-none { scrollbar-width: none; }
   .scrollbar-none::-webkit-scrollbar { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

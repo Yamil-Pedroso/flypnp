@@ -44,8 +44,8 @@ describe("createBookings", () => {
       user: { _id: "user-1", id: "user-1", name: "Ada", isAdmin: false },
       body: {
         place: "place-1",
-        checkIn: "2026-08-01",
-        checkOut: "2026-08-04",
+        checkIn: "2099-08-01",
+        checkOut: "2099-08-04",
         numOfGuests: { adults: 2 },
         status: "confirmed",
         price: 1,

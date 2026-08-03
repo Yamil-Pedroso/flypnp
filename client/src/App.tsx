@@ -7,6 +7,7 @@ import { BookingProvider } from "./providers/BookingProvider";
 import { PaymentProvider } from "./providers/PaymentProvider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "sonner";
+import { MotionConfig } from "framer-motion";
 import "./index.css";
 
 import WithNavbarLayout from "./layouts/WithNavbarLayout";
@@ -47,6 +48,7 @@ import MessagesProvider from "./providers/MessagesProvider";
 
 function App() {
   return (
+    <MotionConfig reducedMotion="user">
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <Toaster position="bottom-right" richColors />
       <UserProvider>
@@ -112,6 +114,7 @@ function App() {
         </MessagesProvider>
       </UserProvider>
     </GoogleOAuthProvider>
+    </MotionConfig>
   );
 }
 

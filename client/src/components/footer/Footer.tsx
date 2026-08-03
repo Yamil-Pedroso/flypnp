@@ -2,12 +2,20 @@ import { Link } from "react-router-dom";
 import { Heart, Mail, MapPin } from "lucide-react";
 import { FaInstagram } from "react-icons/fa6";
 import images from "../../assets/images";
+import { motion, useReducedMotion } from "framer-motion";
 
 const Footer = () => {
   const year = new Date().getFullYear();
+  const reducedMotion = useReducedMotion();
 
   return (
-    <footer className="border-t border-slate-800 bg-slate-950 text-slate-300">
+    <motion.footer
+      initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.12 }}
+      transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+      className="border-t border-slate-800 bg-slate-950 text-slate-300"
+    >
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div className="max-w-md">
@@ -49,7 +57,7 @@ const Footer = () => {
           <p className="inline-flex items-center gap-1.5">Travel with an open mind <Heart className="size-3.5 fill-rose-500 text-rose-500" /></p>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
 

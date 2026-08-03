@@ -7,6 +7,7 @@ import PlacesForm from "./PlacesForm";
 const placeMocks = vi.hoisted(() => ({
   create: vi.fn(),
   uploadFromLink: vi.fn(),
+  geocode: vi.fn(),
 }));
 
 vi.mock("../../lib/hooks", () => ({
@@ -23,6 +24,7 @@ vi.mock("../../services", async (importOriginal) => {
       ...original.placesService,
       create: placeMocks.create,
       uploadFromLink: placeMocks.uploadFromLink,
+      geocode: placeMocks.geocode,
     },
   };
 });
@@ -31,6 +33,7 @@ describe("PlacesForm", () => {
   it("publishes a listing owned by the signed-in host", async () => {
     placeMocks.uploadFromLink.mockResolvedValueOnce("https://cdn.example.com/home.jpg");
     placeMocks.create.mockResolvedValueOnce({ _id: "place-1" });
+    placeMocks.geocode.mockResolvedValueOnce({ latitude: 46.0207, longitude: 7.7491, country: "Switzerland", countryCode: "CH", geocodedAddress: "Zermatt, Switzerland", geocodedAt: new Date().toISOString() });
     const user = userEvent.setup();
     render(<MemoryRouter><PlacesForm /></MemoryRouter>);
 
@@ -46,6 +49,8 @@ describe("PlacesForm", () => {
     await user.type(screen.getByPlaceholderText("Paste a public image URL"), "https://example.com/home.jpg");
     await user.click(screen.getByRole("button", { name: "Add link" }));
     await user.click(screen.getByRole("button", { name: "Publish listing" }));
+
+    await waitFor(() => expect(placeMocks.geocode).toHaveBeenCalledWith("Zermatt, Switzerland"));
 
     await waitFor(() => expect(placeMocks.create).toHaveBeenCalledWith(expect.objectContaining({
       title: "Alpine home",
