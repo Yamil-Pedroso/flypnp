@@ -344,10 +344,10 @@ const Messages = () => {
         conversation.otherParticipant.name
           .toLowerCase()
           .includes(normalizedQuery) ||
-        conversation.booking.place.title
+        conversation.booking.place?.title
           .toLowerCase()
           .includes(normalizedQuery) ||
-        conversation.booking.place.address
+        conversation.booking.place?.address
           .toLowerCase()
           .includes(normalizedQuery);
       return matchesFilter && matchesQuery;
@@ -602,7 +602,7 @@ const Messages = () => {
                         </span>
                       </span>
                       <span className="mt-0.5 block truncate text-xs font-medium text-slate-500">
-                        {conversation.booking.place.title}
+                        {conversation.booking.place?.title}
                       </span>
                       <span className="mt-1 flex items-center gap-2">
                         <span
@@ -692,9 +692,9 @@ const Messages = () => {
 
               <div className="border-b border-slate-100 bg-slate-50/80 p-3 sm:p-4">
                 <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-                  {selectedConversation.booking.place.photos[0]?.main ? (
+                  {selectedConversation.booking.place?.photos[0]?.main ? (
                     <img
-                      src={selectedConversation.booking.place.photos[0].main}
+                      src={selectedConversation.booking.place?.photos[0]?.main}
                       alt=""
                       className="size-16 shrink-0 rounded-xl object-cover"
                     />
@@ -706,7 +706,7 @@ const Messages = () => {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="truncate text-sm font-bold text-slate-950">
-                        {selectedConversation.booking.place.title}
+                        {selectedConversation.booking.place?.title}
                       </p>
                       <span
                         className={`rounded-full px-2 py-1 text-[0.65rem] font-black uppercase tracking-wide ${
@@ -722,7 +722,7 @@ const Messages = () => {
                     </div>
                     <p className="mt-1 flex items-center gap-1 text-xs text-slate-500">
                       <MapPin className="size-3" />
-                      {selectedConversation.booking.place.address}
+                      {selectedConversation.booking.place?.address}
                     </p>
                     <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-slate-600">
                       <span className="flex items-center gap-1">

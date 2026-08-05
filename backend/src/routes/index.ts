@@ -2,6 +2,7 @@ import { unlink } from "fs/promises";
 import { Router } from "express";
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
+
 import user from "./userRoutes";
 import place from "./placeRoutes";
 import booking from "./bookingRoutes";
@@ -29,12 +30,12 @@ const upload = multer({
 const isSafeRemoteUrl = (value: unknown) => {
   try {
     const url = new URL(String(value));
-    if (!['http:', 'https:'].includes(url.protocol)) return false;
+    if (!["http:", "https:"].includes(url.protocol)) return false;
     const hostname = url.hostname.toLowerCase();
     return !(
-      hostname === 'localhost' ||
-      hostname === '::1' ||
-      hostname.endsWith('.local') ||
+      hostname === "localhost" ||
+      hostname === "::1" ||
+      hostname.endsWith(".local") ||
       /^127\./.test(hostname) ||
       /^10\./.test(hostname) ||
       /^192\.168\./.test(hostname) ||
@@ -46,59 +47,62 @@ const isSafeRemoteUrl = (value: unknown) => {
   }
 };
 
-router.get('/', (_req, res) => {
-  res.json({ success: true, service: 'flypnp-api-v1' });
+router.get("/", (_req, res) => {
+  res.json({ success: true, service: "flypnp-api-v1" });
 });
 
 router.post(
-  '/upload-from-link',
+  "/upload-from-link",
   isLoggedIn,
   asyncHandler(async (req, res) => {
     if (!isSafeRemoteUrl(req.body.imageUrl)) {
-      throw new CustomError('A valid public image URL is required', 400);
+      throw new CustomError("A valid public image URL is required", 400);
     }
     const result = await cloudinary.uploader.upload(String(req.body.imageUrl), {
-      folder: 'Flypnp/Places',
-      resource_type: 'image',
+      folder: "Flypnp/Places",
+      resource_type: "image",
     });
     res.status(201).json({ success: true, url: result.secure_url });
-  })
+  }),
 );
 
 router.post(
-  '/upload',
+  "/upload",
   isLoggedIn,
-  upload.array('images', 10),
+  upload.array("images", 10),
   asyncHandler(async (req, res) => {
     const files = (req.files as Express.Multer.File[] | undefined) ?? [];
-    if (files.length === 0) throw new CustomError('At least one image is required', 400);
+    if (files.length === 0)
+      throw new CustomError("At least one image is required", 400);
 
     try {
       const images = await Promise.all(
         files.map(async (file) => {
           const result = await cloudinary.uploader.upload(file.path, {
-            folder: 'Flypnp/Places',
-            resource_type: 'image',
+            folder: "Flypnp/Places",
+            resource_type: "image",
           });
           return result.secure_url;
-        })
+        }),
       );
       res.status(201).json({ success: true, images });
     } finally {
-      await Promise.all(files.map((file) => unlink(file.path).catch(() => undefined)));
+      await Promise.all(
+        files.map((file) => unlink(file.path).catch(() => undefined)),
+      );
     }
-  })
+  }),
 );
 
-router.use('/', user);
-router.use('/', place);
-router.use('/', booking);
-router.use('/', notification);
-router.use('/', wishlist);
-router.use('/', payment);
-router.use('/', experience);
-router.use('/', service);
-router.use('/', message);
-router.use('/', giftCard);
+router.use("/", user);
+router.use("/", place);
+router.use("/", booking);
+router.use("/", notification);
+router.use("/", wishlist);
+router.use("/", payment);
+router.use("/", experience);
+router.use("/", service);
+router.use("/", message);
+router.use("/", giftCard);
 
 export default router;

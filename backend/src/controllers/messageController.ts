@@ -117,7 +117,13 @@ const serializeConversation = (
   const hosting = idString(conversation.host._id) === userId;
   const otherParticipant = hosting ? conversation.guest : conversation.host;
   const booking = conversation.booking;
-  const place = booking.place;
+  const place = booking?.place;
+  if (!place) {
+    throw new CustomError(
+      "This conversation references a stay that is no longer available",
+      410,
+    );
+  }
 
   return {
     _id: idString(conversation._id),
@@ -218,12 +224,14 @@ export const createConversation = async (req: Request, res: Response) => {
 
 export const getConversations = async (req: Request, res: Response) => {
   const userId = req.user!.id;
-  const conversations = (await Conversation.find({
-    $or: [{ guest: req.user!._id }, { host: req.user!._id }],
-  })
-    .populate(conversationPopulation)
-    .sort({ lastMessageAt: -1 })
-    .lean()) as unknown as PopulatedConversation[];
+  const conversations = (
+    (await Conversation.find({
+      $or: [{ guest: req.user!._id }, { host: req.user!._id }],
+    })
+      .populate(conversationPopulation)
+      .sort({ lastMessageAt: -1 })
+      .lean()) as unknown as PopulatedConversation[]
+  ).filter((conversation) => Boolean(conversation.booking?.place));
 
   const conversationIds = conversations.map(
     (conversation) => conversation._id,

@@ -21,13 +21,14 @@ interface DestinationMapProps {
   onChoosePlace: (place: Place) => void;
 }
 
-const fallbackMapStyle: StyleSpecification = {
+const streetMapStyle: StyleSpecification = {
   version: 8,
   sources: {
     openstreetmap: {
       type: "raster",
       tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
       tileSize: 256,
+      maxzoom: 19,
       attribution: "© OpenStreetMap contributors",
     },
   },
@@ -96,21 +97,20 @@ const DestinationMap = ({ region, country, places, expanded = false, onChoosePla
     if (!containerRef.current || mapRef.current) return;
     const map = new MapLibreMap({
       container: containerRef.current,
-      style: "https://tiles.openfreemap.org/styles/liberty",
+      // The standard OSM tiles include borders, country/city labels and streets
+      // in the image itself, so a partially loaded vector style cannot leave a
+      // blank land layer behind.
+      style: streetMapStyle,
       center: region.center,
       zoom: region.zoom,
+      maxZoom: 19,
       attributionControl: false,
     });
     map.addControl(new NavigationControl({ showCompass: false }), "top-right");
     map.addControl(new AttributionControl({ compact: true }), "bottom-right");
-    let styleLoaded = false;
-    map.on("style.load", () => {
-      styleLoaded = true;
+    map.on("load", () => {
       map.resize();
     });
-    const fallbackTimer = window.setTimeout(() => {
-      if (!styleLoaded) map.setStyle(fallbackMapStyle);
-    }, 3000);
     mapRef.current = map;
     // HTML price markers do not depend on the tile style being downloaded.
     // Render them immediately so the simulation remains usable on slow networks.
@@ -118,7 +118,6 @@ const DestinationMap = ({ region, country, places, expanded = false, onChoosePla
     return () => {
       markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = [];
-      window.clearTimeout(fallbackTimer);
       map.remove();
       mapRef.current = null;
     };

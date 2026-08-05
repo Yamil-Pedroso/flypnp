@@ -207,7 +207,7 @@ const MyBookings = () => {
             <div className="mt-7 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               <AnimatePresence mode="popLayout">
                 {visible.map((booking, index) => {
-                  const photo = booking.place.photos[0]?.main;
+                  const photo = booking.place?.photos[0]?.main;
                   const status = statusConfig[booking.status] ?? statusConfig.pending;
 
                   return (

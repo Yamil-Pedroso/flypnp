@@ -88,20 +88,24 @@ export const createBookings = async (req: Request, res: Response) => {
 };
 
 export const getUserBookings = async (req: Request, res: Response) => {
-  const bookings = await Booking.find({
-    owner: req.user!._id,
-    archivedAt: { $exists: false },
-  }).populate("place");
+  const bookings = (
+    await Booking.find({
+      owner: req.user!._id,
+      archivedAt: { $exists: false },
+    }).populate("place")
+  ).filter((booking) => Boolean(booking.place));
   res.status(200).json({ success: true, count: bookings.length, data: bookings });
 };
 
 export const getHostBookings = async (req: Request, res: Response) => {
   const places = await Place.find({ owner: req.user!._id }).select("_id");
   const placeIds = places.map((place) => place._id);
-  const bookings = await Booking.find({ place: { $in: placeIds } })
-    .populate("place")
-    .populate("owner", "name email avatar")
-    .sort({ checkIn: 1, createdAt: -1 });
+  const bookings = (
+    await Booking.find({ place: { $in: placeIds } })
+      .populate("place")
+      .populate("owner", "name email avatar")
+      .sort({ checkIn: 1, createdAt: -1 })
+  ).filter((booking) => Boolean(booking.place));
   res.status(200).json({ success: true, count: bookings.length, data: bookings });
 };
 

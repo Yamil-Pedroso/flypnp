@@ -51,7 +51,7 @@ const getGuestCount = (booking: Booking) => {
 };
 
 const TripCard = ({ booking, past, onDelete }: { booking: Booking; past: boolean; onDelete: (booking: Booking) => void }) => {
-  const photo = booking.place.photos[0]?.main;
+  const photo = booking.place?.photos[0]?.main;
   const statusStyles = {
     pending: "bg-amber-50 text-amber-700",
     confirmed: "bg-emerald-50 text-emerald-700",
