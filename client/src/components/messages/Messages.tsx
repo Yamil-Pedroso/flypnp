@@ -28,20 +28,15 @@ import {
 } from "lucide-react";
 import { useAuth, useMessages } from "../../lib/hooks";
 import { getErrorMessage, type MessageConversation } from "../../services";
+import { useTranslation } from "react-i18next";
 
 type ConversationFilter = "all" | "unread" | "hosting" | "travelling";
 
-const filters: { id: ConversationFilter; label: string }[] = [
-  { id: "all", label: "All" },
-  { id: "unread", label: "Unread" },
-  { id: "hosting", label: "Hosting" },
-  { id: "travelling", label: "Travelling" },
-];
+const filters: ConversationFilter[] = ["all", "unread", "hosting", "travelling"];
 
 const emojiCategories = [
   {
     id: "smileys",
-    label: "Smileys",
     icon: "😀",
     emojis: [
       "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
@@ -57,7 +52,6 @@ const emojiCategories = [
   },
   {
     id: "gestures",
-    label: "Gestures",
     icon: "👋",
     emojis: [
       "👋", "🤚", "🖐️", "✋", "🖖", "👌", "🤌", "🤏", "✌️", "🤞",
@@ -71,7 +65,6 @@ const emojiCategories = [
   },
   {
     id: "travel",
-    label: "Travel",
     icon: "✈️",
     emojis: [
       "✈️", "🛫", "🛬", "🚁", "🚀", "🛸", "🚗", "🚕", "🚌", "🚎",
@@ -85,7 +78,6 @@ const emojiCategories = [
   },
   {
     id: "food",
-    label: "Food",
     icon: "🍽️",
     emojis: [
       "🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐",
@@ -100,7 +92,6 @@ const emojiCategories = [
   },
   {
     id: "nature",
-    label: "Nature",
     icon: "🌿",
     emojis: [
       "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯",
@@ -115,7 +106,6 @@ const emojiCategories = [
   },
   {
     id: "symbols",
-    label: "Symbols",
     icon: "❤️",
     emojis: [
       "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔",
@@ -140,39 +130,39 @@ const initials = (name: string) =>
     .map((part) => part[0]?.toUpperCase())
     .join("");
 
-const formatRelativeTime = (value: string) => {
+const formatRelativeTime = (value: string, locale: string, yesterdayLabel: string) => {
   const date = new Date(value);
   const now = new Date();
   if (Number.isNaN(date.getTime())) return "";
   if (date.toDateString() === now.toDateString()) {
-    return new Intl.DateTimeFormat("en", {
+    return new Intl.DateTimeFormat(locale, {
       hour: "2-digit",
       minute: "2-digit",
     }).format(date);
   }
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
-  if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
-  return new Intl.DateTimeFormat("en", {
+  if (date.toDateString() === yesterday.toDateString()) return yesterdayLabel;
+  return new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
   }).format(date);
 };
 
-const formatMessageTime = (value: string) =>
-  new Intl.DateTimeFormat("en", {
+const formatMessageTime = (value: string, locale: string) =>
+  new Intl.DateTimeFormat(locale, {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
 
-const formatStayDates = (conversation: MessageConversation) => {
+const formatStayDates = (conversation: MessageConversation, locale: string) => {
   const checkIn = new Date(conversation.booking.checkIn);
   const checkOut = new Date(conversation.booking.checkOut);
-  const start = new Intl.DateTimeFormat("en", {
+  const start = new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
   }).format(checkIn);
-  const end = new Intl.DateTimeFormat("en", {
+  const end = new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
   }).format(checkOut);
@@ -185,6 +175,8 @@ const guestCount = (conversation: MessageConversation) => {
 };
 
 const Messages = () => {
+  const { t, i18n } = useTranslation("messages");
+  const locale = i18n.resolvedLanguage ?? i18n.language;
   const reduceMotion = useReducedMotion();
   const { user, loading: authLoading } = useAuth();
   const {
@@ -244,11 +236,11 @@ const Messages = () => {
       .catch((cause) => {
         bookingHandled.current = null;
         toast.error(
-          getErrorMessage(cause, "Could not open this conversation"),
+          getErrorMessage(cause, t("errors.open")),
         );
       })
       .finally(() => setOpeningConversation(false));
-  }, [bookingId, createForBooking, user]);
+  }, [bookingId, createForBooking, t, user]);
 
   useEffect(() => {
     if (!selectedId && conversations[0]) {
@@ -281,9 +273,9 @@ const Messages = () => {
   useEffect(() => {
     if (!selectedId) return;
     void loadMessages(selectedId).catch((cause) => {
-      toast.error(getErrorMessage(cause, "Could not load messages"));
+      toast.error(getErrorMessage(cause, t("errors.load")));
     });
-  }, [loadMessages, selectedId]);
+  }, [loadMessages, selectedId, t]);
 
   useEffect(() => {
     if (!selectedConversation?.unreadCount) return;
@@ -386,7 +378,7 @@ const Messages = () => {
     } catch (cause) {
       preservingOlderScroll.current = false;
       setPrependingHistory(false);
-      toast.error(getErrorMessage(cause, "Could not load older messages"));
+      toast.error(getErrorMessage(cause, t("errors.older")));
     }
   };
 
@@ -445,7 +437,7 @@ const Messages = () => {
       await sendMessage(selectedConversation._id, body);
       setDraft("");
     } catch (cause) {
-      toast.error(getErrorMessage(cause, "Could not send your message"));
+      toast.error(getErrorMessage(cause, t("errors.send")));
     } finally {
       setSending(false);
     }
@@ -467,16 +459,16 @@ const Messages = () => {
             <MessageCircle className="size-8" />
           </span>
           <h1 className="mt-6 text-3xl font-semibold tracking-tight text-slate-950">
-            Sign in to view your messages
+            {t("signInTitle")}
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-500">
-            Your private conversations with hosts and guests will appear here.
+            {t("signInText")}
           </p>
           <Link
             to="/"
             className="mt-7 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white transition hover:bg-emerald-700"
           >
-            Return home
+            {t("home")}
           </Link>
         </section>
       </main>
@@ -490,56 +482,56 @@ const Messages = () => {
           <div>
             <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-[0.16em] text-emerald-700">
               <Inbox className="size-4" />
-              Your inbox
+              {t("inbox")}
             </div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-              Messages
+              {t("title")}
             </h1>
             <p className="mt-2 text-sm text-slate-500">
-              Keep every stay organised in one private conversation.
+              {t("subtitle")}
             </p>
           </div>
           {unreadTotal > 0 && (
             <span className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 ring-1 ring-emerald-100">
               <span className="size-2 rounded-full bg-emerald-500" />
-              {unreadTotal} unread
+              {t("unread", { count: unreadTotal })}
             </span>
           )}
         </header>
 
         <section className="grid min-h-[38rem] overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_24px_80px_-34px_rgba(15,23,42,0.35)] md:h-[min(44rem,calc(100vh-10rem))] md:grid-cols-[23rem_minmax(0,1fr)]">
           <aside
-            aria-label="Conversations"
+            aria-label={t("conversations")}
             className={`${mobileChatOpen ? "hidden" : "flex"} min-h-[38rem] flex-col border-slate-200 md:flex md:min-h-0 md:border-r`}
           >
             <div className="border-b border-slate-100 p-4">
               <label className="relative block">
-                <span className="sr-only">Search messages</span>
+                <span className="sr-only">{t("search")}</span>
                 <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
                 <input
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search messages"
+                  placeholder={t("search")}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-50"
                 />
               </label>
               <div
-                aria-label="Filter conversations"
+                aria-label={t("filtersAria")}
                 className="scrollbar-none mt-3 flex gap-2 overflow-x-auto"
               >
                 {filters.map((item) => (
                   <button
-                    key={item.id}
+                    key={item}
                     type="button"
-                    aria-pressed={filter === item.id}
-                    onClick={() => setFilter(item.id)}
+                    aria-pressed={filter === item}
+                    onClick={() => setFilter(item)}
                     className={`shrink-0 rounded-full px-3.5 py-2 text-xs font-bold transition ${
-                      filter === item.id
+                      filter === item
                         ? "bg-slate-950 text-white"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                     }`}
                   >
-                    {item.label}
+                    {t(`filters.${item}`)}
                   </button>
                 ))}
               </div>
@@ -550,7 +542,7 @@ const Messages = () => {
                 <div className="grid h-full min-h-64 place-items-center">
                   <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500">
                     <LoaderCircle className="size-5 animate-spin" />
-                    Loading conversations…
+                    {t("loading")}
                   </span>
                 </div>
               ) : error ? (
@@ -558,14 +550,14 @@ const Messages = () => {
                   <div>
                     <RefreshCw className="mx-auto size-8 text-rose-400" />
                     <p className="mt-3 font-semibold text-slate-800">
-                      Could not load conversations
+                      {t("loadFailed")}
                     </p>
                     <button
                       type="button"
                       onClick={() => void refresh()}
                       className="mt-4 rounded-full bg-slate-950 px-4 py-2 text-xs font-bold text-white"
                     >
-                      Try again
+                      {t("tryAgain")}
                     </button>
                   </div>
                 </div>
@@ -598,7 +590,7 @@ const Messages = () => {
                           {conversation.otherParticipant.name}
                         </span>
                         <span className="shrink-0 text-[0.7rem] text-slate-400">
-                          {formatRelativeTime(conversation.lastMessageAt)}
+                          {formatRelativeTime(conversation.lastMessageAt, locale, t("yesterday"))}
                         </span>
                       </span>
                       <span className="mt-0.5 block truncate text-xs font-medium text-slate-500">
@@ -613,7 +605,7 @@ const Messages = () => {
                           }`}
                         >
                           {conversation.lastMessageText ||
-                            "Start the conversation"}
+                            t("start")}
                         </span>
                         {conversation.unreadCount > 0 && (
                           <span className="grid size-5 shrink-0 place-items-center rounded-full bg-rose-500 text-[0.65rem] font-black text-white">
@@ -631,13 +623,13 @@ const Messages = () => {
                     <MessageCircle className="mx-auto size-9 text-slate-300" />
                     <p className="mt-3 font-semibold text-slate-700">
                       {conversations.length === 0
-                        ? "No conversations yet"
-                        : "No conversations found"}
+                        ? t("noneYet")
+                        : t("noneFound")}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-slate-400">
                       {conversations.length === 0
-                        ? "Open a reservation and message its host or guest."
-                        : "Try another name or filter."}
+                        ? t("noneYetText")
+                        : t("noneFoundText")}
                     </p>
                   </div>
                 </div>
@@ -647,13 +639,13 @@ const Messages = () => {
 
           {selectedConversation ? (
             <article
-              aria-label={`Conversation with ${selectedConversation.otherParticipant.name}`}
+              aria-label={t("conversationWith", { name: selectedConversation.otherParticipant.name })}
               className={`${mobileChatOpen ? "flex" : "hidden"} min-h-[38rem] min-w-0 flex-col md:flex md:min-h-0`}
             >
               <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3.5 sm:px-5">
                 <button
                   type="button"
-                  aria-label="Back to conversations"
+                  aria-label={t("back")}
                   onClick={() => setMobileChatOpen(false)}
                   className="grid size-9 shrink-0 place-items-center rounded-full text-slate-600 transition hover:bg-slate-100 md:hidden"
                 >
@@ -676,7 +668,7 @@ const Messages = () => {
                   </h2>
                   <p className="flex items-center gap-1.5 text-xs text-emerald-700">
                     <ShieldCheck className="size-3.5" />
-                    Private booking conversation
+                    {t("private")}
                   </p>
                 </div>
                 <Link
@@ -685,7 +677,7 @@ const Messages = () => {
                   }
                   className="hidden items-center gap-1.5 rounded-full border border-slate-200 px-3.5 py-2 text-xs font-bold text-slate-700 transition hover:border-slate-950 hover:bg-slate-950 hover:text-white sm:inline-flex"
                 >
-                  View booking
+                  {t("viewBooking")}
                   <ArrowUpRight className="size-3.5" />
                 </Link>
               </div>
@@ -717,7 +709,7 @@ const Messages = () => {
                               : "bg-rose-100 text-rose-700"
                         }`}
                       >
-                        {selectedConversation.booking.status}
+                        {t(`status.${selectedConversation.booking.status}`)}
                       </span>
                     </div>
                     <p className="mt-1 flex items-center gap-1 text-xs text-slate-500">
@@ -727,11 +719,11 @@ const Messages = () => {
                     <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-slate-600">
                       <span className="flex items-center gap-1">
                         <CalendarDays className="size-3.5" />
-                        {formatStayDates(selectedConversation)}
+                        {formatStayDates(selectedConversation, locale)}
                       </span>
                       <span className="flex items-center gap-1">
                         <Users className="size-3.5" />
-                        {guestCount(selectedConversation)} guests
+                        {t("guests", { count: guestCount(selectedConversation) })}
                       </span>
                     </div>
                   </div>
@@ -770,13 +762,13 @@ const Messages = () => {
                           <LoaderCircle className="size-3.5 animate-spin" />
                         )}
                         {loadingOlderMessages
-                          ? "Loading history…"
-                          : "Load older messages"}
+                          ? t("loadingHistory")
+                          : t("loadOlder")}
                       </button>
                     ) : (
                       <div className="flex w-full items-center gap-3 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-slate-400">
                         <span className="h-px flex-1 bg-slate-100" />
-                        Beginning of conversation
+                        {t("beginning")}
                         <span className="h-px flex-1 bg-slate-100" />
                       </div>
                     )}
@@ -787,11 +779,10 @@ const Messages = () => {
                     <div>
                       <MessageCircle className="mx-auto size-9 text-emerald-500" />
                       <p className="mt-3 font-semibold text-slate-800">
-                        Start the conversation
+                        {t("start")}
                       </p>
                       <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
-                        Coordinate arrival, check-in and anything needed for
-                        this stay.
+                        {t("startText")}
                       </p>
                     </div>
                   </div>
@@ -850,7 +841,7 @@ const Messages = () => {
                         >
                           <p>{message.body}</p>
                           <p className="mt-1 text-[0.65rem] text-slate-400">
-                            {formatMessageTime(message.createdAt)}
+                            {formatMessageTime(message.createdAt, locale)}
                           </p>
                         </motion.div>
                       </motion.div>
@@ -872,7 +863,7 @@ const Messages = () => {
                       }
                       transition={{ duration: reduceMotion ? 0.1 : 0.22 }}
                       className="flex justify-start"
-                      aria-label={`${selectedConversation.otherParticipant.name} is typing`}
+                      aria-label={t("typing", { name: selectedConversation.otherParticipant.name })}
                     >
                       <div className="flex items-center gap-1 rounded-2xl rounded-bl-md bg-slate-100 px-4 py-3 shadow-sm shadow-slate-200/60">
                         <span className="size-2 animate-bounce rounded-full bg-slate-400 [animation-delay:-0.3s]" />
@@ -893,17 +884,16 @@ const Messages = () => {
                   <div
                     ref={emojiPanelRef}
                     role="dialog"
-                    aria-label="Emoji picker"
+                    aria-label={t("emoji.picker")}
                     className="absolute bottom-[5.5rem] left-3 z-20 w-[min(26rem,calc(100%-1.5rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:left-4"
                   >
                     <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
                       <div>
                         <p className="text-sm font-bold text-slate-800">
-                          Emojis
+                          {t("emoji.title")}
                         </p>
                         <p className="mt-0.5 text-[0.65rem] text-slate-400">
-                          {selectedEmojiCategory.label} ·{" "}
-                          {selectedEmojiCategory.emojis.length} options
+                          {t("emoji.options", { category: t(`emoji.${selectedEmojiCategory.id}`), count: selectedEmojiCategory.emojis.length })}
                         </p>
                       </div>
                       <button
@@ -911,12 +901,12 @@ const Messages = () => {
                         onClick={() => setEmojiOpen(false)}
                         className="rounded-full px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100"
                       >
-                        Close
+                        {t("emoji.close")}
                       </button>
                     </div>
                     <div
                       role="tablist"
-                      aria-label="Emoji categories"
+                      aria-label={t("emoji.categories")}
                       className="grid grid-cols-6 border-b border-slate-100 bg-slate-50/80 p-1.5"
                     >
                       {emojiCategories.map((category) => (
@@ -925,8 +915,8 @@ const Messages = () => {
                           type="button"
                           role="tab"
                           aria-selected={category.id === activeEmojiCategory}
-                          aria-label={category.label}
-                          title={category.label}
+                          aria-label={t(`emoji.${category.id}`)}
+                          title={t(`emoji.${category.id}`)}
                           onClick={() => setActiveEmojiCategory(category.id)}
                           className={`flex flex-col items-center gap-0.5 rounded-lg px-1 py-1.5 transition ${
                             category.id === activeEmojiCategory
@@ -938,21 +928,21 @@ const Messages = () => {
                             {category.icon}
                           </span>
                           <span className="hidden text-[0.58rem] font-semibold sm:block">
-                            {category.label}
+                            {t(`emoji.${category.id}`)}
                           </span>
                         </button>
                       ))}
                     </div>
                     <div
                       role="tabpanel"
-                      aria-label={`${selectedEmojiCategory.label} emojis`}
+                      aria-label={t("emoji.panel", { category: t(`emoji.${selectedEmojiCategory.id}`) })}
                       className="scrollbar-none grid max-h-60 grid-cols-8 gap-1 overflow-y-auto p-3 sm:grid-cols-10"
                     >
                       {selectedEmojiCategory.emojis.map((emoji) => (
                         <button
                           key={`${selectedEmojiCategory.id}-${emoji}`}
                           type="button"
-                          aria-label={`Add ${emoji}`}
+                          aria-label={t("emoji.add", { emoji })}
                           onClick={() => addEmoji(emoji)}
                           className="grid aspect-square place-items-center rounded-lg text-xl transition hover:scale-110 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                         >
@@ -966,7 +956,7 @@ const Messages = () => {
                   <button
                     ref={emojiButtonRef}
                     type="button"
-                    aria-label="Open emoji picker"
+                    aria-label={t("emoji.open")}
                     aria-expanded={emojiOpen}
                     onClick={() => setEmojiOpen((open) => !open)}
                     className="grid size-11 shrink-0 place-items-center rounded-xl text-slate-500 transition hover:bg-emerald-50 hover:text-emerald-700"
@@ -974,7 +964,7 @@ const Messages = () => {
                     <Smile className="size-5" />
                   </button>
                   <label className="min-w-0 flex-1">
-                    <span className="sr-only">Write a message</span>
+                    <span className="sr-only">{t("write")}</span>
                     <textarea
                       ref={textareaRef}
                       value={draft}
@@ -987,13 +977,13 @@ const Messages = () => {
                         }
                       }}
                       rows={1}
-                      placeholder={`Message ${selectedConversation.otherParticipant.name}`}
+                      placeholder={t("messagePlaceholder", { name: selectedConversation.otherParticipant.name })}
                       className="max-h-28 min-h-11 w-full resize-none bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-slate-400"
                     />
                   </label>
                   <button
                     type="submit"
-                    aria-label="Send message"
+                    aria-label={t("send")}
                     disabled={!draft.trim() || sending}
                     className="grid size-11 shrink-0 place-items-center rounded-xl bg-rose-500 text-white shadow-md shadow-rose-500/20 transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none"
                   >
@@ -1006,7 +996,7 @@ const Messages = () => {
                 </div>
                 <p className="mt-2 hidden items-center justify-center gap-1.5 text-[0.68rem] text-slate-400 sm:flex">
                   <House className="size-3" />
-                  Keep payments and important details inside Flypnp.
+                  {t("safety")}
                 </p>
               </form>
             </article>
@@ -1015,10 +1005,10 @@ const Messages = () => {
               <div>
                 <MessageCircle className="mx-auto size-12 text-slate-300" />
                 <h2 className="mt-4 text-xl font-semibold text-slate-800">
-                  Select a conversation
+                  {t("select")}
                 </h2>
                 <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
-                  Messages are available from each guest or host reservation.
+                  {t("selectText")}
                 </p>
               </div>
             </div>
@@ -1027,7 +1017,7 @@ const Messages = () => {
 
         <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400">
           <CircleUserRound className="size-4" />
-          Signed in as {user.name}
+          {t("signedIn", { name: user.name })}
         </div>
       </div>
     </main>

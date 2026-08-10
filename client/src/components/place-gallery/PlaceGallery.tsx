@@ -17,32 +17,34 @@ import {
 import { AiFillPicture } from "react-icons/ai";
 import { MdFoodBank, MdCastle, MdOutlineSurfing } from "react-icons/md";
 import { PiWarehouseFill } from "react-icons/pi";
+import { useTranslation } from "react-i18next";
 
 type Category = {
   key: string;
-  label: string;
+  labelKey: string;
   icon: ComponentType<{ size?: number }>;
 };
 
 const categories: Category[] = [
-  { key: "all", label: "Explore", icon: AiFillPicture },
-  { key: "trending", label: "Trending", icon: FaFireAlt },
-  { key: "beachFront", label: "Beachfront", icon: FaUmbrellaBeach },
-  { key: "iconicCities", label: "Iconic cities", icon: FaTreeCity },
-  { key: "tinyHomes", label: "Tiny homes", icon: FaLaptopHouse },
-  { key: "mansions", label: "Mansions", icon: GiFamilyHouse },
-  { key: "cabins", label: "Cabins", icon: FaShuttleVan },
-  { key: "skiing", label: "Skiing", icon: FaSkiing },
-  { key: "design", label: "Design", icon: PiWarehouseFill },
-  { key: "tropical", label: "Tropical", icon: GiTropicalFish },
-  { key: "castles", label: "Castles", icon: MdCastle },
-  { key: "surfing", label: "Surfing", icon: MdOutlineSurfing },
-  { key: "caves", label: "Caves", icon: GiCaveEntrance },
-  { key: "camping", label: "Camping", icon: GiCampingTent },
-  { key: "luxe", label: "Luxe", icon: MdFoodBank },
+  { key: "all", labelKey: "explore", icon: AiFillPicture },
+  { key: "trending", labelKey: "categories.trending", icon: FaFireAlt },
+  { key: "beachFront", labelKey: "categories.beachfront", icon: FaUmbrellaBeach },
+  { key: "iconicCities", labelKey: "categories.iconicCities", icon: FaTreeCity },
+  { key: "tinyHomes", labelKey: "categories.tinyHomes", icon: FaLaptopHouse },
+  { key: "mansions", labelKey: "categories.mansions", icon: GiFamilyHouse },
+  { key: "cabins", labelKey: "categories.cabins", icon: FaShuttleVan },
+  { key: "skiing", labelKey: "categories.skiing", icon: FaSkiing },
+  { key: "design", labelKey: "categories.design", icon: PiWarehouseFill },
+  { key: "tropical", labelKey: "categories.tropical", icon: GiTropicalFish },
+  { key: "castles", labelKey: "categories.castles", icon: MdCastle },
+  { key: "surfing", labelKey: "categories.surfing", icon: MdOutlineSurfing },
+  { key: "caves", labelKey: "categories.caves", icon: GiCaveEntrance },
+  { key: "camping", labelKey: "categories.camping", icon: GiCampingTent },
+  { key: "luxe", labelKey: "categories.luxe", icon: MdFoodBank },
 ];
 
 const PlaceGallery = () => {
+  const { t } = useTranslation("places");
   const [activeCategory, setActiveCategory] = useState("all");
   const { places, loading, error, refresh } = usePlaces();
   const visiblePlaces =
@@ -53,7 +55,7 @@ const PlaceGallery = () => {
   return (
     <section className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div className="flex overflow-x-auto gap-2 px-4 pb-3 -mx-4 scrollbar-none snap-x sm:mx-0 sm:px-0">
-        {categories.map(({ key, label, icon: Icon }) => (
+        {categories.map(({ key, labelKey, icon: Icon }) => (
           <button
             key={key}
             type="button"
@@ -62,7 +64,7 @@ const PlaceGallery = () => {
             onClick={() => setActiveCategory(key)}
           >
             <Icon size={17} />
-            <span>{label}</span>
+            <span>{t(`gallery.${labelKey}`)}</span>
           </button>
         ))}
       </div>
@@ -70,7 +72,7 @@ const PlaceGallery = () => {
       {loading ? (
         <div
           className="grid grid-cols-1 gap-x-5 gap-y-8 pt-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          aria-label="Loading stays"
+          aria-label={t("gallery.loadingStays")}
         >
           {Array.from({ length: 8 }).map((_, index) => (
             <div
@@ -85,17 +87,17 @@ const PlaceGallery = () => {
           role="alert"
         >
           <h2 className="text-xl font-semibold text-slate-900">
-            We couldn’t load the stays
+            {t("gallery.loadTitle")}
           </h2>
           <p className="mt-2 text-slate-600">
-            Check that the backend is running and try again.
+            {t("gallery.loadText")}
           </p>
           <button
             type="button"
             onClick={() => void refresh()}
             className="mt-5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
-            Try again
+            {t("gallery.tryAgain")}
           </button>
         </div>
       ) : visiblePlaces.length ? (
@@ -107,10 +109,10 @@ const PlaceGallery = () => {
       ) : (
         <div className="px-6 py-16 mt-5 text-center bg-white rounded-3xl border border-dashed border-slate-300">
           <h2 className="text-xl font-semibold text-slate-900">
-            No stays found here yet
+            {t("gallery.emptyTitle")}
           </h2>
           <p className="mt-2 text-slate-500">
-            Try another category or clear your destination search.
+            {t("gallery.emptyText")}
           </p>
         </div>
       )}

@@ -3,19 +3,22 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CalendarDays, X } from "lucide-react";
 import MyCalendar from "../../common/calendar/Calendar";
 import { useTravelSearch } from "../SearchContext";
+import { useTranslation } from "react-i18next";
 
 type ActiveField = "checkIn" | "checkOut";
 
-const formatDate = (value: string) => {
-  if (!value) return "Add dates";
-  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(`${value}T00:00:00`));
+const formatDate = (value: string, locale: string | undefined, emptyLabel: string) => {
+  if (!value) return emptyLabel;
+  return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" }).format(new Date(`${value}T00:00:00`));
 };
 
-const DateField = ({ label, value, active, onClick }: {
+const DateField = ({ label, value, active, onClick, locale, emptyLabel }: {
   label: string;
   value: string;
   active: boolean;
   onClick: () => void;
+  locale?: string;
+  emptyLabel: string;
 }) => (
   <button
     type="button"
@@ -27,7 +30,7 @@ const DateField = ({ label, value, active, onClick }: {
     <CalendarDays className={`size-4 shrink-0 transition-colors ${active ? "text-emerald-300" : "text-slate-400"}`} aria-hidden="true" />
     <span className="min-w-0">
       <span className="block text-xs font-semibold">{label}</span>
-      <span className={`block truncate text-xs ${active ? "text-white" : value ? "text-slate-700" : "text-slate-500"}`}>{formatDate(value)}</span>
+      <span className={`block truncate text-xs ${active ? "text-white" : value ? "text-slate-700" : "text-slate-500"}`}>{formatDate(value, locale, emptyLabel)}</span>
     </span>
   </button>
 );
@@ -37,6 +40,7 @@ const DateRangePicker = () => {
   const [open, setOpen] = useState(false);
   const [activeField, setActiveField] = useState<ActiveField>("checkIn");
   const panelRef = useRef<HTMLDivElement>(null);
+  const { t, i18n } = useTranslation("search");
 
   useEffect(() => {
     if (!open) return;
@@ -74,15 +78,15 @@ const DateRangePicker = () => {
 
   return (
     <>
-      <DateField label="Check in" value={checkIn} active={open && activeField === "checkIn"} onClick={() => activate("checkIn")} />
-      <DateField label="Check out" value={checkOut} active={open && activeField === "checkOut"} onClick={() => activate("checkOut")} />
+      <DateField label={t("checkIn")} value={checkIn} active={open && activeField === "checkIn"} onClick={() => activate("checkIn")} locale={i18n.resolvedLanguage} emptyLabel={t("addDates")} />
+      <DateField label={t("checkOut")} value={checkOut} active={open && activeField === "checkOut"} onClick={() => activate("checkOut")} locale={i18n.resolvedLanguage} emptyLabel={t("addDates")} />
 
       <AnimatePresence>
         {open && (
           <motion.div
             ref={panelRef}
             role="dialog"
-            aria-label="Choose dates"
+            aria-label={t("chooseDates")}
             initial={{ opacity: 0, y: -14, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.985 }}
@@ -90,8 +94,8 @@ const DateRangePicker = () => {
             className="absolute left-1/2 top-[calc(100%+0.75rem)] z-[80] w-[min(50rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_80px_-30px_rgba(15,23,42,0.55)]"
           >
             <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-              <div><p className="font-semibold text-slate-950">Choose your dates</p><p className="mt-0.5 text-xs text-slate-500">Select check-in first, then check-out</p></div>
-              <button type="button" aria-label="Close date picker" onClick={() => setOpen(false)} className="grid size-9 place-items-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-950 hover:text-white"><X className="size-4" /></button>
+              <div><p className="font-semibold text-slate-950">{t("chooseDatesTitle")}</p><p className="mt-0.5 text-xs text-slate-500">{t("chooseDatesDescription")}</p></div>
+              <button type="button" aria-label={t("closeDates")} onClick={() => setOpen(false)} className="grid size-9 place-items-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-950 hover:text-white"><X className="size-4" /></button>
             </div>
             <MyCalendar checkIn={checkIn} checkOut={checkOut} onDateChange={updateRange} />
           </motion.div>

@@ -8,8 +8,10 @@ import HostBookings from "./HostBookings";
 import HostHero from "./HostHero";
 import HostListings from "./HostListings";
 import HostStats from "./HostStats";
+import { useTranslation } from "react-i18next";
 
 const HostDashboard = () => {
+  const { t } = useTranslation("places");
   const { user } = useAuth();
   const [places, setPlaces] = useState<Place[]>([]);
   const [bookings, setBookings] = useState<HostBooking[]>([]);
@@ -33,11 +35,11 @@ const HostDashboard = () => {
       setPlaces(ownedPlaces);
       setBookings(hostBookings);
     } catch (cause) {
-      setError(getErrorMessage(cause, "Could not load your host dashboard"));
+      setError(getErrorMessage(cause, t("host.loadError")));
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [t, userId]);
 
   useEffect(() => { void loadDashboard(); }, [loadDashboard]);
 
@@ -49,14 +51,14 @@ const HostDashboard = () => {
     .reduce((total, booking) => total + booking.price, 0), [bookings]);
 
   const removePlace = async (place: Place) => {
-    if (!window.confirm(`Remove "${place.title}"? This is only possible when it has no reservations.`)) return;
+    if (!window.confirm(t("host.removeConfirm", { title: place.title }))) return;
     try {
       setDeletingId(place._id);
       await placesService.remove(place._id);
       setPlaces((current) => current.filter((item) => item._id !== place._id));
-      toast.success("Listing removed");
+      toast.success(t("host.removed"));
     } catch (cause) {
-      toast.error(getErrorMessage(cause, "Could not remove this listing"));
+      toast.error(getErrorMessage(cause, t("host.removeError")));
     } finally {
       setDeletingId(null);
     }
@@ -67,9 +69,9 @@ const HostDashboard = () => {
       <main className="grid min-h-[70vh] place-items-center bg-[#f6f8f6] px-4">
         <div className="max-w-lg rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-xl shadow-slate-900/5">
           <ShieldAlert className="mx-auto size-10 text-rose-500" />
-          <h1 className="mt-5 text-2xl font-semibold text-slate-950">Log in to host your home</h1>
-          <p className="mt-2 text-slate-500">Use the user menu to log in, then return here to create and manage your listings.</p>
-          <Link to="/" className="mt-6 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white">Back to Flypnp</Link>
+          <h1 className="mt-5 text-2xl font-semibold text-slate-950">{t("host.loginTitle")}</h1>
+          <p className="mt-2 text-slate-500">{t("host.loginText")}</p>
+          <Link to="/" className="mt-6 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white">{t("host.back")}</Link>
         </div>
       </main>
     );
@@ -80,9 +82,9 @@ const HostDashboard = () => {
       <div className="mx-auto w-full max-w-7xl space-y-6 px-4 pt-7 sm:px-6 sm:pt-10 lg:px-8">
         <HostHero firstName={user.name.split(" ")[0]} />
         {loading ? (
-          <div className="grid min-h-64 place-items-center rounded-[1.75rem] border border-slate-200 bg-white"><span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500"><LoaderCircle className="size-5 animate-spin" />Loading your hosting workspace…</span></div>
+          <div className="grid min-h-64 place-items-center rounded-[1.75rem] border border-slate-200 bg-white"><span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500"><LoaderCircle className="size-5 animate-spin" />{t("host.loading")}</span></div>
         ) : error ? (
-          <div role="alert" className="rounded-[1.75rem] border border-rose-100 bg-rose-50 px-6 py-12 text-center"><RefreshCw className="mx-auto size-8 text-rose-500" /><h2 className="mt-4 text-xl font-semibold text-slate-950">We couldn't load your host dashboard</h2><p className="mt-2 text-slate-600">{error}</p><button type="button" onClick={() => void loadDashboard()} className="mt-5 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-bold text-white">Try again</button></div>
+          <div role="alert" className="rounded-[1.75rem] border border-rose-100 bg-rose-50 px-6 py-12 text-center"><RefreshCw className="mx-auto size-8 text-rose-500" /><h2 className="mt-4 text-xl font-semibold text-slate-950">{t("host.loadTitle")}</h2><p className="mt-2 text-slate-600">{error}</p><button type="button" onClick={() => void loadDashboard()} className="mt-5 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-bold text-white">{t("host.tryAgain")}</button></div>
         ) : (
           <>
             <HostStats listings={places.length} upcomingBookings={upcomingBookings.length} grossBookingValue={grossBookingValue} />

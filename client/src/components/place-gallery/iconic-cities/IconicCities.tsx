@@ -1,12 +1,14 @@
 import { usePlaces } from "../../../lib/hooks";
 import PlaceCard from "../../place-card/PlaceCard";
+import { useTranslation } from "react-i18next";
 
 const IconicCities = () => {
+  const { t } = useTranslation("places");
   const { places, loading } = usePlaces();
   const iconicCityPlaces = places.filter((place) => place.category === "iconicCities");
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{t("gallery.loading")}</div>;
   }
 
   return (

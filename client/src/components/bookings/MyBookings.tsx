@@ -18,11 +18,12 @@ import {
 import { useBooking } from "../../lib/hooks";
 import { getBookingPaymentPath } from "../../lib/payment";
 import { getErrorMessage, type Booking } from "../../services";
+import { useTranslation } from "react-i18next";
 
 type Filter = "all" | "pending" | "confirmed";
 
-const formatDate = (date: string) =>
-  new Intl.DateTimeFormat("en", {
+const formatDate = (date: string, locale: string) =>
+  new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -35,23 +36,25 @@ const getGuestCount = (booking: Booking) => {
 
 const statusConfig = {
   pending: {
-    label: "Pending",
+    labelKey: "pending",
     dot: "bg-amber-400",
     badge: "bg-amber-50 text-amber-700 ring-amber-600/20",
   },
   confirmed: {
-    label: "Confirmed",
+    labelKey: "confirmed",
     dot: "bg-emerald-400",
     badge: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
   },
   cancelled: {
-    label: "Cancelled",
+    labelKey: "cancelled",
     dot: "bg-rose-400",
     badge: "bg-rose-50 text-rose-700 ring-rose-600/20",
   },
 } as const;
 
 const MyBookings = () => {
+  const { t, i18n } = useTranslation("bookings");
+  const locale = i18n.resolvedLanguage ?? i18n.language;
   const { bookings, loading, error, refresh, deleteBooking } = useBooking();
   const [filter, setFilter] = useState<Filter>("all");
   const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
@@ -74,11 +77,11 @@ const MyBookings = () => {
       setDeleting(true);
       setDeleteError("");
       await deleteBooking(bookingToDelete._id);
-      toast.success("Successfully deleted the booking", { icon: <Trash2 className="size-4" /> });
+      toast.success(t("manager.deleted"), { icon: <Trash2 className="size-4" /> });
       setBookingToDelete(null);
     } catch (cause) {
       setDeleteError(
-        getErrorMessage(cause, "We couldn't remove this booking. Please try again.")
+        getErrorMessage(cause, t("manager.deleteError"))
       );
     } finally {
       setDeleting(false);
@@ -97,29 +100,28 @@ const MyBookings = () => {
               <div className="flex items-center gap-2 text-rose-200">
                 <CalendarCheck className="size-5" />
                 <span className="text-xs font-semibold uppercase tracking-[0.18em]">
-                  Booking manager
+                  {t("manager.eyebrow")}
                 </span>
               </div>
               <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                Every stay, one place.
+                {t("manager.title")}
               </h1>
               <p className="mt-4 max-w-xl leading-7 text-slate-300">
-                Track pending payments, confirmed reservations and past visits — all
-                organised so you never lose sight of what matters.
+                {t("manager.subtitle")}
               </p>
             </div>
             <div className="flex gap-3">
               <div className="min-w-24 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
                 <p className="text-2xl font-semibold">{pending.length}</p>
-                <p className="text-xs text-slate-300">Pending</p>
+                <p className="text-xs text-slate-300">{t("common.pending")}</p>
               </div>
               <div className="min-w-24 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
                 <p className="text-2xl font-semibold">{confirmed.length}</p>
-                <p className="text-xs text-slate-300">Confirmed</p>
+                <p className="text-xs text-slate-300">{t("common.confirmed")}</p>
               </div>
               <div className="min-w-24 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
                 <p className="text-2xl font-semibold">{bookings.length}</p>
-                <p className="text-xs text-slate-300">Total</p>
+                <p className="text-xs text-slate-300">{t("manager.total")}</p>
               </div>
             </div>
           </div>
@@ -130,28 +132,28 @@ const MyBookings = () => {
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
-                Reservation overview
+                {t("manager.overview")}
               </p>
               <h2 className="mt-1 text-3xl font-semibold tracking-tight text-slate-950">
-                My bookings
+                {t("manager.myBookings")}
               </h2>
             </div>
             <div
               className="flex w-fit rounded-full border border-slate-200 bg-white p-1 shadow-sm"
               role="tablist"
-              aria-label="Booking filters"
+              aria-label={t("manager.filters")}
             >
               {(
                 [
-                  { key: "all", label: "All", count: bookings.length },
-                  { key: "pending", label: "Pending", count: pending.length },
+                  { key: "all", labelKey: "all", count: bookings.length },
+                  { key: "pending", labelKey: "pending", count: pending.length },
                   {
                     key: "confirmed",
-                    label: "Confirmed",
+                    labelKey: "confirmed",
                     count: confirmed.length,
                   },
                 ] as const
-              ).map(({ key, label, count }) => (
+              ).map(({ key, labelKey, count }) => (
                 <button
                   key={key}
                   type="button"
@@ -164,7 +166,7 @@ const MyBookings = () => {
                       : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
-                  {label}{" "}
+                  {t(`common.${labelKey}`)}{" "}
                   <span className="opacity-60">{count}</span>
                 </button>
               ))}
@@ -174,7 +176,7 @@ const MyBookings = () => {
           {loading ? (
             <div
               className="mt-7 grid gap-6 md:grid-cols-2 xl:grid-cols-3"
-              aria-label="Loading bookings"
+              aria-label={t("common.loading")}
             >
               {Array.from({ length: 3 }).map((_, i) => (
                 <div
@@ -190,17 +192,17 @@ const MyBookings = () => {
             >
               <RefreshCw className="mx-auto size-8 text-rose-500" />
               <h3 className="mt-4 text-xl font-semibold text-slate-950">
-                We couldn't load your bookings
+                {t("manager.loadTitle")}
               </h3>
               <p className="mt-2 text-slate-600">
-                Please check the connection and try again.
+                {t("manager.loadText")}
               </p>
               <button
                 type="button"
                 onClick={() => void refresh()}
                 className="mt-5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
               >
-                Try again
+                {t("common.tryAgain")}
               </button>
             </div>
           ) : visible.length > 0 ? (
@@ -241,11 +243,11 @@ const MyBookings = () => {
                           className={`absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset ${status.badge}`}
                         >
                           <span className={`size-1.5 rounded-full ${status.dot}`} />
-                          {status.label}
+                          {t(`common.${status.labelKey}`)}
                         </span>
                         <button
                           type="button"
-                          aria-label={`Delete booking ${booking.place.title}`}
+                          aria-label={t("manager.deleteLabel", { title: booking.place.title })}
                           onClick={() => requestDelete(booking)}
                           className="absolute right-4 top-4 grid size-9 place-items-center rounded-full bg-white/90 text-slate-700 shadow-sm backdrop-blur transition hover:scale-105 hover:bg-rose-500 hover:text-white"
                         >
@@ -267,23 +269,23 @@ const MyBookings = () => {
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
                             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                              Check in
+                              {t("common.checkIn")}
                             </p>
                             <p className="mt-1 font-semibold text-slate-800">
-                              {formatDate(booking.checkIn)}
+                              {formatDate(booking.checkIn, locale)}
                             </p>
                           </div>
                           <div>
                             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                              Check out
+                              {t("common.checkOut")}
                             </p>
                             <p className="mt-1 font-semibold text-slate-800">
-                              {formatDate(booking.checkOut)}
+                              {formatDate(booking.checkOut, locale)}
                             </p>
                           </div>
                           <div>
                             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                              Guests
+                              {t("common.guests")}
                             </p>
                             <p className="mt-1 flex items-center gap-1.5 font-semibold text-slate-800">
                               <Users className="size-3.5 text-slate-400" />
@@ -292,7 +294,7 @@ const MyBookings = () => {
                           </div>
                           <div>
                             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                              Total
+                              {t("common.total")}
                             </p>
                             <p className="mt-1 flex items-center gap-1.5 font-semibold text-slate-800">
                               <CircleDollarSign className="size-3.5 text-slate-400" />
@@ -308,14 +310,14 @@ const MyBookings = () => {
                               className="flex w-full items-center justify-center gap-2 rounded-full bg-rose-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-rose-500/20 transition hover:-translate-y-0.5 hover:bg-rose-600"
                             >
                               <CreditCard className="size-4" />
-                              Complete payment
+                              {t("common.completePayment")}
                             </Link>
                           ) : (
                             <Link
                               to={`/place/${booking.place.category}/${booking.place._id}`}
                               className="flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-950 hover:text-slate-950"
                             >
-                              View stay details
+                              {t("manager.viewDetails")}
                             </Link>
                           )}
                         </div>
@@ -335,20 +337,20 @@ const MyBookings = () => {
               </div>
               <h3 className="mt-6 text-2xl font-semibold tracking-tight text-slate-950">
                 {filter === "all"
-                  ? "No bookings yet"
-                  : `No ${filter} bookings`}
+                  ? t("manager.empty")
+                  : t("manager.emptyFiltered", { status: t(`common.${filter}`) })}
               </h3>
               <p className="mx-auto mt-3 max-w-lg leading-7 text-slate-500">
                 {filter === "all"
-                  ? "Your future getaways will appear here once you reserve a stay."
-                  : "Try switching to a different filter or explore new places to stay."}
+                  ? t("manager.emptyText")
+                  : t("manager.emptyFilteredText")}
               </p>
               <Link
                 to="/"
                 className="mt-7 inline-flex items-center gap-2 rounded-full bg-rose-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-500/20 transition hover:-translate-y-0.5 hover:bg-rose-600"
               >
                 <Compass className="size-4" />
-                Discover stays
+                {t("manager.discover")}
               </Link>
             </div>
           )}
@@ -366,14 +368,14 @@ const MyBookings = () => {
           >
             <button
               type="button"
-              aria-label="Close delete overlay"
+              aria-label={t("manager.closeOverlay")}
               onClick={() => !deleting && setBookingToDelete(null)}
               className="absolute inset-0 cursor-default"
             />
             <motion.div
               role="dialog"
               aria-modal="true"
-              aria-label="Delete booking"
+              aria-label={t("manager.deleteDialog")}
               initial={{ opacity: 0, y: 18, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.97 }}
@@ -382,7 +384,7 @@ const MyBookings = () => {
             >
               <button
                 type="button"
-                aria-label="Close delete confirmation"
+                aria-label={t("manager.closeDelete")}
                 disabled={deleting}
                 onClick={() => setBookingToDelete(null)}
                 className="absolute right-4 top-4 grid size-9 place-items-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-950 hover:text-white disabled:opacity-50"
@@ -393,16 +395,16 @@ const MyBookings = () => {
                 <AlertTriangle className="size-6" />
               </span>
               <h2 className="mt-5 text-2xl font-semibold tracking-tight text-slate-950">
-                Remove this booking?
+                {t("manager.removeTitle")}
               </h2>
               <p className="mt-2 pr-5 text-sm leading-6 text-slate-600">
                 <span className="font-semibold text-slate-900">
                   {bookingToDelete.place.title}
                 </span>{" "}
-                will be removed from your bookings.{" "}
+                {t("manager.removeText", { title: bookingToDelete.place.title }).replace(bookingToDelete.place.title, "")}{" "}
                 {bookingToDelete.status === "pending"
-                  ? "The pending reservation will also be cancelled."
-                  : "Its confirmed payment record will remain protected."}
+                  ? t("manager.pendingCancelled")
+                  : t("manager.paymentProtected")}
               </p>
               {deleteError && (
                 <p
@@ -419,7 +421,7 @@ const MyBookings = () => {
                   onClick={() => setBookingToDelete(null)}
                   className="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-950 disabled:opacity-50"
                 >
-                  Keep booking
+                  {t("manager.keep")}
                 </button>
                 <button
                   type="button"
@@ -430,12 +432,12 @@ const MyBookings = () => {
                   {deleting ? (
                     <>
                       <LoaderCircle className="size-4 animate-spin" />
-                      Removing…
+                      {t("common.remove")}
                     </>
                   ) : (
                     <>
                       <Trash2 className="size-4" />
-                      Remove booking
+                      {t("manager.removeBooking")}
                     </>
                   )}
                 </button>

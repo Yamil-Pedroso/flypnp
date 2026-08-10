@@ -4,6 +4,7 @@ import type { Value } from "react-calendar/dist/shared/types.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "react-calendar/dist/Calendar.css";
 import "./styles.css";
+import { useTranslation } from "react-i18next";
 
 interface MyCalendarProps {
   className?: string;
@@ -21,6 +22,7 @@ const toDateInput = (date: Date) => {
 };
 
 const MyCalendar = ({ className, checkIn, checkOut, onDateChange }: MyCalendarProps) => {
+  const { t, i18n } = useTranslation("search");
   const initialCheckIn = fromDateInput(checkIn) ?? new Date();
   const [checkInMonth, setCheckInMonth] = useState(new Date(initialCheckIn.getFullYear(), initialCheckIn.getMonth(), 1));
   const [checkOutMonth, setCheckOutMonth] = useState(new Date(initialCheckIn.getFullYear(), initialCheckIn.getMonth() + 1, 1));
@@ -51,7 +53,7 @@ const MyCalendar = ({ className, checkIn, checkOut, onDateChange }: MyCalendarPr
     }
   };
 
-  const formatMonthYear = (date: Date) => new Intl.DateTimeFormat("default", { year: "numeric", month: "long" }).format(date);
+  const formatMonthYear = (date: Date) => new Intl.DateTimeFormat(i18n.resolvedLanguage, { year: "numeric", month: "long" }).format(date);
   const minimumDate = new Date(new Date().setHours(0, 0, 0, 0));
 
   return (
@@ -60,7 +62,7 @@ const MyCalendar = ({ className, checkIn, checkOut, onDateChange }: MyCalendarPr
         <div className="calendar-wrapper first">
           <div className="month-arrow-first">
             <div className="calendar-header"><p>{formatMonthYear(checkInMonth)}</p></div>
-            <button className="arrow-left navigation-arrow" type="button" aria-label="Previous month" onClick={() => navigateMonths(-1)}><ChevronLeft aria-hidden="true" /></button>
+            <button className="arrow-left navigation-arrow" type="button" aria-label={t("previousMonth")} onClick={() => navigateMonths(-1)}><ChevronLeft aria-hidden="true" /></button>
           </div>
           <Calendar activeStartDate={checkInMonth} onActiveStartDateChange={({ activeStartDate }) => activeStartDate && setCheckInMonth(activeStartDate)} onChange={selectDates} value={range} minDate={minimumDate} selectRange allowPartialRange showNavigation={false} />
         </div>
@@ -68,7 +70,7 @@ const MyCalendar = ({ className, checkIn, checkOut, onDateChange }: MyCalendarPr
         <div className="calendar-wrapper second">
           <div className="month-arrow-second">
             <div className="calendar-header"><p>{formatMonthYear(checkOutMonth)}</p></div>
-            <button className="arrow-right navigation-arrow" type="button" aria-label="Next month" onClick={() => navigateMonths(1)}><ChevronRight aria-hidden="true" /></button>
+            <button className="arrow-right navigation-arrow" type="button" aria-label={t("nextMonth")} onClick={() => navigateMonths(1)}><ChevronRight aria-hidden="true" /></button>
           </div>
           <Calendar activeStartDate={checkOutMonth} onActiveStartDateChange={({ activeStartDate }) => activeStartDate && setCheckOutMonth(activeStartDate)} onChange={selectDates} value={range} minDate={minimumDate} selectRange allowPartialRange showNavigation={false} />
         </div>

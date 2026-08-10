@@ -1,5 +1,8 @@
+import { useTranslation } from "react-i18next";
+
 const Booking = () => {
-  return <div>Booking</div>
+  const { t } = useTranslation("app", { keyPrefix: "stubs" });
+  return <div>{t("booking")}</div>
 }
 
 export default Booking

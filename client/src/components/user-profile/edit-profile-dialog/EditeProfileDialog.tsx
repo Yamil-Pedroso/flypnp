@@ -1,5 +1,8 @@
+import { useTranslation } from "react-i18next";
+
 const EditeProfileDialog = () => {
-  return <div>Edite Profile</div>
+  const { t } = useTranslation("app", { keyPrefix: "stubs" });
+  return <div>{t("editProfile")}</div>
 }
 
 export default EditeProfileDialog

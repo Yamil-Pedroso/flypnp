@@ -11,8 +11,6 @@ export interface DestinationCountry {
 
 export interface DestinationRegion {
   id: "africa" | "americas" | "asia" | "europe" | "oceania";
-  name: string;
-  eyebrow: string;
   image: string;
   center: Coordinates;
   zoom: number;
@@ -22,8 +20,6 @@ export interface DestinationRegion {
 export const destinationRegions: DestinationRegion[] = [
   {
     id: "africa",
-    name: "Africa",
-    eyebrow: "Deserts, coasts & safaris",
     image: images.map6,
     center: [18.5, 2.5],
     zoom: 2.35,
@@ -37,8 +33,6 @@ export const destinationRegions: DestinationRegion[] = [
   },
   {
     id: "americas",
-    name: "Americas",
-    eyebrow: "Cities, islands & wild nature",
     image: images.map4,
     center: [-84, 17],
     zoom: 1.75,
@@ -52,8 +46,6 @@ export const destinationRegions: DestinationRegion[] = [
   },
   {
     id: "asia",
-    name: "Asia",
-    eyebrow: "Temples, megacities & islands",
     image: images.map2,
     center: [91, 31],
     zoom: 2.15,
@@ -67,8 +59,6 @@ export const destinationRegions: DestinationRegion[] = [
   },
   {
     id: "europe",
-    name: "Europe",
-    eyebrow: "Alpine stays & old-world cities",
     image: images.map3,
     center: [13, 50],
     zoom: 3.1,
@@ -82,8 +72,6 @@ export const destinationRegions: DestinationRegion[] = [
   },
   {
     id: "oceania",
-    name: "Oceania",
-    eyebrow: "Ocean escapes & open horizons",
     image: images.map1,
     center: [151, -22],
     zoom: 2.6,

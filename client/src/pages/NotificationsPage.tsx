@@ -15,6 +15,7 @@ import {
 import { toast } from 'sonner'
 import { getErrorMessage } from '../services'
 import type { Notification } from '../services'
+import { useTranslation } from 'react-i18next'
 
 const notificationIcon = (notification: Notification): LucideIcon => {
   switch (notification.type) {
@@ -34,22 +35,23 @@ const notificationIcon = (notification: Notification): LucideIcon => {
 
 const NotificationsPage = () => {
   const { notifications, deleteNotification, markAsRead } = useNotifications()
+  const { t, i18n } = useTranslation('app', { keyPrefix: 'notifications' })
 
   const handleDeleteNotification = async (id: string) => {
     try {
       await deleteNotification(id)
-      toast.success('Notification deleted successfully.', { icon: <Trash2 className="size-4" /> })
+      toast.success(t('deleted'), { icon: <Trash2 className="size-4" /> })
     } catch (cause) {
-      toast.error(getErrorMessage(cause, 'The notification could not be deleted.'))
+      toast.error(getErrorMessage(cause, t('deleteError')))
     }
   }
 
   return (
     <main className="mx-auto min-h-[32rem] w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">Inbox</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">{t('inbox')}</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-          {notifications.length === 0 ? 'No notifications yet' : 'Your notifications'}
+          {notifications.length === 0 ? t('empty') : t('title')}
         </h1>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -61,8 +63,8 @@ const NotificationsPage = () => {
               </span>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h2 className="font-semibold text-slate-950">{notification.title || 'Flypnp update'}</h2>
-                  {!notification.read && <span className="size-2 rounded-full bg-emerald-500" aria-label="Unread" />}
+                  <h2 className="font-semibold text-slate-950">{notification.title || t('defaultTitle')}</h2>
+                  {!notification.read && <span className="size-2 rounded-full bg-emerald-500" aria-label={t('unread')} />}
                 </div>
                 <p className="mt-1 flex items-start gap-2 text-sm leading-6 text-slate-600">
                   {createElement(notificationIcon(notification), { className: 'mt-0.5 size-4 shrink-0 text-slate-400' })}
@@ -73,22 +75,22 @@ const NotificationsPage = () => {
             {notification.createdAt && (
               <p className="mt-4 flex items-center gap-1.5 text-xs text-slate-400">
                 <Clock3 className="size-3.5" />
-                {new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(notification.createdAt))}
+                {new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(notification.createdAt))}
               </p>
             )}
             <div className="mt-4 flex flex-wrap items-center gap-3">
               {notification.actionUrl && (
                 <Link to={notification.actionUrl} onClick={() => void markAsRead(notification._id)} className="rounded-full bg-slate-950 px-4 py-2 text-xs font-bold text-white transition hover:bg-emerald-700">
-                  View details
+                  {t('viewDetails')}
                 </Link>
               )}
               {!notification.read && (
                 <button type="button" onClick={() => void markAsRead(notification._id)} className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 transition hover:text-emerald-700">
-                  <Check className="size-3.5" /> Mark as read
+                  <Check className="size-3.5" /> {t('markRead')}
                 </button>
               )}
             </div>
-            <button type="button" aria-label="Delete notification" onClick={() => void handleDeleteNotification(notification._id)} className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full text-slate-400 transition hover:bg-rose-50 hover:text-rose-600">
+            <button type="button" aria-label={t('delete')} onClick={() => void handleDeleteNotification(notification._id)} className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full text-slate-400 transition hover:bg-rose-50 hover:text-rose-600">
               <Trash2 className="size-4" />
             </button>
           </article>

@@ -1,12 +1,14 @@
 import { usePlaces } from "../../../lib/hooks";
 import PlaceCard from "../../place-card/PlaceCard";
+import { useTranslation } from "react-i18next";
 
 const BeachFront = () => {
+  const { t } = useTranslation("places");
   const { places, loading } = usePlaces();
   const beachFrontPlaces = places.filter((place) => place.category === "beachFront");
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{t("gallery.loading")}</div>;
   }
 
   return (

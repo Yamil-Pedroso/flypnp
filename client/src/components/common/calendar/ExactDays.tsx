@@ -1,14 +1,11 @@
 import { useState } from 'react'
 import { FaPlusMinus } from 'react-icons/fa6'
+import { useTranslation } from 'react-i18next'
 
-const daysOptions = [
-  { text: 'day' },
-  { text: 'days' },
-  { text: 'days' },
-  { text: 'days' },
-]
+const daysOptions = [1, 2, 3, 4]
 
 const ExactDays = () => {
+  const { t } = useTranslation('search')
   const [selected, setSelected] = useState<number | null>(null)
 
   const handleSelection = (index: number) => () => {
@@ -21,10 +18,10 @@ const ExactDays = () => {
         onClick={handleSelection(0)}
         className={`rounded-full border px-4 py-2 text-sm transition ${selected === 0 ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 text-slate-600 hover:border-slate-400'}`}
       >
-        Exact days
+        {t('exactDays')}
       </button>
       <div className="flex flex-wrap justify-center gap-2">
-        {daysOptions.map((option, index) => (
+        {daysOptions.map((count, index) => (
           <button type="button"
             key={index}
             className={`rounded-full border px-4 py-2 text-sm transition ${selected === index + 1 ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 text-slate-600 hover:border-slate-400'}`}
@@ -32,8 +29,8 @@ const ExactDays = () => {
           >
             <div className="flex items-center gap-1">
               <FaPlusMinus size={12} />
-              <span>{index + 1}</span>
-              <span>{option.text}</span>
+              <span>{count}</span>
+              <span>{t('day', { count })}</span>
             </div>
           </button>
         ))}

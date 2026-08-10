@@ -1,5 +1,8 @@
+import { useTranslation } from "react-i18next";
+
 const AccountNav = () => {
-  return <div>AccountNav</div>
+  const { t } = useTranslation("app", { keyPrefix: "stubs" });
+  return <div>{t("accountNav")}</div>
 }
 
 export default AccountNav

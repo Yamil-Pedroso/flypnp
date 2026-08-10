@@ -1,41 +1,43 @@
 // Tailwind-based SearchDestination Component
 import { useState, useEffect } from "react";
 import images from "../../../assets/images";
+import { useTranslation } from "react-i18next";
 
 interface SearchDestinationProps {
   img?: string;
-  title: string;
+  titleKey: string;
 }
 
 const searchDestinationData: SearchDestinationProps[] = [
   {
     img: images.map1,
-    title: "I'm flexible",
+    titleKey: "destinationExtra.flexible",
   },
   {
     img: images.map2,
-    title: "Southeast Asia",
+    titleKey: "regions.southeastAsia",
   },
   {
     img: images.map3,
-    title: "Germany",
+    titleKey: "regions.germany",
   },
   {
     img: images.map4,
-    title: "United States",
+    titleKey: "regions.unitedStates",
   },
   {
     img: images.map5,
-    title: "Italy",
+    titleKey: "regions.italy",
   },
   {
     img: images.map6,
-    title: "Africa",
+    titleKey: "regions.africa",
   },
 ];
 
 const SearchDestination = () => {
   const [bgWhiteActive, setBgWhiteActive] = useState(false);
+  const { t } = useTranslation("search");
 
   const handleBgWhiteActive = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
@@ -81,25 +83,25 @@ const SearchDestination = () => {
         {bgWhiteActive ? (
           <div className="flex flex-col justify-center w-full h-full bg-neutral-800 rounded-full shadow-md px-6">
             <label htmlFor="" className="text-white text-sm">
-              Where
+              {t("where")}
             </label>
             <input
               type="text"
-              placeholder="Search destinations"
+              placeholder={t("searchDestinations")}
               className="text-white bg-neutral-800 placeholder:text-neutral-400 border-none outline-none w-48 text-base"
             />
           </div>
         ) : (
           <div className="ml-6" onClick={handleBgWhiteActive}>
-            <p className="text-sm">Where</p>
-            <p className="text-neutral-500">Search destinations</p>
+            <p className="text-sm">{t("where")}</p>
+            <p className="text-neutral-500">{t("searchDestinations")}</p>
           </div>
         )}
       </div>
       {bgWhiteActive && (
         <div className="absolute top-20 w-[32rem] h-[30rem] bg-white rounded-2xl shadow-lg z-50 overflow-hidden">
           <p className="pt-11 pl-6 ml-3 text-xs font-bold text-neutral-700">
-            Search by region
+            {t("destinationExtra.searchByRegion")}
           </p>
           <div className="mt-9 flex justify-center items-center flex-wrap">
             {searchDestinationData.map((item, index) => (
@@ -109,10 +111,10 @@ const SearchDestination = () => {
               >
                 <img
                   src={item.img}
-                  alt="map"
+                  alt={t("destinationExtra.mapRepresenting", { region: t(item.titleKey) })}
                   className="w-[8.5rem] h-[8.3rem] rounded-lg border border-gray-300"
                 />
-                <p className="mt-1 text-sm text-neutral-500">{item.title}</p>
+                <p className="mt-1 text-sm text-neutral-500">{t(item.titleKey)}</p>
               </div>
             ))}
           </div>

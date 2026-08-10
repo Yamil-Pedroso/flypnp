@@ -5,12 +5,14 @@ import CreateWishListBox from "../wishlist/create/CreateWishListBox";
 import WebpImage from "./WebpImage";
 import type { Place } from "../../services";
 import { getTravelParams, useTravelSearch } from "../search/SearchContext";
+import { useTranslation } from "react-i18next";
 
 interface PlaceCardProps {
   place: Place;
 }
 
 const PlaceCard = ({ place }: PlaceCardProps) => {
+  const { t } = useTranslation("places");
   const [showCreateWishList, setShowCreateWishList] = useState(false);
   const { destination, checkIn, checkOut, guests } = useTravelSearch();
 
@@ -41,7 +43,7 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
       <div>
         {mainPhotoUrl && (
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-slate-200">
-            <Link to={placeUrl} className="block size-full" aria-label={`View ${title}`}>
+            <Link to={placeUrl} className="block size-full" aria-label={t("card.view", { title })}>
               <WebpImage
                 src={mainPhotoUrl}
                 alt={title}
@@ -50,7 +52,7 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
             </Link>
             <button
               type="button"
-              aria-label={`Save ${title} to wishlist`}
+              aria-label={t("card.save", { title })}
               className="absolute right-3 top-3 flex size-10 items-center justify-center rounded-full bg-white/90 text-slate-800 shadow-sm backdrop-blur transition hover:scale-105 hover:text-rose-500"
               onClick={handleClickCreateWishList}
             >
@@ -65,7 +67,7 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
             <span className="flex shrink-0 items-center gap-1 text-sm text-slate-800"><Star className="size-4 fill-slate-900" />{rating.toFixed(1)}</span>
           </div>
           <p className="mt-0.5 truncate text-sm text-slate-500">{address}</p>
-          <p className="mt-2 text-sm text-slate-700"><span className="font-semibold text-slate-950">CHF {price}</span> night</p>
+          <p className="mt-2 text-sm text-slate-700"><span className="font-semibold text-slate-950">CHF {price}</span> {t("card.night")}</p>
         </div>
       </div>
     </article>

@@ -3,6 +3,7 @@ import { Heart } from "lucide-react";
 import { useWishlist } from "../../lib/hooks";
 import type { Experience } from "../../services";
 import CreateWishListBox from "../wishlist/create/CreateWishListBox";
+import { useTranslation } from "react-i18next";
 
 const ExperienceWishlistButton = ({
   experience,
@@ -11,6 +12,7 @@ const ExperienceWishlistButton = ({
   experience: Experience;
   className?: string;
 }) => {
+  const { t } = useTranslation("experiences");
   const [open, setOpen] = useState(false);
   const { wishlist } = useWishlist();
   const isSaved = wishlist.some((wish) => wish.experience === experience._id);
@@ -19,7 +21,7 @@ const ExperienceWishlistButton = ({
     <>
       <button
         type="button"
-        aria-label={`Save ${experience.title} to wishlist`}
+        aria-label={t("card.save", { title: experience.title })}
         aria-pressed={isSaved}
         onClick={(event) => {
           event.preventDefault();

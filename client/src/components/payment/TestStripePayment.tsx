@@ -7,6 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getErrorMessage, giftCardsService, paymentsService } from "../../services";
 import { useBooking, useExperiences } from "../../lib/hooks";
+import { useTranslation } from "react-i18next";
 
 interface CheckoutFormProps {
   onSuccessfulCheckout: () => void;
@@ -29,6 +30,7 @@ const cardOptions = {
 };
 
 const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
+  const { t } = useTranslation("commerce");
   const stripe = useStripe();
   const elements = useElements();
   const location = useLocation();
@@ -54,7 +56,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
     const preparePayment = async () => {
       if (!bookingId && !experienceBookingId && !serviceRequestId) {
         if (active) {
-          setError("Missing booking details. Return to the listing and try again.");
+          setError(t("payment.missing"));
           setPreparing(false);
         }
         return;
@@ -69,7 +71,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
           currency: "chf",
           useGiftBalance: Boolean(wallet?.balance),
         });
-        if (!data.success) throw new Error("The secure payment session could not be created.");
+        if (!data.success) throw new Error(t("payment.sessionError"));
         if (active) {
           setGiftCardAmount(data.giftCardAmount ?? 0);
           setStripeAmount(data.stripeAmount ?? data.data.amount);
@@ -83,14 +85,14 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
           }
           return;
         }
-        if (!data.clientSecret) throw new Error("The secure payment session could not be created.");
+        if (!data.clientSecret) throw new Error(t("payment.sessionError"));
         if (active) {
           setClientSecret(data.clientSecret);
           setPaymentId(data.data._id);
           setSuccessUrl(data.successUrl);
         }
       } catch (cause) {
-        if (active) setError(getErrorMessage(cause, "The secure payment session could not be created."));
+        if (active) setError(getErrorMessage(cause, t("payment.sessionError")));
       } finally {
         if (active) setPreparing(false);
       }
@@ -98,7 +100,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
 
     void preparePayment();
     return () => { active = false; };
-  }, [bookingId, experienceBookingId, navigate, refreshBookings, refreshExperienceBookings, serviceRequestId]);
+  }, [bookingId, experienceBookingId, navigate, refreshBookings, refreshExperienceBookings, serviceRequestId, t]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -106,7 +108,7 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
 
     const card = elements.getElement(CardElement);
     if (!card) {
-      setError("Card details are not ready yet. Please try again.");
+      setError(t("payment.cardNotReady"));
       return;
     }
 
@@ -119,19 +121,19 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
         return_url: successUrl,
       });
       if (result.error) {
-        setError(result.error.message ?? "Payment failed. Please check your card details.");
+        setError(result.error.message ?? t("payment.failed"));
       } else if (result.paymentIntent?.status === "succeeded") {
-        if (!paymentId) throw new Error("Missing payment reference.");
+        if (!paymentId) throw new Error(t("payment.missingReference"));
         await paymentsService.confirm(paymentId);
         await Promise.all([refreshBookings(), refreshExperienceBookings()]);
         setPaymentStatus("confirmed");
-        toast.success("Payment completed successfully.");
+        toast.success(t("payment.completed"));
         onSuccessfulCheckout();
         const returnLocation = new URL(successUrl, window.location.origin);
         navigate(`${returnLocation.pathname}${returnLocation.search}`);
       }
     } catch (cause) {
-      setError(getErrorMessage(cause, "The payment was received, but the booking could not be confirmed. Please try again."));
+      setError(getErrorMessage(cause, t("payment.confirmError")));
     } finally {
       setLoading(false);
     }
@@ -143,8 +145,8 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="mb-2 flex items-center justify-between gap-3 text-sm font-semibold text-slate-800">
-          <span className="flex items-center gap-2"><CreditCard className="size-4 text-emerald-700" /> Card information</span>
-          <span className="flex items-center gap-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-slate-400"><LockKeyhole className="size-3" /> Encrypted</span>
+          <span className="flex items-center gap-2"><CreditCard className="size-4 text-emerald-700" /> {t("payment.card")}</span>
+          <span className="flex items-center gap-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-slate-400"><LockKeyhole className="size-3" /> {t("payment.encrypted")}</span>
         </label>
         <div className={`rounded-2xl border bg-slate-50 px-4 py-4 transition ${error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200 focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-50"}`}>
           <CardElement options={cardOptions} />
@@ -154,31 +156,32 @@ const CheckoutForm = ({ onSuccessfulCheckout }: CheckoutFormProps) => {
       {giftCardAmount > 0 && (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm">
           <p className="flex items-center justify-between gap-4 font-semibold text-emerald-900">
-            <span>Gift card balance applied</span>
+            <span>{t("payment.giftApplied")}</span>
             <span className="tabular-nums">−{(giftCardAmount / 100).toFixed(2)} CHF</span>
           </p>
-          <p className="mt-1 text-xs text-emerald-700">Stripe will charge {(stripeAmount / 100).toFixed(2)} CHF.</p>
+          <p className="mt-1 text-xs text-emerald-700">{t("payment.stripeCharge", { amount: (stripeAmount / 100).toFixed(2) })}</p>
         </div>
       )}
 
-      {isPreparing && <p className="flex items-center gap-2 text-xs font-medium text-slate-500"><LoaderCircle className="size-3.5 animate-spin" /> Preparing your secure payment…</p>}
+      {isPreparing && <p className="flex items-center gap-2 text-xs font-medium text-slate-500"><LoaderCircle className="size-3.5 animate-spin" /> {t("payment.preparing")}</p>}
       {error && <p role="alert" className="rounded-xl bg-rose-50 px-3.5 py-3 text-sm font-medium leading-5 text-rose-700 ring-1 ring-rose-100">{error}</p>}
-      {paymentStatus === "confirmed" && <p className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3.5 py-3 text-sm font-semibold text-emerald-800"><CheckCircle2 className="size-4" /> Payment confirmed</p>}
+      {paymentStatus === "confirmed" && <p className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3.5 py-3 text-sm font-semibold text-emerald-800"><CheckCircle2 className="size-4" /> {t("payment.confirmed")}</p>}
 
       <button type="submit" disabled={buttonDisabled} className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-600 to-rose-500 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-rose-500/20 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0">
-        {isLoading ? <><LoaderCircle className="size-4 animate-spin" /> Processing payment…</> : <><LockKeyhole className="size-4" /> Confirm and pay</>}
+        {isLoading ? <><LoaderCircle className="size-4 animate-spin" /> {t("payment.processing")}</> : <><LockKeyhole className="size-4" /> {t("payment.confirm")}</>}
       </button>
-      <p className="text-center text-[0.7rem] leading-5 text-slate-400">By confirming, you agree to Flypnp's booking terms and cancellation policy.</p>
+      <p className="text-center text-[0.7rem] leading-5 text-slate-400">{t("payment.terms")}</p>
       <ToastContainer position="bottom-center" autoClose={3000} hideProgressBar theme="light" />
     </form>
   );
 };
 
 const MyStripeForm = () => {
+  const { t } = useTranslation("commerce");
   if (!stripePublicKey) {
     return (
       <p role="alert" className="rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
-        Secure payments are temporarily unavailable. Please contact Flypnp support.
+        {t("payment.unavailable")}
       </p>
     );
   }

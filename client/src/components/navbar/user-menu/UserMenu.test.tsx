@@ -58,8 +58,8 @@ describe("UserMenu language modal", () => {
     await user.click(screen.getByTestId("language-modal-backdrop"));
     await waitFor(() => expect(screen.queryByRole("dialog", { name: "Choose your language" })).not.toBeInTheDocument());
 
-    await user.click(screen.getByRole("button", { name: "Language and currency" }));
-    await user.click(screen.getByRole("button", { name: "Close language settings" }));
+    await user.click(screen.getByRole("button", { name: "Idioma y moneda" }));
+    await user.click(screen.getByRole("button", { name: "Cerrar configuración de idioma" }));
     await waitFor(() => expect(screen.queryByRole("dialog", { name: "Choose your language" })).not.toBeInTheDocument());
   });
 });

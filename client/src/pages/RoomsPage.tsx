@@ -1,5 +1,8 @@
+import { useTranslation } from "react-i18next";
+
 const RoomsPage = () => {
-  return <div>RoomsPage</div>
+  const { t } = useTranslation("app", { keyPrefix: "stubs" });
+  return <div>{t("rooms")}</div>
 }
 
 export default RoomsPage

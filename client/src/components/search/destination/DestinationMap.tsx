@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import type { Place } from "../../../services";
 import { useWishlist } from "../../../lib/hooks";
 import type { DestinationCountry, DestinationRegion } from "./destinationRegions";
+import { useTranslation } from "react-i18next";
 
 interface SimulatedPlace {
   place: Place;
@@ -64,6 +65,7 @@ const DestinationMap = ({ region, country, places, expanded = false, onChoosePla
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const { wishlist, addWishlist, deleteWishlist } = useWishlist();
+  const { t } = useTranslation("search");
 
   const simulatedPlaces = useMemo<SimulatedPlace[]>(() => {
     if (!country) return [];
@@ -155,7 +157,7 @@ const DestinationMap = ({ region, country, places, expanded = false, onChoosePla
       markerButton.type = "button";
       markerButton.className = `flypnp-price-marker${selectedPlaceId === place._id ? " is-selected" : ""}`;
       markerButton.textContent = `CHF ${place.price}`;
-      markerButton.setAttribute("aria-label", `Show ${place.title}, CHF ${place.price} per night`);
+      markerButton.setAttribute("aria-label", t("destinationExtra.showPlace", { title: place.title, price: place.price }));
       markerButton.addEventListener("click", (event) => {
         event.stopPropagation();
         setSelectedPlaceId(place._id);
@@ -167,7 +169,7 @@ const DestinationMap = ({ region, country, places, expanded = false, onChoosePla
       markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = [];
     };
-  }, [mapReady, selectedPlaceId, simulatedPlaces]);
+  }, [mapReady, selectedPlaceId, simulatedPlaces, t]);
 
   const isSaved = (placeId: string) => wishlist.some((item) => item.place === placeId);
   const toggleWishlist = async (place: Place) => {
@@ -175,13 +177,13 @@ const DestinationMap = ({ region, country, places, expanded = false, onChoosePla
       setSavingId(place._id);
       if (isSaved(place._id)) {
         await deleteWishlist(place._id);
-        toast.success("Removed from your wishlist");
+        toast.success(t("destination.removed"));
       } else {
         await addWishlist(place._id, place.title, place.photos[0]?.main, "place");
-        toast.success("Saved to your wishlist");
+        toast.success(t("destination.saved"));
       }
     } catch {
-      toast.error("Sign in to save this stay to your wishlist");
+      toast.error(t("destination.signIn"));
     } finally {
       setSavingId(null);
     }
@@ -189,18 +191,18 @@ const DestinationMap = ({ region, country, places, expanded = false, onChoosePla
 
   return (
     <div className={`relative min-h-0 overflow-hidden bg-slate-100 ${expanded ? "h-full min-h-[22rem] rounded-none" : "h-[25rem] rounded-[1.5rem] lg:h-full lg:rounded-l-none"}`}>
-      <div ref={containerRef} className="size-full" aria-label={`Interactive map of ${country?.name ?? region.name}`} />
+      <div ref={containerRef} className="size-full" aria-label={t("destination.interactiveMap", { place: country?.name ?? t(`regionCards.${region.id}.name`) })} />
       <div className="pointer-events-none absolute left-3 top-3 rounded-full border border-white/70 bg-white/90 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm">
         {country
           ? simulatedCount > 0
-            ? `${simulatedPlaces.length} stays · ${simulatedCount} simulated`
-            : `${simulatedPlaces.length} stays at verified locations`
-          : "Choose a country to see stays"}
+            ? t("destinationExtra.simulated", { count: simulatedPlaces.length, simulated: simulatedCount })
+            : t("destinationExtra.verified", { count: simulatedPlaces.length })
+          : t("destination.chooseCountryHint")}
       </div>
 
       {country && simulatedPlaces.length === 0 && (
         <div className="absolute inset-0 grid place-items-center bg-white/55 p-6 text-center">
-          <div className="rounded-2xl bg-white px-5 py-4 shadow-lg"><MapPin className="mx-auto size-6 text-emerald-600" /><p className="mt-2 text-sm font-semibold text-slate-900">No sample stays available yet</p></div>
+          <div className="rounded-2xl bg-white px-5 py-4 shadow-lg"><MapPin className="mx-auto size-6 text-emerald-600" /><p className="mt-2 text-sm font-semibold text-slate-900">{t("destination.noStays")}</p></div>
         </div>
       )}
 
@@ -213,9 +215,9 @@ const DestinationMap = ({ region, country, places, expanded = false, onChoosePla
             <div className="min-w-0 flex-1 py-1">
               <div className="flex items-start justify-between gap-2">
                 <button type="button" onClick={() => onChoosePlace(selectedPlace)} className="min-w-0 text-left"><h3 className="truncate text-sm font-bold text-slate-950">{selectedPlace.title}</h3><p className="mt-0.5 truncate text-xs text-slate-500">{selectedPlace.address}</p></button>
-                <button type="button" disabled={savingId === selectedPlace._id} onClick={() => void toggleWishlist(selectedPlace)} aria-label={isSaved(selectedPlace._id) ? `Remove ${selectedPlace.title} from wishlist` : `Save ${selectedPlace.title} to wishlist`} className="grid size-9 shrink-0 place-items-center rounded-full bg-slate-50 text-rose-500 transition hover:bg-rose-50 disabled:opacity-50"><Heart className={`size-5 ${isSaved(selectedPlace._id) ? "fill-current" : ""}`} /></button>
+                <button type="button" disabled={savingId === selectedPlace._id} onClick={() => void toggleWishlist(selectedPlace)} aria-label={isSaved(selectedPlace._id) ? t("destination.removeWishlist", { title: selectedPlace.title }) : t("destination.saveWishlist", { title: selectedPlace.title })} className="grid size-9 shrink-0 place-items-center rounded-full bg-slate-50 text-rose-500 transition hover:bg-rose-50 disabled:opacity-50"><Heart className={`size-5 ${isSaved(selectedPlace._id) ? "fill-current" : ""}`} /></button>
               </div>
-              <div className="mt-3 flex items-center justify-between gap-3 text-xs"><span className="font-bold text-slate-950">CHF {selectedPlace.price} <span className="font-normal text-slate-500">night</span></span><span className="flex items-center gap-1 font-semibold"><Star className="size-3.5 fill-amber-400 text-amber-400" />{selectedPlace.rating.toFixed(1)}</span></div>
+              <div className="mt-3 flex items-center justify-between gap-3 text-xs"><span className="font-bold text-slate-950">CHF {selectedPlace.price} <span className="font-normal text-slate-500">{t("destination.night")}</span></span><span className="flex items-center gap-1 font-semibold"><Star className="size-3.5 fill-amber-400 text-amber-400" />{selectedPlace.rating.toFixed(1)}</span></div>
             </div>
           </div>
         </article>

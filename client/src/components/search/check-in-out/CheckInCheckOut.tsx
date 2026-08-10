@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import CalendarComp from "../../common/calendar/CalendarComp";
+import { useTranslation } from "react-i18next";
 
 interface CheckInCheckOutProps {
   menuClick: boolean;
 }
 
 const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
+  const { t } = useTranslation("search");
   const [bgWhiteActive, setBgWhiteActive] = useState(false);
   const [bgWhiteActiveTwo, setBgWhiteActiveTwo] = useState(false);
 
@@ -64,13 +66,13 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
         {menuClick ? (
           bgWhiteActive ? (
             <div className="w-full ml-6 flex flex-col justify-center hover:bg-[#dbdbdb] hover:rounded-full cursor-pointer">
-              <p className="ml-6">Date</p>
-              <p className="ml-6 text-[#909090] text-base">Check in</p>
+              <p className="ml-6">{t("date")}</p>
+              <p className="ml-6 text-[#909090] text-base">{t("checkIn")}</p>
             </div>
           ) : (
             <div className="w-full ml-6 flex flex-col justify-center hover:bg-[#dbdbdb] hover:rounded-full cursor-pointer">
-              <p className="ml-6">Date</p>
-              <p className="ml-6 text-[#909090] text-base">Add dates</p>
+              <p className="ml-6">{t("date")}</p>
+              <p className="ml-6 text-[#909090] text-base">{t("addDates")}</p>
             </div>
           )
         ) : (
@@ -83,8 +85,8 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
               } w-full h-full flex flex-col justify-center cursor-pointer hover:bg-[#dbdbdb] hover:rounded-full`}
               onClick={(e) => handleBgWhiteActive("check-in", e)}
             >
-              <p className="ml-6">Check in</p>
-              <p className="ml-6 text-[#909090] text-base">Add dates</p>
+              <p className="ml-6">{t("checkIn")}</p>
+              <p className="ml-6 text-[#909090] text-base">{t("addDates")}</p>
             </div>
             <div className="w-[0.1rem] h-10 bg-[#dbdbdb]" />
             <div
@@ -95,8 +97,8 @@ const CheckInCheckOut = ({ menuClick }: CheckInCheckOutProps) => {
               } w-full h-full flex flex-col justify-center cursor-pointer hover:bg-[#dbdbdb] hover:rounded-full`}
               onClick={(e) => handleBgWhiteActive("check-out", e)}
             >
-              <p className="ml-6">Check out</p>
-              <p className="ml-6 text-[#909090] text-base">Add dates</p>
+              <p className="ml-6">{t("checkOut")}</p>
+              <p className="ml-6 text-[#909090] text-base">{t("addDates")}</p>
             </div>
           </>
         )}

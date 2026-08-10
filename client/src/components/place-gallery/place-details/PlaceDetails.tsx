@@ -22,31 +22,29 @@ import { usePlaces, useWishlist } from "../../../lib/hooks";
 import CreateWishListBox from "../../wishlist/create/CreateWishListBox";
 import ReserveBox from "./ReserveBox";
 import ShowAllPhotos from "./ShowAllPhotos";
+import { useTranslation } from "react-i18next";
 
 const stayHighlights = [
   {
     icon: BedDouble,
-    title: "Room in a chalet",
-    text: "Your own room in the home, plus access to shared spaces.",
+    key: "room",
   },
   {
     icon: House,
-    title: "Shared common spaces",
-    text: "You'll share part of the home with the host and other guests.",
+    key: "common",
   },
   {
     icon: Bath,
-    title: "Shared bathroom",
-    text: "You'll share a bathroom with the host and other guests in the home.",
+    key: "bathroom",
   },
   {
     icon: Award,
-    title: "Jane is a Superhost",
-    text: "An experienced, highly rated host committed to memorable stays.",
+    key: "superhost",
   },
 ];
 
 const PlaceDetails = () => {
+  const { t } = useTranslation("places");
   const { id, category } = useParams<{ id: string; category: string }>();
   const { places, loading, error, refresh } = usePlaces();
   const { wishlist, deleteWishlist } = useWishlist();
@@ -56,7 +54,7 @@ const PlaceDetails = () => {
 
   if (loading) {
     return (
-      <main className="mx-auto min-h-screen w-full max-w-7xl animate-pulse px-4 py-8 sm:px-6 lg:px-8" aria-label="Loading place">
+      <main className="mx-auto min-h-screen w-full max-w-7xl animate-pulse px-4 py-8 sm:px-6 lg:px-8" aria-label={t("details.loading")}>
         <div className="h-8 w-2/3 rounded-full bg-slate-200" />
         <div className="mt-5 h-72 rounded-[2rem] bg-slate-200 sm:h-[30rem]" />
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_23rem]">
@@ -71,9 +69,9 @@ const PlaceDetails = () => {
     return (
       <main className="mx-auto flex min-h-[60vh] max-w-xl items-center px-4 text-center">
         <div className="w-full rounded-[2rem] border border-rose-100 bg-rose-50 p-8">
-          <h1 className="text-2xl font-semibold text-slate-950">We couldn't load this stay</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Please check your connection and try again.</p>
-          <button type="button" onClick={refresh} className="mt-5 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">Try again</button>
+          <h1 className="text-2xl font-semibold text-slate-950">{t("details.loadTitle")}</h1>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("details.loadText")}</p>
+          <button type="button" onClick={refresh} className="mt-5 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">{t("details.tryAgain")}</button>
         </div>
       </main>
     );
@@ -88,8 +86,8 @@ const PlaceDetails = () => {
       <main className="mx-auto flex min-h-[60vh] max-w-xl items-center px-4 text-center">
         <div className="w-full rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
           <Sparkles className="mx-auto size-8 text-emerald-600" />
-          <h1 className="mt-4 text-2xl font-semibold text-slate-950">Place not found</h1>
-          <p className="mt-2 text-sm text-slate-500">This stay may no longer be available.</p>
+          <h1 className="mt-4 text-2xl font-semibold text-slate-950">{t("details.notFound")}</h1>
+          <p className="mt-2 text-sm text-slate-500">{t("details.unavailable")}</p>
         </div>
       </main>
     );
@@ -100,7 +98,7 @@ const PlaceDetails = () => {
   const photoCount = 1 + thumbnails.length;
   const isSaved = wishlist.some((wish) => wish.place === place._id);
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-  const shareText = `Check out ${place.title} on Flypnp!`;
+  const shareText = t("details.shareText", { title: place.title });
 
   const handleShareWhatsApp = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, "_blank");
@@ -119,14 +117,14 @@ const PlaceDetails = () => {
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareUrl);
-    toast.success("Link copied to clipboard!", { icon: <Link className="size-4" /> });
+    toast.success(t("details.linkCopied"), { icon: <Link className="size-4" /> });
     setShareOpen(false);
   };
 
   const handleSave = () => {
     if (isSaved) {
       deleteWishlist(place._id);
-      toast("Removed from wishlist", { icon: <Trash2 className="size-4" /> });
+      toast(t("details.removed"), { icon: <Trash2 className="size-4" /> });
     } else {
       setShowCreateWishList(true);
     }
@@ -139,21 +137,21 @@ const PlaceDetails = () => {
           <div className="min-w-0">
             <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600">
               <span className="inline-flex items-center gap-1 font-semibold text-slate-900"><Star className="size-4 fill-current" /> {place.rating}</span>
-              <span className="font-medium underline decoration-slate-300 underline-offset-4">{place.reviews} reviews</span>
+              <span className="font-medium underline decoration-slate-300 underline-offset-4">{place.reviews} {t("details.reviews")}</span>
               <span className="inline-flex min-w-0 items-center gap-1"><MapPin className="size-4 shrink-0 text-emerald-600" /><span className="truncate">{place.address}</span></span>
             </div>
             <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-4xl">{place.title}</h1>
           </div>
           <div className="flex shrink-0 gap-1 sm:gap-2">
             <div className="relative">
-              <button type="button" onClick={() => setShareOpen(!shareOpen)} aria-label="Share this place" className="group flex size-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-white hover:shadow-sm sm:size-auto sm:gap-2 sm:px-4 sm:py-2.5">
-                <Share2 className="size-5 transition group-hover:-translate-y-0.5" /><span className="hidden text-sm font-semibold sm:inline">Share</span>
+              <button type="button" onClick={() => setShareOpen(!shareOpen)} aria-label={t("details.sharePlace")} className="group flex size-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-white hover:shadow-sm sm:size-auto sm:gap-2 sm:px-4 sm:py-2.5">
+                <Share2 className="size-5 transition group-hover:-translate-y-0.5" /><span className="hidden text-sm font-semibold sm:inline">{t("details.share")}</span>
               </button>
               {shareOpen && (
                 <>
                   <div className="fixed inset-0 z-50" onClick={() => setShareOpen(false)} />
                   <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
-                    <p className="px-4 pt-3.5 pb-1 text-xs font-bold uppercase tracking-[0.17em] text-slate-400">Share this place</p>
+                    <p className="px-4 pt-3.5 pb-1 text-xs font-bold uppercase tracking-[0.17em] text-slate-400">{t("details.sharePlace")}</p>
                     <button type="button" onClick={handleShareWhatsApp} className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-700">
                       <MessageCircle className="size-5 text-emerald-600" /> WhatsApp
                     </button>
@@ -161,21 +159,21 @@ const PlaceDetails = () => {
                       <Globe className="size-5 text-blue-600" /> Facebook
                     </button>
                     <button type="button" onClick={handleShareTwitter} className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-950">
-                      <span className="grid size-5 place-items-center text-sm font-bold text-slate-900">X</span> X (Twitter)
+                      <span className="grid size-5 place-items-center text-sm font-bold text-slate-900">X</span> {t("details.twitter")}
                     </button>
                     <div className="border-t border-slate-100" />
                     <button type="button" onClick={handleCopyLink} className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-950">
-                      <Copy className="size-5" /> Copy link
+                      <Copy className="size-5" /> {t("details.copyLink")}
                     </button>
                   </div>
                 </>
               )}
             </div>
-            <button type="button" onClick={handleSave} aria-label={isSaved ? "Remove from wishlist" : "Save this place"} className={`group flex size-10 items-center justify-center rounded-full transition sm:size-auto sm:gap-2 sm:px-4 sm:py-2.5 ${isSaved ? "text-rose-600 hover:bg-rose-50" : "text-slate-700 hover:bg-rose-50 hover:text-rose-600"}`}>
-              <Heart className={`size-5 transition group-hover:scale-110 ${isSaved ? "fill-rose-500" : ""}`} /><span className="hidden text-sm font-semibold sm:inline">{isSaved ? "Saved" : "Save"}</span>
+            <button type="button" onClick={handleSave} aria-label={t(isSaved ? "details.removeWishlist" : "details.savePlace")} className={`group flex size-10 items-center justify-center rounded-full transition sm:size-auto sm:gap-2 sm:px-4 sm:py-2.5 ${isSaved ? "text-rose-600 hover:bg-rose-50" : "text-slate-700 hover:bg-rose-50 hover:text-rose-600"}`}>
+              <Heart className={`size-5 transition group-hover:scale-110 ${isSaved ? "fill-rose-500" : ""}`} /><span className="hidden text-sm font-semibold sm:inline">{t(isSaved ? "details.saved" : "details.save")}</span>
             </button>
             <a href="#reservation" className="hidden items-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-slate-800 lg:flex">
-              Reserve
+              {t("details.reserve")}
             </a>
           </div>
         </header>
@@ -189,13 +187,13 @@ const PlaceDetails = () => {
             <div className="hidden grid-cols-2 gap-1 lg:grid">
               {thumbnails.slice(0, 4).map((photo, index) => (
                 <div key={photo} className="group min-h-0 overflow-hidden">
-                  <img src={photo} alt={`${place.title} view ${index + 2}`} className="size-full object-cover transition duration-700 group-hover:scale-105" />
+                  <img src={photo} alt={t("details.viewPhoto", { title: place.title, number: index + 2 })} className="size-full object-cover transition duration-700 group-hover:scale-105" />
                 </div>
               ))}
             </div>
           </div>
           <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-slate-950/85 px-3 py-2 text-xs font-semibold text-white shadow-lg backdrop-blur-md sm:left-5 sm:top-5">
-            <Sparkles className="size-4 text-amber-300" /> Guest favorite
+            <Sparkles className="size-4 text-amber-300" /> {t("details.guestFavorite")}
           </div>
           <ShowAllPhotos photoCount={photoCount} />
         </section>
@@ -203,7 +201,7 @@ const PlaceDetails = () => {
         <div className="grid gap-10 pt-8 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-14">
           <section className="min-w-0">
             <div className="border-b border-slate-200 pb-8">
-              <span className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">About this stay</span>
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">{t("details.about")}</span>
               <h2 className="mt-3 max-w-3xl text-2xl font-semibold leading-tight tracking-[-0.02em] text-slate-950 sm:text-3xl">{place.description}</h2>
               <div className="mt-5 flex flex-wrap gap-2">
                 {place.perks.map((perk) => <span key={perk} className="rounded-full border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-600 shadow-sm">{perk}</span>)}
@@ -213,32 +211,32 @@ const PlaceDetails = () => {
             <div className="my-8 overflow-hidden rounded-[1.75rem] bg-slate-950 p-6 text-white shadow-[0_22px_55px_-35px_rgba(15,23,42,0.8)] sm:p-8">
               <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
                 <div className="max-w-md">
-                  <div className="flex items-center gap-2 text-amber-300"><Sparkles className="size-5" /><span className="text-xs font-bold uppercase tracking-[0.2em]">Loved by travelers</span></div>
-                  <h3 className="mt-3 text-2xl font-semibold">A Flypnp guest favorite</h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-300">One of the most loved homes, according to guests who keep coming back.</p>
+                  <div className="flex items-center gap-2 text-amber-300"><Sparkles className="size-5" /><span className="text-xs font-bold uppercase tracking-[0.2em]">{t("details.loved")}</span></div>
+                  <h3 className="mt-3 text-2xl font-semibold">{t("details.favoriteTitle")}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">{t("details.favoriteText")}</p>
                 </div>
                 <div className="flex items-center gap-7 rounded-2xl bg-white/8 px-5 py-4 ring-1 ring-white/10">
                   <div><p className="text-2xl font-semibold">{place.rating}</p><div className="mt-1 flex gap-0.5 text-amber-300">{Array.from({ length: 5 }, (_, index) => <Star key={index} className="size-3 fill-current" />)}</div></div>
                   <div className="h-10 w-px bg-white/15" />
-                  <div><p className="text-2xl font-semibold">{place.reviews}</p><p className="text-xs text-slate-400">reviews</p></div>
+                  <div><p className="text-2xl font-semibold">{place.reviews}</p><p className="text-xs text-slate-400">{t("details.reviews")}</p></div>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-4 border-b border-slate-200 pb-8">
               <div className="relative size-16 shrink-0">
-                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=400&auto=format&fit=crop" alt="Host Jane" className="size-full rounded-full object-cover ring-4 ring-white shadow-md" />
+                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=400&auto=format&fit=crop" alt={t("details.hostAlt")} className="size-full rounded-full object-cover ring-4 ring-white shadow-md" />
                 <span className="absolute -bottom-1 -right-1 grid size-7 place-items-center rounded-full bg-rose-500 text-white ring-2 ring-white"><Award className="size-4" /></span>
               </div>
-              <div><p className="text-lg font-semibold text-slate-950">Hosted by Jane</p><p className="mt-0.5 text-sm text-slate-500">Superhost · 4 years hosting</p></div>
+              <div><p className="text-lg font-semibold text-slate-950">{t("details.hostedBy")}</p><p className="mt-0.5 text-sm text-slate-500">{t("details.hostMeta")}</p></div>
             </div>
 
             <div className="grid gap-3 py-8 sm:grid-cols-2">
-              {stayHighlights.map(({ icon: Icon, title, text }) => (
-                <article key={title} className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md">
+              {stayHighlights.map(({ icon: Icon, key }) => (
+                <article key={key} className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md">
                   <span className="grid size-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700"><Icon className="size-5" /></span>
-                  <h3 className="mt-4 font-semibold text-slate-950">{title}</h3>
-                  <p className="mt-1.5 text-sm leading-6 text-slate-500">{text}</p>
+                  <h3 className="mt-4 font-semibold text-slate-950">{t(`details.highlights.${key}.title`)}</h3>
+                  <p className="mt-1.5 text-sm leading-6 text-slate-500">{t(`details.highlights.${key}.text`)}</p>
                 </article>
               ))}
             </div>
@@ -252,16 +250,16 @@ const PlaceDetails = () => {
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 py-3 shadow-[0_-12px_35px_-25px_rgba(15,23,42,0.55)] backdrop-blur-xl lg:hidden">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <div><p className="text-lg font-semibold text-slate-950">{place.price} CHF <span className="text-sm font-normal text-slate-500">night</span></p><p className="mt-0.5 flex items-center gap-1 text-xs font-semibold text-slate-700"><Star className="size-3.5 fill-current" /> {place.rating} · <span className="underline">{place.reviews} reviews</span></p></div>
-          <button type="button" onClick={() => setReserveBoxVisible(true)} className="rounded-full bg-rose-500 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-rose-500/20 transition active:scale-95">Reserve</button>
+          <div><p className="text-lg font-semibold text-slate-950">{place.price} CHF <span className="text-sm font-normal text-slate-500">{t("card.night")}</span></p><p className="mt-0.5 flex items-center gap-1 text-xs font-semibold text-slate-700"><Star className="size-3.5 fill-current" /> {place.rating} · <span className="underline">{place.reviews} {t("details.reviews")}</span></p></div>
+          <button type="button" onClick={() => setReserveBoxVisible(true)} className="rounded-full bg-rose-500 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-rose-500/20 transition active:scale-95">{t("details.reserve")}</button>
         </div>
       </div>
 
       {reserveBoxVisible && (
-        <div className="fixed inset-0 z-50 flex items-end bg-slate-950/55 p-0 backdrop-blur-sm lg:hidden" role="dialog" aria-modal="true" aria-label="Reserve this place">
-          <button type="button" aria-label="Close reservation overlay" onClick={() => setReserveBoxVisible(false)} className="absolute inset-0 cursor-default" />
+        <div className="fixed inset-0 z-50 flex items-end bg-slate-950/55 p-0 backdrop-blur-sm lg:hidden" role="dialog" aria-modal="true" aria-label={t("details.reserveDialog")}>
+          <button type="button" aria-label={t("details.closeOverlay")} onClick={() => setReserveBoxVisible(false)} className="absolute inset-0 cursor-default" />
           <div className="relative max-h-[92vh] w-full overflow-y-auto rounded-t-[2rem] bg-[#fbfcfb] p-4 pb-8 shadow-2xl sm:mx-auto sm:mb-4 sm:max-w-md sm:rounded-[2rem]">
-            <div className="mb-3 flex items-center justify-between px-1"><div className="h-1.5 w-10 rounded-full bg-slate-300 sm:hidden" /><p className="hidden text-sm font-semibold text-slate-950 sm:block">Complete your reservation</p><button type="button" aria-label="Close reservation" onClick={() => setReserveBoxVisible(false)} className="grid size-9 place-items-center rounded-full bg-white text-slate-700 shadow-sm ring-1 ring-slate-200"><X className="size-5" /></button></div>
+            <div className="mb-3 flex items-center justify-between px-1"><div className="h-1.5 w-10 rounded-full bg-slate-300 sm:hidden" /><p className="hidden text-sm font-semibold text-slate-950 sm:block">{t("details.reserve")}</p><button type="button" aria-label={t("details.close")} onClick={() => setReserveBoxVisible(false)} className="grid size-9 place-items-center rounded-full bg-white text-slate-700 shadow-sm ring-1 ring-slate-200"><X className="size-5" /></button></div>
             <ReserveBox />
           </div>
         </div>

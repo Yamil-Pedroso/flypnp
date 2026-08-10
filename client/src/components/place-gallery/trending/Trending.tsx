@@ -1,12 +1,14 @@
 import { usePlaces } from "../../../lib/hooks";
 import PlaceCard from "../../place-card/PlaceCard";
+import { useTranslation } from "react-i18next";
 
 const Trending = () => {
+  const { t } = useTranslation("places");
   const { places, loading } = usePlaces();
   const trendingPlaces = places.filter((place) => place.category === "trending");
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{t("gallery.loading")}</div>;
   }
 
   return (
